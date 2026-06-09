@@ -27,9 +27,9 @@ export default function LoginModal({ isOpen, onClose }) {
     onClose();
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    const res = login(email, password);
+    const res = await login(email, password);
     if (res.success) {
       handleClose();
     } else {

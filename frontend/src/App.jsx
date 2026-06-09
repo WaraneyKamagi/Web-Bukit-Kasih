@@ -7,6 +7,7 @@ import Informasi from './pages/Informasi';
 import Sejarah from './pages/Sejarah';
 import AdminDashboard from './pages/AdminDashboard';
 import Profile from './pages/Profile';
+import ChatbotWidget from './components/ChatbotWidget';
 import { AppProvider } from './context/AppContext';
 
 function App() {
@@ -25,6 +26,7 @@ function App() {
               <Route path="/profile" element={<Profile />} />
             </Routes>
           </div>
+          <ChatbotWidget />
           <Footer />
         </div>
       </Router>
