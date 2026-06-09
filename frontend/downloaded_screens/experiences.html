@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Experiences | ELITE VOYAGE</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-tertiary-fixed-variant": "#6f3800",
+                        "outline-variant": "#c2c7d1",
+                        "surface-bright": "#fcf9f8",
+                        "primary-container": "#0f4c81",
+                        "on-tertiary-fixed": "#2f1400",
+                        "surface-container-lowest": "#ffffff",
+                        "surface-glass": "rgba(255, 255, 255, 0.7)",
+                        "secondary-container": "#9cd6ff",
+                        "surface-container-low": "#f6f3f2",
+                        "background-main": "#FFFFFF",
+                        "on-background": "#1b1c1c",
+                        "secondary": "#236488",
+                        "inverse-primary": "#a0c9ff",
+                        "surface-dim": "#dcd9d9",
+                        "on-primary-fixed": "#001c37",
+                        "surface-container-high": "#eae7e7",
+                        "tertiary": "#532800",
+                        "surface-tint": "#2d6197",
+                        "on-secondary": "#ffffff",
+                        "on-primary": "#ffffff",
+                        "background": "#fcf9f8",
+                        "error-container": "#ffdad6",
+                        "primary": "#00355f",
+                        "on-error": "#ffffff",
+                        "error": "#ba1a1a",
+                        "surface-variant": "#e5e2e1",
+                        "on-secondary-fixed-variant": "#004c6d",
+                        "inverse-on-surface": "#f3f0ef",
+                        "subtext": "#777777",
+                        "tertiary-container": "#743b00",
+                        "tertiary-fixed-dim": "#ffb780",
+                        "on-tertiary": "#ffffff",
+                        "on-secondary-container": "#1a5d81",
+                        "on-surface": "#1b1c1c",
+                        "on-tertiary-container": "#f9a767",
+                        "outline": "#727780",
+                        "on-surface-variant": "#42474f",
+                        "accent-gold": "#FEBB02",
+                        "primary-fixed-dim": "#a0c9ff",
+                        "on-primary-fixed-variant": "#07497d",
+                        "surface-container": "#f0eded",
+                        "on-primary-container": "#8ebdf9",
+                        "secondary-fixed-dim": "#93cdf6",
+                        "surface-container-highest": "#e5e2e1",
+                        "primary-fixed": "#d2e4ff",
+                        "secondary-fixed": "#c8e6ff",
+                        "on-error-container": "#93000a",
+                        "tertiary-fixed": "#ffdcc4",
+                        "surface": "#fcf9f8",
+                        "inverse-surface": "#303030",
+                        "on-secondary-fixed": "#001e2e"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px",
+                        "24": "24px"
+                    },
+                    "spacing": {
+                        "margin-tablet": "32px",
+                        "base": "8px",
+                        "margin-mobile": "20px",
+                        "margin-desktop": "64px",
+                        "gutter": "24px",
+                        "container-max": "1280px",
+                        "120": "120px",
+                        "80": "80px"
+                    },
+                    "fontFamily": {
+                        "headline-md": ["Inter"],
+                        "body-lg": ["Inter"],
+                        "display-xl-mobile": ["Inter"],
+                        "body-md": ["Inter"],
+                        "display-xl": ["Inter"],
+                        "headline-lg": ["Inter"],
+                        "label-caps": ["Inter"]
+                    },
+                    "fontSize": {
+                        "headline-md": ["24px", { "lineHeight": "32px", "fontWeight": "500" }],
+                        "body-lg": ["18px", { "lineHeight": "28px", "fontWeight": "400" }],
+                        "display-xl-mobile": ["40px", { "lineHeight": "48px", "letterSpacing": "-0.01em", "fontWeight": "600" }],
+                        "body-md": ["16px", { "lineHeight": "24px", "fontWeight": "400" }],
+                        "display-xl": ["64px", { "lineHeight": "72px", "letterSpacing": "-0.02em", "fontWeight": "600" }],
+                        "headline-lg": ["32px", { "lineHeight": "40px", "fontWeight": "600" }],
+                        "label-caps": ["12px", { "lineHeight": "16px", "letterSpacing": "0.08em", "fontWeight": "600" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        body {
+            background-color: #fcf9f8;
+            color: #1b1c1c;
+        }
+        .ambient-shadow {
+            box-shadow: 0 40px 40px -10px rgba(15, 76, 129, 0.08);
+        }
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+        }
+        .hide-scroll::-webkit-scrollbar {
+            display: none;
+        }
+        .hide-scroll {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+    </style>
+</head>
+<body class="antialiased selection:bg-primary selection:text-white">
+<!-- TopNavBar Shared Component -->
+<nav class="fixed top-0 w-full z-50 backdrop-blur-xl bg-surface-glass shadow-[0_40px_40px_-10px_rgba(15,76,129,0.08)] transition-all duration-500 ease-in-out">
+<div class="flex justify-between items-center h-20 px-margin-mobile md:px-margin-desktop max-w-container-max mx-auto">
+<!-- Brand -->
+<a class="font-headline-md text-headline-md font-semibold tracking-tight text-primary dark:text-on-primary-container" href="#">
+                ELITE VOYAGE
+            </a>
+<!-- Navigation Links (Web only) -->
+<ul class="hidden md:flex space-x-8 items-center h-full">
+<li><a class="text-on-surface-variant dark:text-outline-variant hover:text-primary dark:hover:text-on-primary-container transition-colors font-body-md text-body-md block py-2" href="#">Destinations</a></li>
+<!-- Active State Applied Here based on prompt -->
+<li><a class="text-primary dark:text-on-primary-container border-b-2 border-primary dark:border-on-primary-container pb-1 font-body-md text-body-md block" href="#">Experiences</a></li>
+<li><a class="text-on-surface-variant dark:text-outline-variant hover:text-primary dark:hover:text-on-primary-container transition-colors font-body-md text-body-md block py-2" href="#">Hotels</a></li>
+<li><a class="text-on-surface-variant dark:text-outline-variant hover:text-primary dark:hover:text-on-primary-container transition-colors font-body-md text-body-md block py-2" href="#">Concierge</a></li>
+</ul>
+<!-- Actions -->
+<div class="flex items-center space-x-4">
+<button class="hidden md:block text-on-surface-variant hover:text-primary transition-colors font-body-md text-body-md px-4 py-2">Sign In</button>
+<button class="bg-primary text-white font-body-md text-body-md px-6 py-3 rounded-full hover:bg-surface-tint transition-colors duration-300">Book Now</button>
+</div>
+</div>
+</nav>
+<main class="pt-20">
+<!-- Hero Section -->
+<section class="relative w-full h-[819px] min-h-[600px] flex items-center justify-center overflow-hidden bg-surface-container-lowest">
+<!-- Background Image -->
+<div class="absolute inset-0 z-0">
+<img alt="Hot air balloons floating over a spectacular rocky landscape at sunrise" class="w-full h-full object-cover object-center scale-105" data-alt="A breathtaking aerial view of several majestic hot air balloons floating gently over a dramatic, rocky desert landscape at sunrise. The soft, golden morning light casts long shadows across the rugged terrain, emphasizing the Quiet Luxury aesthetic. The sky is a gradient of pale blues and warm peach tones, providing a serene backdrop for the colorful balloons. The composition is expansive, conveying a sense of exclusive adventure and tranquil exploration, perfectly suited for a high-end luxury travel experience platform." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBuxKkOTNzvghUf2HOiVjCsD36YeguHWBZYrHKsWL_G9IGSjIu3Jkl8732gxQa4eX-xVl7Jxhz18csigA-vXglfeQkmps61zkfxCEEVpMETlnL6to7Glm5WFp91D99CvzNJZzx3OUlcP9G49o5P6TxxlCkkLJ7GpzjBP8Jgu76ZUAbDUNhFQw4X7lVrgKD4Cl9lq4aTzPFdDLn5jj34MZEJ2wlw8aisRINZ5G9-Fn4xSFwD6lUpsFGoLfIToJqinMC1v3zaYZIRIjo"/>
+<!-- Tonal Overlay -->
+<div class="absolute inset-0 bg-primary/10 mix-blend-multiply"></div>
+<!-- Gradient to fade into content -->
+<div class="absolute bottom-0 w-full h-1/3 bg-gradient-to-t from-background to-transparent"></div>
+</div>
+<!-- Content -->
+<div class="relative z-10 text-center px-4 max-w-4xl mx-auto mt-20">
+<span class="font-label-caps text-label-caps text-white tracking-[0.2em] uppercase mb-4 block drop-shadow-md">Curated Journeys</span>
+<h1 class="font-display-xl-mobile md:font-display-xl text-display-xl-mobile md:text-display-xl text-white mb-6 drop-shadow-lg leading-tight">Unforgettable Experiences</h1>
+<p class="font-body-lg text-body-lg text-white/90 max-w-2xl mx-auto mb-10 drop-shadow">Immerse yourself in extraordinary moments crafted exclusively for the world's most discerning travelers. Discover the art of exceptional living across the globe.</p>
+<!-- Floating Search/Filter Bar -->
+<div class="glass-panel rounded-24 p-2 inline-flex items-center mx-auto ambient-shadow max-w-full overflow-x-auto hide-scroll">
+<div class="flex items-center divide-x divide-outline-variant/30 px-2">
+<button class="px-6 py-3 font-body-md text-body-md text-primary font-medium hover:bg-white/20 rounded-xl transition-colors whitespace-nowrap">Adventure</button>
+<button class="px-6 py-3 font-body-md text-body-md text-on-surface-variant hover:bg-white/20 rounded-xl transition-colors whitespace-nowrap">Wellness</button>
+<button class="px-6 py-3 font-body-md text-body-md text-on-surface-variant hover:bg-white/20 rounded-xl transition-colors whitespace-nowrap">Culture</button>
+<button class="px-6 py-3 font-body-md text-body-md text-on-surface-variant hover:bg-white/20 rounded-xl transition-colors whitespace-nowrap">Gastronomy</button>
+</div>
+</div>
+</div>
+</section>
+<!-- Featured Experiences Grid -->
+<section class="max-w-container-max mx-auto px-margin-mobile md:px-margin-desktop py-120">
+<div class="mb-16 flex justify-between items-end">
+<div>
+<h2 class="font-headline-lg text-headline-lg text-on-background mb-2">Signature Adventures</h2>
+<p class="font-body-lg text-body-lg text-subtext">Hand-picked itineraries designed for the adventurous soul.</p>
+</div>
+<div class="hidden md:flex gap-4">
+<button aria-label="Previous" class="w-12 h-12 rounded-full border border-outline-variant flex items-center justify-center hover:bg-surface-container-high transition-colors text-primary">
+<span class="material-symbols-outlined" data-icon="arrow_back">arrow_back</span>
+</button>
+<button aria-label="Next" class="w-12 h-12 rounded-full bg-primary text-white flex items-center justify-center hover:bg-surface-tint transition-colors">
+<span class="material-symbols-outlined" data-icon="arrow_forward">arrow_forward</span>
+</button>
+</div>
+</div>
+<!-- Bento Grid Layout -->
+<div class="grid grid-cols-1 md:grid-cols-12 gap-gutter auto-rows-[400px]">
+<!-- Large Feature Card -->
+<article class="col-span-1 md:col-span-8 group relative rounded-24 overflow-hidden ambient-shadow cursor-pointer">
+<img alt="Private luxury safari experience" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" data-alt="A pristine, high-end luxury safari setting in the African savannah during the golden hour. A sophisticated, custom-outfitted vintage Land Rover sits quietly on the grassy plains, observing a magnificent herd of elephants in the distance. The lighting is soft and cinematic, casting warm, serene glows that align with the Modern Minimalism and Quiet Luxury brand aesthetic. The scene implies exclusivity, calm confidence, and deep immersion in nature without any sense of rush or crowding." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDhkzLUyZJGfShDeenMIG_qxFmFnTFtdGmMRxZg2xE-rJ1ICfPfUWVvbXmfBH0BJfG0MFRsfMSpRRhicd5-7OPg64kml3vw07eTZ99kNXvDKUdyORXI7_atWK-XyuPMiPklqilM0Esxp86kszItsNm4SxmFT3Om1zvU6JQmDr5-3PNRHBuG7NrXBE5l6Ph5sne-VuDB4Uo08hHNpojdc6XIIucWGYs_H0z_jr51O0Llf0GVevGOddoP1FsBINXxZfF-UBPUickmn3A"/>
+<div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent"></div>
+<!-- Content overlay -->
+<div class="absolute inset-0 p-8 flex flex-col justify-end text-white">
+<div class="mb-auto flex justify-between items-start">
+<span class="bg-primary/90 backdrop-blur-md px-3 py-1 rounded-full font-label-caps text-label-caps tracking-widest uppercase">Rare Find</span>
+<button class="w-10 h-10 rounded-full glass-panel flex items-center justify-center hover:bg-white/90 transition-colors text-primary">
+<span class="material-symbols-outlined" data-icon="bookmark_border">bookmark_border</span>
+</button>
+</div>
+<div class="translate-y-4 group-hover:translate-y-0 transition-transform duration-500">
+<div class="flex items-center gap-2 mb-2 text-white/80 font-body-md text-body-md">
+<span class="material-symbols-outlined text-[18px]" data-icon="location_on">location_on</span>
+<span>Serengeti, Tanzania</span>
+</div>
+<h3 class="font-headline-lg text-headline-lg mb-2">Private Migration Safari</h3>
+<p class="font-body-md text-body-md text-white/80 line-clamp-2 max-w-xl mb-6 opacity-0 group-hover:opacity-100 transition-opacity duration-500 delay-100">Witness the greatest wildlife spectacle on earth from the comfort of a bespoke mobile camp, guided by award-winning local naturalists.</p>
+<div class="flex items-center justify-between">
+<div class="font-body-lg text-body-lg">From $12,500 <span class="text-sm opacity-70">/ person</span></div>
+<button class="bg-white text-primary px-6 py-2.5 rounded-full font-body-md text-body-md font-medium hover:bg-surface-bright transition-colors">Book Private Tour</button>
+</div>
+</div>
+</div>
+</article>
+<!-- Small Feature Card 1 -->
+<article class="col-span-1 md:col-span-4 group relative rounded-24 overflow-hidden ambient-shadow cursor-pointer">
+<img alt="Glacier hiking" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" data-alt="A striking view of a serene, bright blue glacier landscape in Iceland under a clear, pale sky. The expansive white and icy blue environment embodies the Glassmorphism and minimalist aesthetic. In the vastness, a single figure or small, exclusive group is engaged in an elite glacier hiking experience, emphasizing scale and isolation. The ambient lighting is high-key and pristine, reflecting the aspirational and reliable Quiet Luxury design language." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDi2N93YE0LE-v26gfPzLKw80zH7lF1DhieMKifeSWbv5gP4fQHvlacdChzHxdIHbyqO7Ph70dyND-Sz3l4hXPzBJA7Ip4ly_W9OBhWsIsO-IRq4hbpTPI3yC-NI-WG-41I-sZk96kD_11BWqSj_WiUb7AAnNqsW7CLpT1hxBAozrFuE6ZOJw4tyeyOaRc8jHw0WyZJrhJrk4zpLQAVTqkuoxUEhwoI72mETARLr5jf_SMyx8IiJnI-SDautbx4i7OzBH0CPbl-bN0"/>
+<div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/10 to-transparent"></div>
+<div class="absolute inset-0 p-6 flex flex-col justify-end text-white">
+<div class="mb-auto self-end">
+<button class="w-10 h-10 rounded-full glass-panel flex items-center justify-center hover:bg-white/90 transition-colors text-primary">
+<span class="material-symbols-outlined" data-icon="bookmark_border">bookmark_border</span>
+</button>
+</div>
+<div class="flex items-center gap-2 mb-1 text-white/80 font-body-md text-body-md text-sm">
+<span class="material-symbols-outlined text-[16px]" data-icon="location_on">location_on</span>
+<span>Vatnajökull, Iceland</span>
+</div>
+<h3 class="font-headline-md text-headline-md mb-4">Heli-Glacier Expedition</h3>
+<button class="w-full glass-panel text-white border border-white/30 px-4 py-2 rounded-full font-body-md text-body-md hover:bg-white hover:text-primary transition-colors">Explore</button>
+</div>
+</article>
+<!-- Small Feature Card 2 -->
+<article class="col-span-1 md:col-span-4 group relative rounded-24 overflow-hidden ambient-shadow cursor-pointer">
+<img alt="Luxury yacht" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" data-alt="An elegant, modern luxury yacht sailing smoothly on calm, deep blue Mediterranean waters off the Amalfi Coast. The composition features expansive negative space with the deep blue sea contrasting against pristine white yacht decking. The lighting is bright and summery, evoking a sense of calm, exclusive luxury and frictionless travel. The overall mood is sophisticated, serene, and perfectly aligned with the high-end, premium aesthetic." src="https://lh3.googleusercontent.com/aida-public/AB6AXuByW9AKaOIs_Raw1bhXbrdRmOG_4Q_86r_uwDXQEQFQDmquCtEJ8g9RGZxVC_gMRoDdutKjjryd40NjKjiW1Z8ZWtSUSghZ6o7Ws7CaAnCFVmfrrWBawrLSZpGaNqbjk3TyyYskEgXWWuTODR4BtPvCID6iGnywmV6em3m9Tg_TkqbsI5fig6wtli7Nbi5092GtEkjTXJr0iI22fMujfuiyKjEpHU_otz70kcByZfh3STRtBua5yET8bVBDuRfmPW9V7v0QJAbq4bk"/>
+<div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/10 to-transparent"></div>
+<div class="absolute inset-0 p-6 flex flex-col justify-end text-white">
+<div class="mb-auto self-start">
+<span class="bg-accent-gold/90 text-on-surface backdrop-blur-md px-3 py-1 rounded-full font-label-caps text-label-caps tracking-widest uppercase">Trending</span>
+</div>
+<div class="flex items-center gap-2 mb-1 text-white/80 font-body-md text-body-md text-sm">
+<span class="material-symbols-outlined text-[16px]" data-icon="location_on">location_on</span>
+<span>Amalfi Coast, Italy</span>
+</div>
+<h3 class="font-headline-md text-headline-md mb-4">Chartered Riviera Sailing</h3>
+<button class="w-full glass-panel text-white border border-white/30 px-4 py-2 rounded-full font-body-md text-body-md hover:bg-white hover:text-primary transition-colors">Explore</button>
+</div>
+</article>
+<!-- Medium Feature Card -->
+<article class="col-span-1 md:col-span-8 group relative rounded-24 overflow-hidden ambient-shadow cursor-pointer">
+<img alt="Luxury wellness resort" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" data-alt="A serene, minimalist wellness pavilion located within a lush, misty tropical forest in Kyoto. The architecture features clean lines, natural wood elements, and expansive glass walls that seamlessly blend the indoor luxury space with the tranquil outdoor environment. Soft, diffused natural light fills the space, creating an atmosphere of ultimate relaxation and rejuvenation. The color palette relies on deep greens, muted earth tones, and bright whites, reflecting the Quiet Luxury wellness concept." src="https://lh3.googleusercontent.com/aida-public/AB6AXuD3Ui7nhTLLms2HAgDIgS7YRNgZSZ40_piPSJdoBb5gM3wDpfY4ZdDLEG0OBBRXnx6bZRZGdJy_NGxfuTsq5OAIKWxNYU5PDSgZpHh97ESyjFkDwFZW8mtaNz6WGT4h649ZVchDP2rQCGt3mArOZGuesTtmMXqrqiKZxhMUNupx8opcHmkQ8ITkdpYjCs9-4GSuJJkWtQ4TMDZs6wCVtuMpA5pvXw3VYV6o4Kef_3IkplovcbSkL1gcsS5yjgPups_bm4c-_qDl0nE"/>
+<div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent"></div>
+<div class="absolute inset-0 p-8 flex flex-col justify-end text-white">
+<div class="mb-auto self-end">
+<button class="w-10 h-10 rounded-full glass-panel flex items-center justify-center hover:bg-white/90 transition-colors text-primary">
+<span class="material-symbols-outlined" data-icon="bookmark_border">bookmark_border</span>
+</button>
+</div>
+<div class="translate-y-4 group-hover:translate-y-0 transition-transform duration-500">
+<div class="flex items-center gap-2 mb-2 text-white/80 font-body-md text-body-md">
+<span class="material-symbols-outlined text-[18px]" data-icon="location_on">location_on</span>
+<span>Kyoto, Japan</span>
+</div>
+<h3 class="font-headline-lg text-headline-lg mb-2">Zen Mastery Retreat</h3>
+<p class="font-body-md text-body-md text-white/80 line-clamp-2 max-w-xl mb-6 opacity-0 group-hover:opacity-100 transition-opacity duration-500 delay-100">A profound wellness journey combining ancient meditation practices with modern luxury in a secluded temple sanctuary.</p>
+<div class="flex items-center justify-between">
+<div class="font-body-lg text-body-lg">From $8,200 <span class="text-sm opacity-70">/ person</span></div>
+<button class="bg-white text-primary px-6 py-2.5 rounded-full font-body-md text-body-md font-medium hover:bg-surface-bright transition-colors">Book Private Retreat</button>
+</div>
+</div>
+</div>
+</article>
+</div>
+<div class="mt-16 text-center">
+<button class="border border-outline px-8 py-4 rounded-full font-body-md text-body-md text-primary font-medium hover:bg-surface-container-high transition-colors inline-flex items-center gap-2">
+                    View All Experiences
+                    <span class="material-symbols-outlined text-[20px]" data-icon="arrow_outward">arrow_outward</span>
+</button>
+</div>
+</section>
+<!-- Testimonial Section (Glassmorphism over Image) -->
+<section class="relative w-full py-120 overflow-hidden">
+<div class="absolute inset-0 z-0">
+<img alt="Minimalist coastal view" class="w-full h-full object-cover" data-alt="A highly minimalist, expansive view of a pristine white sand beach meeting a calm, deep turquoise ocean. The horizon is clear and sharp under a bright, cloudless sky. The composition relies on vast negative space and a soothing color palette of blues and whites, characteristic of modern minimalist design and the Quiet Luxury brand ethos. The scene evokes a deep sense of peace, exclusivity, and premium escape." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCo5KiG568yMcdUklYy4hrzqsGZw_gThzp9NedC7RbNSiC4pXhPuHWIApWxrL1JoKEMy48l7nvEXlgnPZhgdDJHIfBgSXXKier1rnlRqYZ6L_WQt5kg6wEz6-IlaD91jT8Q9Gc_h5akkiYFVCMuDtkwsHEI0-vvtN1p2mjA4QYzkvcVujvlin7OreFYWrlo2A8ibU7yIZ5cbT81HB-j8rK8YfsTj1kEcuEOH0TS0ohWSRESay390AefkJnh5Bbis8kJEu9pA0QoevY"/>
+<div class="absolute inset-0 bg-primary-container/20"></div>
+</div>
+<div class="relative z-10 max-w-4xl mx-auto px-margin-mobile md:px-margin-desktop text-center">
+<div class="glass-panel rounded-24 p-12 md:p-16 ambient-shadow border border-white/40">
+<span class="material-symbols-outlined text-[48px] text-primary/40 mb-6" data-icon="format_quote">format_quote</span>
+<p class="font-headline-lg text-headline-lg text-primary mb-8 leading-relaxed">
+                        "The level of personalization and access provided by Elite Voyage was unprecedented. Our private access to the Vatican Museums felt entirely effortless and profoundly exclusive."
+                    </p>
+<div class="flex flex-col items-center">
+<div class="w-16 h-16 rounded-full overflow-hidden mb-4 border-2 border-white shadow-sm">
+<img alt="Client portrait" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDsr7oqw1bs8gapUqJHSsnpR7IC7eEVqF1CGVR4TNixQ-XHkpKFGUE6akhwdpl7GkhfNnvIY0kFa9CdAFY3BwH_f8NiwRoi9hoDhm_DBC1iSa47arlMcyXbhykQAIu_fMd0eUX-8Ef_FjBxgzAQDUX3nk1apZtxn9YkdaVxdkN_8hnRH9d-In5dlQZAXTKnoVjKnzP8N_H-l7WFOdAUKAWfbsVpT3mQwqJnv6iFuaGUF9RS_pSBW_q2pg0oUQKLASd4YCdYv-231_M"/>
+</div>
+<h4 class="font-headline-md text-headline-md text-on-background">Alexander W.</h4>
+<span class="font-body-md text-body-md text-subtext">Global Entrepreneur</span>
+</div>
+<!-- Minimal Carousel Indicators -->
+<div class="flex justify-center gap-3 mt-10">
+<button aria-label="Slide 1" class="w-8 h-1 bg-primary rounded-full transition-all duration-300"></button>
+<button aria-label="Slide 2" class="w-4 h-1 bg-outline-variant hover:bg-primary/50 rounded-full transition-all duration-300"></button>
+<button aria-label="Slide 3" class="w-4 h-1 bg-outline-variant hover:bg-primary/50 rounded-full transition-all duration-300"></button>
+</div>
+</div>
+</div>
+</section>
+</main>
+<!-- Footer Shared Component -->
+<footer class="w-full bg-surface-container-lowest dark:bg-inverse-surface border-t border-outline-variant dark:border-outline py-12">
+<div class="flex flex-col md:flex-row justify-between items-center px-margin-mobile md:px-margin-desktop max-w-container-max mx-auto gap-8 md:gap-0">
+<!-- Brand -->
+<div class="font-headline-md text-headline-md text-primary dark:text-inverse-primary tracking-tight font-semibold">
+                ELITE VOYAGE
+            </div>
+<!-- Links -->
+<ul class="flex flex-wrap justify-center gap-x-8 gap-y-4">
+<li><a class="font-body-md text-body-md text-subtext dark:text-outline-variant hover:text-primary dark:hover:text-on-primary-container transition-colors opacity-100 hover:opacity-80" href="#">Privacy Policy</a></li>
+<li><a class="font-body-md text-body-md text-subtext dark:text-outline-variant hover:text-primary dark:hover:text-on-primary-container transition-colors opacity-100 hover:opacity-80" href="#">Terms of Service</a></li>
+<li><a class="font-body-md text-body-md text-subtext dark:text-outline-variant hover:text-primary dark:hover:text-on-primary-container transition-colors opacity-100 hover:opacity-80" href="#">Travel Insurance</a></li>
+<li><a class="font-body-md text-body-md text-subtext dark:text-outline-variant hover:text-primary dark:hover:text-on-primary-container transition-colors opacity-100 hover:opacity-80" href="#">Sustainability</a></li>
+</ul>
+<!-- Copyright -->
+<div class="font-body-md text-body-md text-subtext dark:text-outline-variant">
+                © 2024 ELITE VOYAGE. All rights reserved.
+            </div>
+</div>
+</footer>
+<script>
+        // Simple script to handle navbar background on scroll
+        const navbar = document.querySelector('nav');
+        window.addEventListener('scroll', () => {
+            if (window.scrollY > 50) {
+                navbar.classList.add('shadow-lg');
+                navbar.classList.replace('bg-surface-glass', 'bg-white/90');
+            } else {
+                navbar.classList.remove('shadow-lg');
+                navbar.classList.replace('bg-white/90', 'bg-surface-glass');
+            }
+        });
+    </script>
+</body></html>

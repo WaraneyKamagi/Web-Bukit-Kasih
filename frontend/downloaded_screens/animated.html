@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+
+<html class="scroll-smooth" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Elite Voyage - Explore Heaven Together</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "surface-container-lowest": "#ffffff",
+                        "tertiary": "#532800",
+                        "secondary-fixed-dim": "#93cdf6",
+                        "on-secondary-fixed": "#001e2e",
+                        "surface-bright": "#fcf9f8",
+                        "on-error": "#ffffff",
+                        "on-tertiary-container": "#f9a767",
+                        "tertiary-fixed": "#ffdcc4",
+                        "inverse-on-surface": "#f3f0ef",
+                        "subtext": "#777777",
+                        "surface-container-highest": "#e5e2e1",
+                        "on-background": "#1b1c1c",
+                        "accent-gold": "#FEBB02",
+                        "surface-container": "#f0eded",
+                        "on-error-container": "#93000a",
+                        "on-tertiary-fixed-variant": "#6f3800",
+                        "on-surface-variant": "#42474f",
+                        "error-container": "#ffdad6",
+                        "on-primary": "#ffffff",
+                        "inverse-surface": "#303030",
+                        "outline": "#727780",
+                        "primary-container": "#0f4c81",
+                        "surface": "#fcf9f8",
+                        "error": "#ba1a1a",
+                        "surface-tint": "#2d6197",
+                        "primary": "#00355f",
+                        "on-tertiary": "#ffffff",
+                        "on-primary-fixed": "#001c37",
+                        "on-primary-fixed-variant": "#07497d",
+                        "surface-container-high": "#eae7e7",
+                        "on-secondary-container": "#1a5d81",
+                        "surface-dim": "#dcd9d9",
+                        "secondary-container": "#9cd6ff",
+                        "surface-container-low": "#f6f3f2",
+                        "surface-variant": "#e5e2e1",
+                        "secondary": "#236488",
+                        "on-tertiary-fixed": "#2f1400",
+                        "tertiary-fixed-dim": "#ffb780",
+                        "on-secondary": "#ffffff",
+                        "background-main": "#FFFFFF",
+                        "on-primary-container": "#8ebdf9",
+                        "on-surface": "#1b1c1c",
+                        "background": "#fcf9f8",
+                        "inverse-primary": "#a0c9ff",
+                        "primary-fixed": "#d2e4ff",
+                        "surface-glass": "rgba(255, 255, 255, 0.7)",
+                        "primary-fixed-dim": "#a0c9ff",
+                        "on-secondary-fixed-variant": "#004c6d",
+                        "tertiary-container": "#743b00",
+                        "secondary-fixed": "#c8e6ff",
+                        "outline-variant": "#c2c7d1"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "margin-desktop": "64px",
+                        "margin-tablet": "32px",
+                        "base": "8px",
+                        "container-max": "1280px",
+                        "margin-mobile": "20px",
+                        "gutter": "24px"
+                    },
+                    "fontFamily": {
+                        "headline-lg": ["Inter"],
+                        "label-caps": ["Inter"],
+                        "headline-md": ["Inter"],
+                        "body-lg": ["Inter"],
+                        "display-xl": ["Inter"],
+                        "display-xl-mobile": ["Inter"],
+                        "body-md": ["Inter"]
+                    },
+                    "fontSize": {
+                        "headline-lg": ["32px", { "lineHeight": "40px", "fontWeight": "600" }],
+                        "label-caps": ["12px", { "lineHeight": "16px", "letterSpacing": "0.08em", "fontWeight": "600" }],
+                        "headline-md": ["24px", { "lineHeight": "32px", "fontWeight": "500" }],
+                        "body-lg": ["18px", { "lineHeight": "28px", "fontWeight": "400" }],
+                        "display-xl": ["64px", { "lineHeight": "72px", "letterSpacing": "-0.02em", "fontWeight": "600" }],
+                        "display-xl-mobile": ["40px", { "lineHeight": "48px", "letterSpacing": "-0.01em", "fontWeight": "600" }],
+                        "body-md": ["16px", { "lineHeight": "24px", "fontWeight": "400" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        body { font-family: 'Inter', sans-serif; background-color: #fcf9f8; }
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+        .hide-scrollbar::-webkit-scrollbar { display: none; }
+        .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        @keyframes float {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+            100% { transform: translateY(0px); }
+        }
+
+        .animate-fade-up {
+            animation: fadeUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+            opacity: 0;
+        }
+
+        .animate-float {
+            animation: float 6s ease-in-out infinite;
+        }
+
+        .delay-100 { animation-delay: 100ms; }
+        .delay-200 { animation-delay: 200ms; }
+        .delay-300 { animation-delay: 300ms; }
+
+        .reveal {
+            opacity: 0;
+            transform: translateY(40px);
+            transition: all 1s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .reveal.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    </style>
+</head>
+<body class="text-on-surface antialiased bg-background">
+<!-- Top Navigation -->
+<nav class="fixed top-0 w-full z-50 backdrop-blur-xl bg-surface-glass shadow-[0_40px_40px_-10px_rgba(15,76,129,0.08)] transition-all duration-500 ease-in-out">
+<div class="flex justify-between items-center h-20 px-margin-mobile md:px-margin-desktop max-w-container-max mx-auto">
+<div class="font-headline-md text-headline-md font-semibold tracking-tight text-primary">ELITE VOYAGE</div>
+<div class="hidden md:flex gap-8">
+<a class="text-primary border-b-2 border-primary pb-1 font-body-md text-body-md" href="#">Destinations</a>
+<a class="text-on-surface-variant hover:text-primary transition-colors font-body-md text-body-md" href="#">Experiences</a>
+<a class="text-on-surface-variant hover:text-primary transition-colors font-body-md text-body-md" href="#">Hotels</a>
+<a class="text-on-surface-variant hover:text-primary transition-colors font-body-md text-body-md" href="#">Concierge</a>
+</div>
+<div class="flex items-center gap-4">
+<a class="hidden md:block font-body-md text-body-md text-primary font-medium hover:opacity-80 transition-opacity" href="#">Sign In</a>
+<button class="bg-primary text-on-primary px-6 py-2 rounded-full font-body-md text-body-md hover:bg-primary/90 hover:shadow-lg hover:-translate-y-0.5 transition-all duration-300 shadow-sm">
+                    Book Now
+                </button>
+</div>
+</div>
+</nav>
+<!-- Hero Section -->
+<section class="relative min-h-[90vh] md:min-h-screen flex flex-col justify-center overflow-hidden pt-20">
+<!-- Background Image with Overlay -->
+<div class="absolute inset-0 z-0">
+<img alt="Scenic lake and mountains at sunrise" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBfDmtWBivVULJKk651j-VRWNYgLYqd1KKtxKij51KoWaGYtWUHKfPzmSChDqhMO-566xXvzL82im2ucYR7dGsAlxyWNXUKoLJQdbtXIR8KXsSiv4e03oIsWn-vrJMN5gG6jLSBsZDrsDr4h0FlOatREB6EEpp4YrbYDiYPipP0q66kk_XSJ6TovkjXp1jYsv-7s7clC2avII_3mTmlukx5cNwmA07_Q3AbTmNoUzJxFUy3c4MwdcYgGhjKlM9y5Ga5-LKIgJ7xPrs"/>
+<div class="absolute inset-0 bg-gradient-to-b from-black/20 via-primary-container/10 to-background"></div>
+</div>
+<div class="relative z-10 w-full max-w-container-max mx-auto px-margin-mobile md:px-margin-desktop flex flex-col items-center justify-center text-center mt-12 md:mt-24">
+<span class="font-label-caps text-label-caps text-on-primary bg-primary/20 px-4 py-1.5 rounded-full mb-6 border border-white/20 backdrop-blur-sm tracking-wider uppercase animate-fade-up delay-100">
+                Adventure
+            </span>
+<h1 class="font-display-xl-mobile md:font-display-xl text-display-xl-mobile md:text-display-xl text-on-primary mb-12 max-w-4xl drop-shadow-lg animate-fade-up delay-200">
+                Let's Explore Heaven Together
+            </h1>
+<!-- Floating Search Bar -->
+<div class="glass-panel w-full max-w-5xl rounded-[24px] p-2 md:p-4 shadow-[0_40px_40px_-10px_rgba(15,76,129,0.15)] mt-8 animate-fade-up delay-300 animate-float">
+<div class="flex flex-col md:flex-row items-center divide-y md:divide-y-0 md:divide-x divide-white/30 w-full">
+<div class="w-full md:w-1/4 p-4 text-left group transition-all duration-300 hover:bg-white/5 rounded-xl cursor-text">
+<label class="block font-label-caps text-label-caps text-white/80 mb-1 group-hover:text-white transition-colors">Where</label>
+<input class="w-full bg-transparent border-none focus:ring-0 p-0 font-body-lg text-body-lg text-white placeholder-white/60 focus:outline-none" placeholder="Search destination" type="text"/>
+</div>
+<div class="w-full md:w-1/4 p-4 text-left group transition-all duration-300 hover:bg-white/5 rounded-xl cursor-text">
+<label class="block font-label-caps text-label-caps text-white/80 mb-1 group-hover:text-white transition-colors">Check In</label>
+<input class="w-full bg-transparent border-none focus:ring-0 p-0 font-body-lg text-body-lg text-white placeholder-white/60 focus:outline-none" placeholder="Add dates" type="text"/>
+</div>
+<div class="w-full md:w-1/4 p-4 text-left group transition-all duration-300 hover:bg-white/5 rounded-xl cursor-text">
+<label class="block font-label-caps text-label-caps text-white/80 mb-1 group-hover:text-white transition-colors">Check Out</label>
+<input class="w-full bg-transparent border-none focus:ring-0 p-0 font-body-lg text-body-lg text-white placeholder-white/60 focus:outline-none" placeholder="Add dates" type="text"/>
+</div>
+<div class="w-full md:w-1/4 p-4 text-left group flex justify-between items-center transition-all duration-300 hover:bg-white/5 rounded-xl cursor-text">
+<div>
+<label class="block font-label-caps text-label-caps text-white/80 mb-1 group-hover:text-white transition-colors">Amenities</label>
+<input class="w-full bg-transparent border-none focus:ring-0 p-0 font-body-lg text-body-lg text-white placeholder-white/60 focus:outline-none" placeholder="Add guests" type="text"/>
+</div>
+<button class="w-14 h-14 rounded-full bg-on-background flex items-center justify-center hover:bg-black hover:scale-105 transition-all duration-300 shrink-0 shadow-lg">
+<span class="material-symbols-outlined text-white" style="font-variation-settings: 'FILL' 0;">search</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Destination Tags -->
+<div class="flex flex-wrap justify-center gap-3 mt-12 text-white/90 font-body-md text-body-md animate-fade-up delay-300">
+<span class="px-4 py-1.5 rounded-full border border-white/20 glass-panel hover:bg-white/30 hover:-translate-y-1 hover:shadow-lg cursor-pointer transition-all duration-300">Maldives</span>
+<span class="px-4 py-1.5 rounded-full border border-white/20 glass-panel hover:bg-white/30 hover:-translate-y-1 hover:shadow-lg cursor-pointer transition-all duration-300">Raja Ampat</span>
+<span class="px-4 py-1.5 rounded-full border border-white/20 glass-panel hover:bg-white/30 hover:-translate-y-1 hover:shadow-lg cursor-pointer transition-all duration-300">Bromo</span>
+<span class="px-4 py-1.5 rounded-full border border-white/20 glass-panel hover:bg-white/30 hover:-translate-y-1 hover:shadow-lg cursor-pointer transition-all duration-300">Bali</span>
+<span class="px-4 py-1.5 rounded-full border border-white/20 glass-panel hover:bg-white/30 hover:-translate-y-1 hover:shadow-lg cursor-pointer transition-all duration-300">Labuan Bajo</span>
+</div>
+</div>
+<!-- Scroll Indicator (Left Floating) -->
+<div class="absolute left-8 bottom-12 hidden md:flex flex-col items-center gap-4 z-10 text-white animate-fade-up delay-300">
+<div class="flex flex-col gap-2">
+<button class="w-10 h-10 rounded-full border border-white/40 flex items-center justify-center hover:bg-white/20 hover:shadow-[0_0_15px_rgba(255,255,255,0.4)] transition-all duration-300 group">
+<span class="material-symbols-outlined text-sm group-hover:-translate-y-1 transition-transform">north</span>
+</button>
+<button class="w-10 h-10 rounded-full border border-white flex items-center justify-center bg-white/10 hover:bg-white/20 hover:shadow-[0_0_15px_rgba(255,255,255,0.4)] transition-all duration-300 group">
+<span class="material-symbols-outlined text-sm group-hover:translate-y-1 transition-transform">south</span>
+</button>
+</div>
+<span class="font-label-caps text-label-caps rotate-90 origin-left mt-8 tracking-widest text-white/80">SCROLL</span>
+</div>
+</section>
+<!-- Categories Section -->
+<section class="py-24 px-margin-mobile md:px-margin-desktop max-w-container-max mx-auto reveal">
+<div class="flex flex-col md:flex-row justify-between items-end mb-16 gap-8">
+<div class="max-w-xl">
+<span class="font-label-caps text-label-caps text-primary tracking-widest uppercase mb-4 block">Categories</span>
+<h2 class="font-headline-lg text-headline-lg text-on-surface">Discover your next dream destination</h2>
+</div>
+<div class="max-w-md">
+<p class="font-body-md text-body-md text-subtext">
+                    Experience the pinnacle of natural beauty and curated luxury. From pristine beaches to breathtaking highlands, we find the extraordinary for you.
+                </p>
+</div>
+</div>
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+<!-- Card 1 -->
+<div class="group relative h-[400px] rounded-[24px] overflow-hidden cursor-pointer shadow-sm hover:shadow-[0_20px_40px_-10px_rgba(15,76,129,0.2)] hover:-translate-y-2 transition-all duration-500">
+<div class="absolute inset-0 bg-surface-variant animate-pulse" data-alt="A majestic cascading waterfall in a lush, vibrant green tropical jungle. The scene is illuminated by soft, natural sunlight filtering through the canopy, creating a bright, refreshing light-mode aesthetic. The water looks crystal clear and inviting. The overall mood is serene, natural, and adventurous."></div>
+<img alt="" class="absolute inset-0 w-full h-full object-cover group-hover:scale-110 transition-transform duration-700 opacity-0" onload="this.classList.remove('opacity-0'); this.previousElementSibling.remove()" src=""/>
+<div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-80 group-hover:opacity-100 transition-opacity duration-500"></div>
+<div class="absolute bottom-0 left-0 p-6 w-full flex justify-between items-end">
+<h3 class="font-headline-md text-headline-md text-white transform group-hover:-translate-y-2 transition-transform duration-500">Waterfall</h3>
+<button class="w-10 h-10 rounded-full bg-white/20 backdrop-blur-md flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all translate-x-4 group-hover:translate-x-0 duration-500 hover:bg-white hover:text-primary">
+<span class="material-symbols-outlined text-white hover:text-primary transition-colors">arrow_forward</span>
+</button>
+</div>
+</div>
+<!-- Card 2 -->
+<div class="group relative h-[400px] rounded-[24px] overflow-hidden cursor-pointer shadow-sm hover:shadow-[0_20px_40px_-10px_rgba(15,76,129,0.2)] hover:-translate-y-2 transition-all duration-500">
+<div class="absolute inset-0 bg-surface-variant animate-pulse" data-alt="A perfectly still, mirror-like alpine lake surrounded by towering pine trees and distant snow-capped mountains. The lighting is early morning, casting soft pastel hues of pink and blue across the sky and water, fitting a calming light-mode luxury aesthetic. The mood is peaceful, vast, and pristine."></div>
+<img alt="" class="absolute inset-0 w-full h-full object-cover group-hover:scale-110 transition-transform duration-700 opacity-0" onload="this.classList.remove('opacity-0'); this.previousElementSibling.remove()" src=""/>
+<div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-80 group-hover:opacity-100 transition-opacity duration-500"></div>
+<div class="absolute bottom-0 left-0 p-6 w-full flex justify-between items-end">
+<h3 class="font-headline-md text-headline-md text-white transform group-hover:-translate-y-2 transition-transform duration-500">Lake</h3>
+<button class="w-10 h-10 rounded-full bg-white/20 backdrop-blur-md flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all translate-x-4 group-hover:translate-x-0 duration-500 hover:bg-white hover:text-primary">
+<span class="material-symbols-outlined text-white hover:text-primary transition-colors">arrow_forward</span>
+</button>
+</div>
+</div>
+<!-- Card 3 -->
+<div class="group relative h-[400px] rounded-[24px] overflow-hidden cursor-pointer shadow-sm hover:shadow-[0_20px_40px_-10px_rgba(15,76,129,0.2)] hover:-translate-y-2 transition-all duration-500">
+<div class="absolute inset-0 bg-surface-variant animate-pulse" data-alt="Expansive, rolling green hills under a bright, clear blue sky with a few fluffy white clouds. The landscape looks incredibly lush and manicured, resembling a high-end luxury resort setting or a premium nature reserve. The sunlight is bright and welcoming, creating a vibrant light-mode feeling of fresh air and space."></div>
+<img alt="" class="absolute inset-0 w-full h-full object-cover group-hover:scale-110 transition-transform duration-700 opacity-0" onload="this.classList.remove('opacity-0'); this.previousElementSibling.remove()" src=""/>
+<div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-80 group-hover:opacity-100 transition-opacity duration-500"></div>
+<div class="absolute bottom-0 left-0 p-6 w-full flex justify-between items-end">
+<h3 class="font-headline-md text-headline-md text-white transform group-hover:-translate-y-2 transition-transform duration-500">Greenfield</h3>
+<button class="w-10 h-10 rounded-full bg-white/20 backdrop-blur-md flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all translate-x-4 group-hover:translate-x-0 duration-500 hover:bg-white hover:text-primary">
+<span class="material-symbols-outlined text-white hover:text-primary transition-colors">arrow_forward</span>
+</button>
+</div>
+</div>
+<!-- Card 4 -->
+<div class="group relative h-[400px] rounded-[24px] overflow-hidden cursor-pointer shadow-sm hover:shadow-[0_20px_40px_-10px_rgba(15,76,129,0.2)] hover:-translate-y-2 transition-all duration-500">
+<div class="absolute inset-0 bg-surface-variant animate-pulse" data-alt="An idyllic, pristine white sand beach meeting crystal clear turquoise waters. A few luxurious, minimal sun loungers are visible in the foreground. The scene is bathed in brilliant midday sunshine, embodying a premium tropical getaway light-mode aesthetic. The mood is relaxing, exclusive, and warm."></div>
+<img alt="" class="absolute inset-0 w-full h-full object-cover group-hover:scale-110 transition-transform duration-700 opacity-0" onload="this.classList.remove('opacity-0'); this.previousElementSibling.remove()" src=""/>
+<div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-80 group-hover:opacity-100 transition-opacity duration-500"></div>
+<div class="absolute bottom-0 left-0 p-6 w-full flex justify-between items-end">
+<h3 class="font-headline-md text-headline-md text-white transform group-hover:-translate-y-2 transition-transform duration-500">Beach</h3>
+<button class="w-10 h-10 rounded-full bg-white/20 backdrop-blur-md flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all translate-x-4 group-hover:translate-x-0 duration-500 hover:bg-white hover:text-primary">
+<span class="material-symbols-outlined text-white hover:text-primary transition-colors">arrow_forward</span>
+</button>
+</div>
+</div>
+</div>
+</section>
+<!-- Footer -->
+<footer class="w-full bg-surface-container-lowest border-t border-outline-variant mt-24 reveal">
+<div class="flex flex-col md:flex-row justify-between items-center py-12 px-margin-mobile md:px-margin-desktop max-w-container-max mx-auto gap-6">
+<div class="font-headline-md text-headline-md text-primary font-semibold">ELITE VOYAGE</div>
+<div class="flex flex-wrap justify-center gap-6">
+<a class="font-body-md text-body-md text-subtext hover:text-primary transition-colors" href="#">Privacy Policy</a>
+<a class="font-body-md text-body-md text-subtext hover:text-primary transition-colors" href="#">Terms of Service</a>
+<a class="font-body-md text-body-md text-subtext hover:text-primary transition-colors" href="#">Travel Insurance</a>
+<a class="font-body-md text-body-md text-subtext hover:text-primary transition-colors" href="#">Sustainability</a>
+</div>
+<div class="font-body-md text-body-md text-subtext">
+                © 2024 ELITE VOYAGE. All rights reserved.
+            </div>
+</div>
+</footer>
+<script>
+    document.addEventListener("DOMContentLoaded", () => {
+        const reveals = document.querySelectorAll('.reveal');
+        
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('active');
+                    observer.unobserve(entry.target);
+                }
+            });
+        }, { 
+            threshold: 0.1,
+            rootMargin: "0px 0px -50px 0px"
+        });
+
+        reveals.forEach(reveal => {
+            observer.observe(reveal);
+        });
+    });
+</script>
+</body></html>

@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Hotels - Elite Voyage</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-tertiary-fixed-variant": "#6f3800",
+                        "outline-variant": "#c2c7d1",
+                        "surface-bright": "#fcf9f8",
+                        "primary-container": "#0f4c81",
+                        "on-tertiary-fixed": "#2f1400",
+                        "surface-container-lowest": "#ffffff",
+                        "surface-glass": "rgba(255, 255, 255, 0.7)",
+                        "secondary-container": "#9cd6ff",
+                        "surface-container-low": "#f6f3f2",
+                        "background-main": "#FFFFFF",
+                        "on-background": "#1b1c1c",
+                        "secondary": "#236488",
+                        "inverse-primary": "#a0c9ff",
+                        "surface-dim": "#dcd9d9",
+                        "on-primary-fixed": "#001c37",
+                        "surface-container-high": "#eae7e7",
+                        "tertiary": "#532800",
+                        "surface-tint": "#2d6197",
+                        "on-secondary": "#ffffff",
+                        "on-primary": "#ffffff",
+                        "background": "#fcf9f8",
+                        "error-container": "#ffdad6",
+                        "primary": "#00355f",
+                        "on-error": "#ffffff",
+                        "error": "#ba1a1a",
+                        "surface-variant": "#e5e2e1",
+                        "on-secondary-fixed-variant": "#004c6d",
+                        "inverse-on-surface": "#f3f0ef",
+                        "subtext": "#777777",
+                        "tertiary-container": "#743b00",
+                        "tertiary-fixed-dim": "#ffb780",
+                        "on-tertiary": "#ffffff",
+                        "on-secondary-container": "#1a5d81",
+                        "on-surface": "#1b1c1c",
+                        "on-tertiary-container": "#f9a767",
+                        "outline": "#727780",
+                        "on-surface-variant": "#42474f",
+                        "accent-gold": "#FEBB02",
+                        "primary-fixed-dim": "#a0c9ff",
+                        "on-primary-fixed-variant": "#07497d",
+                        "surface-container": "#f0eded",
+                        "on-primary-container": "#8ebdf9",
+                        "secondary-fixed-dim": "#93cdf6",
+                        "surface-container-highest": "#e5e2e1",
+                        "primary-fixed": "#d2e4ff",
+                        "secondary-fixed": "#c8e6ff",
+                        "on-error-container": "#93000a",
+                        "tertiary-fixed": "#ffdcc4",
+                        "surface": "#fcf9f8",
+                        "inverse-surface": "#303030",
+                        "on-secondary-fixed": "#001e2e"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "margin-tablet": "32px",
+                        "base": "8px",
+                        "margin-mobile": "20px",
+                        "margin-desktop": "64px",
+                        "gutter": "24px",
+                        "container-max": "1280px"
+                    },
+                    "fontFamily": {
+                        "headline-md": ["Inter"],
+                        "body-lg": ["Inter"],
+                        "display-xl-mobile": ["Inter"],
+                        "body-md": ["Inter"],
+                        "display-xl": ["Inter"],
+                        "headline-lg": ["Inter"],
+                        "label-caps": ["Inter"]
+                    },
+                    "fontSize": {
+                        "headline-md": ["24px", { "lineHeight": "32px", "fontWeight": "500" }],
+                        "body-lg": ["18px", { "lineHeight": "28px", "fontWeight": "400" }],
+                        "display-xl-mobile": ["40px", { "lineHeight": "48px", "letterSpacing": "-0.01em", "fontWeight": "600" }],
+                        "body-md": ["16px", { "lineHeight": "24px", "fontWeight": "400" }],
+                        "display-xl": ["64px", { "lineHeight": "72px", "letterSpacing": "-0.02em", "fontWeight": "600" }],
+                        "headline-lg": ["32px", { "lineHeight": "40px", "fontWeight": "600" }],
+                        "label-caps": ["12px", { "lineHeight": "16px", "letterSpacing": "0.08em", "fontWeight": "600" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        body { font-family: 'Inter', sans-serif; background-color: #fcf9f8; }
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+        }
+        .ambient-shadow {
+            box-shadow: 0 40px 40px -10px rgba(15, 76, 129, 0.08);
+        }
+    </style>
+</head>
+<body class="text-on-background bg-background antialiased selection:bg-primary-container selection:text-white">
+<!-- TopNavBar Shared Component -->
+<nav class="fixed top-0 w-full z-50 backdrop-blur-xl bg-surface-glass shadow-[0_40px_40px_-10px_rgba(15,76,129,0.08)] transition-all duration-500 ease-in-out hover:backdrop-blur-2xl hover:bg-white/40">
+<div class="flex justify-between items-center h-20 px-margin-desktop max-w-container-max mx-auto md:px-margin-tablet sm:px-margin-mobile">
+<div class="font-headline-md text-headline-md font-semibold tracking-tight text-primary dark:text-on-primary-container">
+                ELITE VOYAGE
+            </div>
+<!-- Desktop Navigation -->
+<div class="hidden md:flex space-x-8 items-center font-body-md text-body-md">
+<a class="text-on-surface-variant dark:text-outline-variant hover:text-primary dark:hover:text-on-primary-container transition-colors" href="#">Destinations</a>
+<a class="text-on-surface-variant dark:text-outline-variant hover:text-primary dark:hover:text-on-primary-container transition-colors" href="#">Experiences</a>
+<a class="text-primary dark:text-on-primary-container border-b-2 border-primary dark:border-on-primary-container pb-1" href="#">Hotels</a>
+<a class="text-on-surface-variant dark:text-outline-variant hover:text-primary dark:hover:text-on-primary-container transition-colors" href="#">Concierge</a>
+</div>
+<div class="hidden md:flex space-x-4 items-center">
+<button class="text-primary dark:text-on-primary-container font-body-md text-body-md hover:opacity-80 transition-opacity">Sign In</button>
+<button class="bg-[#0F4C81] text-white px-6 py-2 rounded-full font-body-md text-body-md hover:bg-primary transition-colors">Book Now</button>
+</div>
+<!-- Mobile Menu Toggle -->
+<div class="md:hidden flex items-center">
+<button class="text-primary p-2">
+<span class="material-symbols-outlined">menu</span>
+</button>
+</div>
+</div>
+</nav>
+<main>
+<!-- Hero Section -->
+<section class="relative h-[870px] w-full flex flex-col items-center justify-center mt-20">
+<div class="absolute inset-0 w-full h-full z-0">
+<img alt="Luxury overwater villa" class="w-full h-full object-cover" data-alt="A breathtaking view of a luxury overwater villa resort in the Maldives during golden hour. Crystal clear turquoise water laps gently against wooden stilts supporting elegant, modern villas with thatched roofs. The warm, inviting light perfectly captures the 'Quiet Luxury' aesthetic, emphasizing serenity, expansive space, and premium quality. The high-resolution image creates an aspirational and deeply relaxing mood." src="https://lh3.googleusercontent.com/aida-public/AB6AXuB5Kc4pFZJBWh98dBvw_3EL6SxlMRyoRVyGxL-c7bkEa1BxIJgQZB-JO5wY1LeqdZHtlCtJLFQNk5pwqNkq84cLi5c5qZWxtTO14Gps0K9yjsDiG3t6aakaHtkC2PyUxvX3FxrspSn15fSV1wf6GQfY1-h054tsLkduuDdC6ZFgcZJM70QYsPa6NlL274qmtH98RH-JlaHwR1_5NulRh4ecu-4ZT-dO6yMU19grvTFvJza8fduqduGzBrtXOcbdcwMSHnoQiZeWpuY"/>
+<div class="absolute inset-0 bg-primary/20"></div>
+</div>
+<div class="relative z-10 text-center px-4">
+<h1 class="font-display-xl text-display-xl text-white mb-6 drop-shadow-lg hidden md:block">World-Class Stays</h1>
+<h1 class="font-display-xl-mobile text-display-xl-mobile text-white mb-4 drop-shadow-lg md:hidden">World-Class Stays</h1>
+<p class="font-body-lg text-body-lg text-white/90 max-w-2xl mx-auto mb-12 drop-shadow-md">Discover unparalleled luxury, curated for the modern explorer.</p>
+</div>
+<!-- Floating Search Bar -->
+<div class="relative z-20 w-full max-w-4xl mx-auto px-4 mt-8 md:mt-0 transform translate-y-1/2">
+<div class="glass-panel rounded-[24px] p-2 flex flex-col md:flex-row items-center justify-between ambient-shadow border border-white/40">
+<div class="flex-1 flex items-center w-full md:w-auto p-3 border-b md:border-b-0 md:border-r border-outline-variant/30">
+<span class="material-symbols-outlined text-primary mr-3">location_on</span>
+<div class="flex flex-col w-full">
+<span class="font-label-caps text-label-caps text-subtext uppercase">Where to?</span>
+<input class="bg-transparent border-none focus:ring-0 p-0 font-body-md text-on-background placeholder:text-outline w-full" placeholder="Search destinations" type="text"/>
+</div>
+</div>
+<div class="flex-1 flex items-center w-full md:w-auto p-3 border-b md:border-b-0 md:border-r border-outline-variant/30">
+<span class="material-symbols-outlined text-primary mr-3">calendar_today</span>
+<div class="flex flex-col w-full">
+<span class="font-label-caps text-label-caps text-subtext uppercase">Dates</span>
+<input class="bg-transparent border-none focus:ring-0 p-0 font-body-md text-on-background placeholder:text-outline w-full" placeholder="Add dates" type="text"/>
+</div>
+</div>
+<div class="flex-1 flex items-center w-full md:w-auto p-3">
+<span class="material-symbols-outlined text-primary mr-3">home_work</span>
+<div class="flex flex-col w-full">
+<span class="font-label-caps text-label-caps text-subtext uppercase">Property Type</span>
+<select class="bg-transparent border-none focus:ring-0 p-0 font-body-md text-on-background text-outline w-full appearance-none cursor-pointer">
+<option value="">All Types</option>
+<option value="resort">Resorts</option>
+<option value="villa">Villas</option>
+<option value="boutique">Boutique</option>
+</select>
+</div>
+</div>
+<div class="p-2 w-full md:w-auto mt-2 md:mt-0">
+<button class="w-full md:w-auto bg-[#0F4C81] text-white p-4 rounded-full hover:bg-primary transition-colors flex items-center justify-center">
+<span class="material-symbols-outlined">search</span>
+</button>
+</div>
+</div>
+</div>
+</section>
+<!-- Spacer for floating search bar -->
+<div class="h-32 md:h-24"></div>
+<!-- Featured Hotels Collection -->
+<section class="max-w-container-max mx-auto px-margin-desktop md:px-margin-tablet sm:px-margin-mobile py-20">
+<div class="mb-12 flex flex-col md:flex-row justify-between items-end">
+<div>
+<h2 class="font-headline-lg text-headline-lg text-primary mb-2">Featured Collection</h2>
+<p class="font-body-md text-body-md text-subtext">Handpicked 5-star properties for the discerning traveler.</p>
+</div>
+<button class="mt-4 md:mt-0 font-label-caps text-label-caps text-primary uppercase tracking-widest hover:opacity-80 transition-opacity flex items-center">
+                    View All <span class="material-symbols-outlined ml-1 text-sm">arrow_forward</span>
+</button>
+</div>
+<!-- Bento Grid Layout -->
+<div class="grid grid-cols-1 md:grid-cols-12 gap-gutter">
+<!-- Large Card -->
+<div class="md:col-span-8 group relative rounded-xl overflow-hidden cursor-pointer h-[500px]">
+<img alt="Luxury hotel pool" class="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" data-alt="An expansive, infinity-edge swimming pool at a premium luxury resort, overlooking a serene, mountainous coastline. The setting sun casts long, soft shadows and bathes the scene in warm, inviting golden light, reflecting off the calm water. The composition is clean and minimalist, showcasing the 'Quiet Luxury' aesthetic with ample negative space and high-end architectural details. The mood is tranquil and exclusive." src="https://lh3.googleusercontent.com/aida-public/AB6AXuD1JDHs3awpr_xzrx7xLAp_AA0FB5ya53cMpgtJt9oy1H4E_eJj5B6xryMIENhRNOcbob6gTdz0crLInLcuw5ACnEIxYz0AawQL1uXVmyzuh6LA3dMLdqzS6JdbjZ89RtVYwz20V3ydRToN41Kn_fo27SE91mNJyvvI5O1lufizY-r46g7JRzCN5AwAoO7iEduJTenZjWunWih7Exqjfvaq9TQ-BJAzgR1dsHE17wz6Yt8VYFZZlkGfnbyVrRORMyeZ-dZRzpnCcq4"/>
+<div class="absolute inset-0 bg-gradient-to-t from-primary/80 via-transparent to-transparent"></div>
+<div class="absolute top-6 left-6">
+<span class="bg-surface-glass backdrop-blur-md px-3 py-1 rounded-full font-label-caps text-label-caps text-primary uppercase">Trending</span>
+</div>
+<div class="absolute bottom-0 left-0 w-full p-8 flex justify-between items-end">
+<div>
+<h3 class="font-headline-md text-headline-md text-white mb-1">Amanera, Dominican Republic</h3>
+<div class="flex items-center text-white/90 font-body-md text-body-md mb-3 space-x-4">
+<span class="flex items-center"><span class="material-symbols-outlined text-[18px] mr-1" data-weight="fill">star</span> 5.0</span>
+<span>Playa Grande</span>
+</div>
+<div class="flex space-x-3">
+<span class="material-symbols-outlined text-white/80" title="Pool">pool</span>
+<span class="material-symbols-outlined text-white/80" title="Spa">spa</span>
+<span class="material-symbols-outlined text-white/80" title="Dining">restaurant</span>
+</div>
+</div>
+<div class="text-right">
+<span class="block font-body-md text-body-md text-white/80">From</span>
+<span class="font-headline-md text-headline-md text-white">$1,850 <span class="text-sm font-normal">/night</span></span>
+</div>
+</div>
+</div>
+<!-- Small Card 1 -->
+<div class="md:col-span-4 group relative rounded-xl overflow-hidden cursor-pointer h-[500px]">
+<img alt="Minimalist hotel bedroom" class="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" data-alt="A pristine, minimalist luxury hotel bedroom featuring a plush, king-sized bed with crisp white linens. Large floor-to-ceiling windows reveal a soft, natural landscape outside, allowing abundant diffused daylight to illuminate the space. The interior design utilizes neutral tones, light wood accents, and clean lines, embodying a modern, serene aesthetic. The overall atmosphere is calm, orderly, and highly refined." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDmNI8xak8SVGe-sPcoZvGZvhxA8EHwtHwNUu3fm8j3xZMvlXTsZ7rsEjqNEug5u7_ghilMTbzS-KWXzQvxlfhE62Di0YrqSYX_59781DpB585Y590CB9q0k_lP_wbYMRSCJ_1jrCsLDATayPcXkHae8beOs2nM6rDBkAcLNAiy6qFQNCxI4p1rPx-9GplNeE5LIJPEomHOI9S1RVfibSe0m4ZsqDqNyGgqpuK5kkDlbM4geQFDBT7tpFFX5vPzjEuTrtOYerNt2MY"/>
+<div class="absolute inset-0 bg-gradient-to-t from-primary/80 via-transparent to-transparent"></div>
+<div class="absolute top-6 left-6">
+<span class="bg-surface-glass backdrop-blur-md px-3 py-1 rounded-full font-label-caps text-label-caps text-primary uppercase">Rare Find</span>
+</div>
+<div class="absolute bottom-0 left-0 w-full p-6 flex flex-col justify-end">
+<h3 class="font-headline-md text-headline-md text-white mb-1">Amangiri, Utah</h3>
+<div class="flex items-center text-white/90 font-body-md text-body-md mb-3">
+<span class="flex items-center"><span class="material-symbols-outlined text-[18px] mr-1" data-weight="fill">star</span> 4.9</span>
+</div>
+<div class="mt-2">
+<span class="font-headline-md text-headline-md text-white">$2,200 <span class="text-sm font-normal">/night</span></span>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Member Exclusive Section -->
+<section class="bg-surface-container-low py-24">
+<div class="max-w-container-max mx-auto px-margin-desktop md:px-margin-tablet sm:px-margin-mobile flex flex-col md:flex-row items-center gap-16">
+<div class="md:w-1/2 relative">
+<div class="aspect-square rounded-full overflow-hidden border-8 border-white ambient-shadow relative z-10 max-w-md mx-auto">
+<img alt="Concierge serving champagne" class="w-full h-full object-cover" data-alt="A close-up, elegant shot of a formally dressed concierge pouring premium champagne into crystal flutes on a sleek, dark marble bar top. The lighting is low and sophisticated, highlighting the sparkling bubbles and the polished details of the service. The image conveys exclusive member perks, high-end hospitality, and a quiet, luxurious atmosphere tailored for discerning guests." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDx3_XuKSB_ZpnIfmZQIeya6nbOvs3HkPFr-slwRRjz0tMY1-a_wQjiv8RFRamVv-ifZJqp06KiOGnpJ0AX8pYkAhX85X9Ci644JhBgSYR3Dd6k1DGBrmsDGe8-xr7g6TveV-X6FRW2ch4Bqh8CHhYQut4vZFe1PjaCKqoiFatdARybt7OnJ4VCgpiUpiShK_MLrPwZZspqCZqDdxqxEaxQIhkv61xj8SqwhoTctg0W2dH9qZxXAranITwPOYKjNnogRadBxcmHrrM"/>
+</div>
+<!-- Decorative element -->
+<div class="absolute -bottom-10 -right-10 w-48 h-48 bg-secondary-container rounded-full opacity-50 blur-3xl z-0"></div>
+</div>
+<div class="md:w-1/2">
+<span class="font-label-caps text-label-caps text-accent-gold uppercase tracking-widest mb-4 block">Elite Privileges</span>
+<h2 class="font-display-xl text-display-xl text-primary mb-6 md:text-[48px] md:leading-[56px]">Elevate Your Stay</h2>
+<p class="font-body-lg text-body-lg text-subtext mb-10 max-w-lg">
+                        Join Elite Voyage to unlock a world of exclusive benefits. Experience seamless travel with perks designed for absolute comfort.
+                    </p>
+<div class="space-y-6">
+<div class="flex items-start">
+<div class="w-12 h-12 rounded-full bg-white flex items-center justify-center ambient-shadow mr-4 shrink-0 text-primary">
+<span class="material-symbols-outlined">upgrade</span>
+</div>
+<div>
+<h4 class="font-headline-md text-headline-md text-on-surface mb-1">Complimentary Upgrades</h4>
+<p class="font-body-md text-body-md text-subtext">Enjoy room upgrades upon arrival, subject to availability.</p>
+</div>
+</div>
+<div class="flex items-start">
+<div class="w-12 h-12 rounded-full bg-white flex items-center justify-center ambient-shadow mr-4 shrink-0 text-primary">
+<span class="material-symbols-outlined">schedule</span>
+</div>
+<div>
+<h4 class="font-headline-md text-headline-md text-on-surface mb-1">Flexible Check-in/out</h4>
+<p class="font-body-md text-body-md text-subtext">Early check-in and late checkout to suit your schedule.</p>
+</div>
+</div>
+<div class="flex items-start">
+<div class="w-12 h-12 rounded-full bg-white flex items-center justify-center ambient-shadow mr-4 shrink-0 text-primary">
+<span class="material-symbols-outlined">concierge</span>
+</div>
+<div>
+<h4 class="font-headline-md text-headline-md text-on-surface mb-1">Dedicated Concierge</h4>
+<p class="font-body-md text-body-md text-subtext">24/7 access to our premium travel advisors.</p>
+</div>
+</div>
+</div>
+<button class="mt-10 px-8 py-4 bg-transparent border-2 border-primary text-primary rounded-full font-body-md text-body-md hover:bg-primary hover:text-white transition-colors">
+                        Become a Member
+                    </button>
+</div>
+</div>
+</section>
+</main>
+<!-- Footer Shared Component -->
+<footer class="w-full border-t border-outline-variant dark:border-outline bg-surface-container-lowest dark:bg-inverse-surface py-12">
+<div class="flex flex-col md:flex-row justify-between items-center px-margin-desktop max-w-container-max mx-auto md:px-margin-tablet sm:px-margin-mobile">
+<div class="font-headline-md text-headline-md text-primary dark:text-inverse-primary mb-6 md:mb-0">
+                ELITE VOYAGE
+            </div>
+<div class="flex flex-wrap justify-center gap-6 font-body-md text-body-md">
+<a class="text-subtext dark:text-outline-variant hover:text-primary dark:hover:text-on-primary-container transition-colors" href="#">Privacy Policy</a>
+<a class="text-subtext dark:text-outline-variant hover:text-primary dark:hover:text-on-primary-container transition-colors" href="#">Terms of Service</a>
+<a class="text-subtext dark:text-outline-variant hover:text-primary dark:hover:text-on-primary-container transition-colors" href="#">Travel Insurance</a>
+<a class="text-subtext dark:text-outline-variant hover:text-primary dark:hover:text-on-primary-container transition-colors" href="#">Sustainability</a>
+</div>
+<div class="font-body-md text-body-md text-subtext mt-6 md:mt-0 text-center md:text-right">
+                © 2024 ELITE VOYAGE. All rights reserved.
+            </div>
+</div>
+</footer>
+</body></html>

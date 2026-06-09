@@ -1,0 +1,15 @@
+# Node.js
+frontend/node_modules/
+frontend/dist/
+frontend/.env*
+
+# Golang
+backend/server.exe
+backend/*.exe
+backend/*.test
+backend/*.out
+backend/bukit_kasih.db
+
+# OS Files
+.DS_Store
+Thumbs.db
