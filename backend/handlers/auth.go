@@ -93,3 +93,46 @@ func GetProfile(c *gin.Context) {
 		"role":  user.Role,
 	})
 }
+
+// Register handles tourist registration
+func Register(c *gin.Context) {
+	var input struct {
+		Name     string `json:"name" binding:"required"`
+		Email    string `json:"email" binding:"required,email"`
+		Password string `json:"password" binding:"required,min=6"`
+	}
+
+	if err := c.ShouldBindJSON(&input); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Format input tidak valid (Password minimal 6 karakter)"})
+		return
+	}
+
+	// Check if user already exists
+	var existingUser models.User
+	if err := database.DB.Where("email = ?", input.Email).First(&existingUser).Error; err == nil {
+		c.JSON(http.StatusConflict, gin.H{"error": "Email ini sudah terdaftar!"})
+		return
+	}
+
+	// Hash password
+	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(input.Password), bcrypt.DefaultCost)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Gagal memproses password"})
+		return
+	}
+
+	// Create user (always Wisatawan)
+	newUser := models.User{
+		Email:    input.Email,
+		Name:     input.Name,
+		Password: string(hashedPassword),
+		Role:     "Wisatawan",
+	}
+
+	if err := database.DB.Create(&newUser).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Gagal menyimpan akun baru"})
+		return
+	}
+
+	c.JSON(http.StatusCreated, gin.H{"message": "Akun berhasil didaftarkan! Silakan masuk."})
+}

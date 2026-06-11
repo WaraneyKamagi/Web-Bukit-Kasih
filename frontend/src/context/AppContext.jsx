@@ -137,6 +137,23 @@ export function AppProvider({ children }) {
     }
   };
 
+  const register = async (name, email, password) => {
+    try {
+      const res = await fetch('/api/auth/register', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name, email, password })
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        return { success: false, error: data.error || 'Registrasi gagal' };
+      }
+      return { success: true, message: data.message };
+    } catch (err) {
+      return { success: false, error: 'Koneksi ke server gagal' };
+    }
+  };
+
   const logout = () => {
     setUser(null);
     setToken(null);
@@ -245,6 +262,7 @@ export function AppProvider({ children }) {
       reviews,
       login,
       logout,
+      register,
       publishAnnouncement,
       addReview,
       deleteReview,

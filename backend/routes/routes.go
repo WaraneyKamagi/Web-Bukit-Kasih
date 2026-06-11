@@ -29,6 +29,7 @@ func SetupRouter() *gin.Engine {
 
 		// Auth routes
 		api.POST("/auth/login", handlers.Login)
+		api.POST("/auth/register", handlers.Register)
 		api.GET("/auth/profile", middleware.AuthMiddleware(), handlers.GetProfile)
 
 		// Announcement routes

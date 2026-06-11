@@ -39,10 +39,11 @@ Sistem ini memiliki berbagai fitur unggulan yang dirancang untuk mendukung kebut
 * **Deskripsi:** Slider interaktif untuk menampilkan ulasan dan pengalaman nyata dari wisatawan.
 * **Interaksi:** Dilengkapi tombol navigasi kiri/kanan, indikator dot, dan fitur geser otomatis (*auto-slide*) setiap 8 detik.
 
-#### G. Sistem Autentikasi Simulasi & Peran Pengguna (RBAC)
-* **Deskripsi:** Sistem login simulasi tanpa database untuk mendemonstrasikan akses khusus berdasarkan peran (*Role-Based Access Control*).
-* **Peran Wisatawan:** Dapat melakukan bookmark aktivitas, menulis ulasan langsung di modal detail, dan melihat riwayat pertanyaan serta balasan pengelola di halaman profil. (Akun uji: `wisatawan@gmail.com` / `password`).
-* **Peran Pengelola (Admin):** Memiliki akses ke Dashboard Admin untuk menerbitkan pengumuman, memoderasi ulasan, membalas pertanyaan wisatawan, dan melihat analitik ringkasan. (Akun uji: `pengelola@bukitkasih.com` / `admin`).
+#### G. Sistem Autentikasi Database & Registrasi Wisatawan (RBAC)
+* **Deskripsi:** Sistem autentikasi berbasis database riil (MySQL/SQLite) menggunakan enkripsi password **bcrypt** dan token **JWT (JSON Web Token)** untuk mengontrol akses berbasis peran (*Role-Based Access Control*).
+* **Fitur Registrasi Baru:** Pengunjung dapat mendaftarkan akun wisatawan baru secara mandiri melalui form pendaftaran gratis pada modal login. Akun baru akan disimpan di database secara otomatis dengan peran *"Wisatawan"*.
+* **Peran Wisatawan:** Dapat melakukan bookmark aktivitas, menulis ulasan langsung di modal detail, dan melihat riwayat pertanyaan serta balasan pengelola di halaman profil. (Akun uji default: `wisatawan@gmail.com` / `password`).
+* **Peran Pengelola (Admin):** Memiliki akses terproteksi ke Dashboard Admin untuk menerbitkan pengumuman, memoderasi ulasan, membalas pertanyaan wisatawan, dan melihat analitik ringkasan. (Akun uji default: `pengelola@bukitkasih.com` / `admin`).
 
 #### H. Dashboard Pengelola (Admin Dashboard)
 * **Deskripsi:** Halaman khusus pengelola (rute `/admin`) untuk mengelola operasional front-end secara real-time.
@@ -74,10 +75,16 @@ Sistem ini dirancang agar siap digunakan sebagai instrumen dalam penelitian kete
 ---
 
 ### 4. Spesifikasi Teknologi (Tech Stack)
-* **Library Utama:** React (v19) untuk manajemen status antarmuka yang reaktif.
-* **Alat Pembangunan (Bundler):** Vite (v8) untuk kompilasi kode super cepat.
-* **Kerangka Desain CSS:** Tailwind CSS (v4) untuk penyusunan antarmuka responsif dan modern.
-* **Penyimpanan Lokal:** *Web Storage API* (LocalStorage) untuk mempertahankan bookmark dan preferensi tema gelap.
+* **Frontend:**
+  * **Library Utama:** React (v19) untuk manajemen status antarmuka yang reaktif.
+  * **Alat Pembangunan (Bundler):** Vite (v8) untuk kompilasi kode super cepat.
+  * **Kerangka Desain CSS:** Tailwind CSS (v4) untuk penyusunan antarmuka responsif dan modern.
+  * **Penyimpanan Lokal:** *Web Storage API* (LocalStorage) untuk mempertahankan bookmark dan preferensi tema gelap.
+* **Backend:**
+  * **Bahasa Pemrograman:** Go (Golang) versi 1.22+ dengan kerangka kerja **Gin Gonic** untuk performa API super cepat.
+  * **Database ORM:** **GORM** untuk interaksi basis data terstruktur.
+  * **Database Engine:** **MySQL** (lewat XAMPP) dan **SQLite** (sebagai basis data berkas lokal).
+  * **Autentikasi & Keamanan:** **JWT (JSON Web Token)** untuk manajemen sesi aman dan enkripsi password menggunakan **bcrypt**.
 
 ---
 

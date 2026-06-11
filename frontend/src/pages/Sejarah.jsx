@@ -9,9 +9,9 @@ export default function Sejarah() {
       {/* Hero Section */}
       <section className="relative min-h-[921px] flex items-center pt-20">
         <div className="absolute inset-0 z-0">
-          <img 
-            alt="Pemandangan tempat ibadah di Puncak Bukit Kasih" 
-            className="w-full h-full object-cover object-center" 
+          <img
+            alt="Pemandangan tempat ibadah di Puncak Bukit Kasih"
+            className="w-full h-full object-cover object-center"
             src={heroBg}
           />
           <div className="absolute inset-0 hero-gradient"></div>
@@ -23,9 +23,9 @@ export default function Sejarah() {
             <p className="font-body-lg text-body-lg text-on-primary/90 mb-10 max-w-xl">
               Didirikan pada tahun 2002 sebagai pusat spiritual dan perdamaian, Bukit Kasih Kanonang berdiri sebagai pengingat nyata akan indahnya kerukunan dan kebersamaan umat beragama di Sulawesi Utara.
             </p>
-            <a 
-              href="https://id.wikipedia.org/wiki/Bukit_Kasih" 
-              target="_blank" 
+            <a
+              href="https://id.wikipedia.org/wiki/Bukit_Kasih"
+              target="_blank"
               rel="noopener noreferrer"
               className="bg-surface-glass text-primary hover:bg-surface-container-lowest font-body-md text-body-md px-8 py-4 rounded-full transition-all duration-300 backdrop-blur-md shadow-[0_20px_40px_-10px_rgba(0,0,0,0.1)] inline-flex items-center space-x-2"
             >
@@ -45,12 +45,12 @@ export default function Sejarah() {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-gutter">
-            
+
             {/* Large Card (Monumen Kerukunan) */}
             <div className="md:col-span-2 group relative rounded-xl overflow-hidden shadow-[0_40px_40px_-10px_rgba(15,76,129,0.08)] bg-surface-container-lowest h-[400px]">
-              <img 
-                alt="Tempat ibadah berdampingan di Bukit Kasih" 
-                className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" 
+              <img
+                alt="Tempat ibadah berdampingan di Bukit Kasih"
+                className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
                 src={ibadahImg}
               />
               <div className="absolute inset-0 bg-gradient-to-t from-primary/90 via-primary/30 to-transparent"></div>
@@ -62,9 +62,9 @@ export default function Sejarah() {
 
             {/* Medium Card 1 (Filosofi Bukit Kasih) */}
             <div className="group relative rounded-xl overflow-hidden shadow-[0_40px_40px_-10px_rgba(15,76,129,0.08)] bg-surface-container-lowest h-[400px]">
-              <img 
-                alt="Monumen salib putih di Bukit Kasih" 
-                className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" 
+              <img
+                alt="Monumen salib putih di Bukit Kasih"
+                className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
                 src={salibImg}
               />
               <div className="absolute inset-0 bg-gradient-to-t from-primary/80 to-transparent"></div>
@@ -76,9 +76,9 @@ export default function Sejarah() {
 
             {/* Medium Card 2 (Legenda Toar Lumimuut) */}
             <div className="group relative rounded-xl overflow-hidden shadow-[0_40px_40px_-10px_rgba(15,76,129,0.08)] bg-surface-container-lowest h-[400px]">
-              <img 
-                alt="Ukiran relief leluhur Minahasa" 
-                className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" 
+              <img
+                alt="Ukiran relief leluhur Minahasa"
+                className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
                 src={reliefImg}
               />
               <div className="absolute inset-0 bg-gradient-to-t from-primary/80 to-transparent"></div>
@@ -96,9 +96,9 @@ export default function Sejarah() {
                 <p className="font-body-lg text-body-lg text-on-primary/80 mb-8">
                   Bukit Kasih bukan sekadar tujuan wisata alam, melainkan sarana edukasi bagi dunia bahwa keberagaman keyakinan adalah jembatan persaudaraan yang indah, dirajut dalam balutan kasih dan rasa hormat yang mendalam.
                 </p>
-                <a 
-                  href="https://id.wikipedia.org/wiki/Bukit_Kasih" 
-                  target="_blank" 
+                <a
+                  href="https://id.wikipedia.org/wiki/Bukit_Kasih"
+                  target="_blank"
                   rel="noopener noreferrer"
                   className="border border-on-primary/30 text-on-primary hover:bg-on-primary hover:text-primary font-body-md text-body-md px-6 py-2 rounded-full transition-all duration-300 inline-block"
                 >
