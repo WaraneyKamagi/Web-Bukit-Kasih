@@ -254,6 +254,28 @@ export function AppProvider({ children }) {
     .catch(err => console.error(err));
   };
 
+  // Instagram Operations (Generate & Publish via AI Agent & Composio)
+  const runInstagramAction = async (action, type, id, prompt = '', caption = '', imageUrl = '') => {
+    try {
+      const res = await fetch('/api/admin/instagram/publish', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({ action, type, id, prompt, caption, imageUrl })
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        return { success: false, error: data.error || 'Terjadi kesalahan sistem' };
+      }
+      return { success: true, data };
+    } catch (err) {
+      console.error('Instagram action failed:', err);
+      return { success: false, error: 'Koneksi ke server gagal' };
+    }
+  };
+
   return (
     <AppContext.Provider value={{
       user,
@@ -267,7 +289,8 @@ export function AppProvider({ children }) {
       addReview,
       deleteReview,
       addInquiry,
-      replyInquiry
+      replyInquiry,
+      runInstagramAction
     }}>
       {children}
     </AppContext.Provider>

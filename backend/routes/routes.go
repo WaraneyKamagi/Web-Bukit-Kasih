@@ -50,6 +50,9 @@ func SetupRouter() *gin.Engine {
 
 		// Chatbot route
 		api.POST("/chat", middleware.AuthMiddleware(), handlers.Chatbot)
+
+		// Instagram routes
+		api.POST("/admin/instagram/publish", middleware.AuthMiddleware(), middleware.AdminOnly(), handlers.PublishToInstagram)
 	}
 
 	return r

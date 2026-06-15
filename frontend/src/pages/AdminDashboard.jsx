@@ -11,7 +11,8 @@ export default function AdminDashboard() {
     reviews, 
     publishAnnouncement, 
     deleteReview, 
-    replyInquiry 
+    replyInquiry,
+    runInstagramAction
   } = useContext(AppContext);
 
   const navigate = useNavigate();
@@ -28,6 +29,62 @@ export default function AdminDashboard() {
   const [toastMessage, setToastMessage] = useState('');
   const [toastType, setToastType] = useState('success');
   const [isToastOpen, setIsToastOpen] = useState(false);
+
+  // Instagram AI Agent State
+  const [isIgModalOpen, setIsIgModalOpen] = useState(false);
+  const [igContentType, setIgContentType] = useState('custom'); // 'announcement', 'review', 'custom'
+  const [igContentId, setIgContentId] = useState(0);
+  const [igCaption, setIgCaption] = useState('');
+  const [igPrompt, setIgPrompt] = useState('');
+  const [igImageURL, setIgImageURL] = useState('https://images.unsplash.com/photo-1590073844006-33379778ae09?auto=format&fit=crop&w=1200&q=80');
+  const [isGenerating, setIsGenerating] = useState(false);
+  const [isPublishing, setIsPublishing] = useState(false);
+
+  const handleOpenIgModal = (type, id = 0, initialPrompt = '') => {
+    setIgContentType(type);
+    setIgContentId(id);
+    setIgPrompt(initialPrompt);
+    setIgCaption('');
+    
+    if (type === 'announcement') {
+      setIgImageURL('https://images.unsplash.com/photo-1540555700478-4be289fbecef?auto=format&fit=crop&w=1200&q=80');
+    } else if (type === 'review') {
+      setIgImageURL('https://images.unsplash.com/photo-1590073844006-33379778ae09?auto=format&fit=crop&w=1200&q=80');
+    } else {
+      setIgImageURL('https://images.unsplash.com/photo-1590073844006-33379778ae09?auto=format&fit=crop&w=1200&q=80');
+    }
+    
+    setIsIgModalOpen(true);
+  };
+
+  const handleGenerateCaption = async () => {
+    setIsGenerating(true);
+    const result = await runInstagramAction('generate', igContentType, igContentId, igPrompt);
+    setIsGenerating(false);
+    if (result.success) {
+      setIgCaption(result.data.caption);
+      showToast('Caption berhasil dibuat oleh AI Agent!', 'success');
+    } else {
+      showToast(result.error || 'Gagal membuat caption', 'error');
+    }
+  };
+
+  const handlePublishInstagram = async (e) => {
+    e.preventDefault();
+    if (!igCaption.trim()) {
+      showToast('Caption tidak boleh kosong', 'error');
+      return;
+    }
+    setIsPublishing(true);
+    const result = await runInstagramAction('publish', igContentType, igContentId, '', igCaption, igImageURL);
+    setIsPublishing(false);
+    if (result.success) {
+      showToast(result.data.message || 'Postingan berhasil dipublikasikan!', 'success');
+      setIsIgModalOpen(false);
+    } else {
+      showToast(result.error || 'Gagal memposting ke Instagram', 'error');
+    }
+  };
 
   // Route Guard
   useEffect(() => {
@@ -191,13 +248,24 @@ export default function AdminDashboard() {
                   </div>
                 </div>
                 
-                {/* Info Card */}
-                <div className="glass-panel-light dark:glass-panel rounded-24 p-6 border border-outline-variant/20 flex flex-col justify-center text-center">
-                  <span className="material-symbols-outlined text-6xl text-primary dark:text-secondary-fixed mb-4">settings_suggest</span>
-                  <h4 className="text-base font-bold text-on-surface mb-2">Simulasi Keamanan Front-End</h4>
-                  <p className="text-sm text-subtext leading-relaxed">
-                    Seluruh pengumuman, moderasi ulasan, dan balasan pesan di dashboard ini langsung memengaruhi konten di halaman Beranda, Aktivitas, dan Profil secara *real-time* di sesi penjelajahan Anda.
-                  </p>
+                {/* Instagram Custom Post Card */}
+                <div className="glass-panel-light dark:glass-panel rounded-24 p-6 border border-outline-variant/20 flex flex-col justify-between text-left">
+                  <div>
+                    <div className="flex items-center gap-3 mb-3 text-[#E1F5FE] bg-[#0F4C81] w-fit px-3 py-1.5 rounded-xl">
+                      <span className="material-symbols-outlined text-[18px]">smart_toy</span>
+                      <span className="text-[10px] font-bold uppercase tracking-wider text-white">AI Agent Hermes</span>
+                    </div>
+                    <h4 className="text-base font-bold text-on-surface mb-2">Buat Postingan Instagram Kustom</h4>
+                    <p className="text-xs text-subtext leading-relaxed mb-4">
+                      Tulis ide atau topik kustom Anda, lalu AI Agent akan menyusun postingan Instagram lengkap dengan tagar dan emoji secara instan.
+                    </p>
+                  </div>
+                  <button 
+                    onClick={() => handleOpenIgModal('custom')}
+                    className="self-start px-5 py-2.5 bg-[#0F4C81] text-white hover:bg-[#0d416f] rounded-full font-body-md text-xs font-bold cursor-pointer transition-colors border-none"
+                  >
+                    Tulis Postingan Kustom
+                  </button>
                 </div>
               </div>
             </div>
@@ -233,13 +301,28 @@ export default function AdminDashboard() {
                     <button 
                       type="button"
                       onClick={handleClearAnnounce}
-                      className="px-6 border border-red-500/30 text-red-600 hover:bg-red-550/10 dark:text-red-400 py-3 rounded-full font-body-md font-semibold transition-colors cursor-pointer text-center"
+                      className="px-6 border border-red-500/30 text-red-650 hover:bg-red-550/10 dark:text-red-400 py-3 rounded-full font-body-md font-semibold transition-colors cursor-pointer text-center"
                     >
                       Matikan
                     </button>
                   )}
                 </div>
               </form>
+
+              {announcement && (
+                <div className="mt-8 border-t border-outline-variant/30 pt-6">
+                  <h4 className="text-sm font-bold text-on-surface mb-2">Promosikan ke Media Sosial</h4>
+                  <p className="text-xs text-subtext mb-4">Bagikan pengumuman aktif ini ke feed Instagram resmi Bukit Kasih via AI Agent (Hermes & Step 3.7 Flash).</p>
+                  <button
+                    type="button"
+                    onClick={() => handleOpenIgModal('announcement', 0, 'Harap tulis pengumuman ini secara formal namun persuasif')}
+                    className="flex items-center gap-2 bg-[#E1F5FE] hover:bg-[#B3E5FC] text-[#0288D1] dark:bg-[#0288D1]/10 dark:hover:bg-[#0288D1]/20 dark:text-[#E1F5FE] px-5 py-2.5 rounded-full font-body-md text-xs font-bold transition-all cursor-pointer border-none"
+                  >
+                    <span className="material-symbols-outlined text-[16px]">share</span>
+                    Bagikan ke Instagram via AI Agent
+                  </button>
+                </div>
+              )}
             </div>
           )}
 
@@ -267,13 +350,24 @@ export default function AdminDashboard() {
                           "{rev.text}"
                         </p>
                       </div>
-                      <button 
-                        onClick={() => handleDeleteReview(rev.id, rev.author)}
-                        className="p-2 border border-red-500/20 text-red-650 hover:bg-red-500/10 rounded-full flex items-center justify-center cursor-pointer transition-colors"
-                        title="Hapus Ulasan"
-                      >
-                        <span className="material-symbols-outlined text-[18px]">delete</span>
-                      </button>
+                      <div className="flex gap-2 shrink-0">
+                        {rev.rating >= 4 && (
+                          <button 
+                            onClick={() => handleOpenIgModal('review', rev.id, 'Ubah ulasan positif ini menjadi postingan promosi Instagram')}
+                            className="p-2 border border-emerald-500/20 text-emerald-600 hover:bg-emerald-500/10 rounded-full flex items-center justify-center cursor-pointer transition-colors"
+                            title="Bagikan Testimoni ke Instagram"
+                          >
+                            <span className="material-symbols-outlined text-[18px]">share</span>
+                          </button>
+                        )}
+                        <button 
+                          onClick={() => handleDeleteReview(rev.id, rev.author)}
+                          className="p-2 border border-red-500/20 text-red-650 hover:bg-red-500/10 rounded-full flex items-center justify-center cursor-pointer transition-colors"
+                          title="Hapus Ulasan"
+                        >
+                          <span className="material-symbols-outlined text-[18px]">delete</span>
+                        </button>
+                      </div>
                     </div>
                   ))
                 ) : (
@@ -394,6 +488,167 @@ export default function AdminDashboard() {
           type={toastType} 
           onClose={() => setIsToastOpen(false)}
         />
+      )}
+
+      {/* Instagram Preview & Publish Modal */}
+      {isIgModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-fade-in">
+          <div className="bg-white dark:bg-neutral-900 border border-outline-variant/30 rounded-32 p-6 sm:p-8 max-w-xl w-full shadow-2xl space-y-6 text-left overflow-y-auto max-h-[90vh] font-sans">
+            
+            {/* Header */}
+            <div className="flex justify-between items-center pb-4 border-b border-outline-variant/20">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-full bg-[#0F4C81] flex items-center justify-center text-white">
+                  <span className="material-symbols-outlined text-xl">smart_toy</span>
+                </div>
+                <div>
+                  <h3 className="text-base font-bold text-on-surface">Instagram Copilot (via Hermes)</h3>
+                  <p className="text-[10px] text-subtext">Menyusun & Mempublikasikan Konten via Composio</p>
+                </div>
+              </div>
+              <button 
+                onClick={() => setIsIgModalOpen(false)}
+                className="text-subtext hover:text-on-surface cursor-pointer border-none bg-transparent"
+              >
+                <span className="material-symbols-outlined text-xl">close</span>
+              </button>
+            </div>
+
+            {/* Input Details */}
+            <div className="space-y-4">
+              {/* Type Badge */}
+              <div className="flex gap-2 items-center text-xs">
+                <span className="font-bold text-subtext uppercase tracking-wider">Sumber Konten:</span>
+                <span className={`px-2.5 py-0.5 rounded-full text-[9px] font-extrabold uppercase ${
+                  igContentType === 'announcement' ? 'bg-amber-500/20 text-amber-700 dark:text-amber-400' :
+                  igContentType === 'review' ? 'bg-emerald-500/20 text-emerald-700 dark:text-emerald-400' :
+                  'bg-blue-500/20 text-blue-700 dark:text-blue-400'
+                }`}>
+                  {igContentType}
+                </span>
+              </div>
+
+              {/* Optional Prompt instructions */}
+              <div>
+                <label className="block text-[10px] font-bold text-subtext uppercase tracking-wider mb-1.5">Instruksi Tambahan AI (Opsional)</label>
+                <textarea 
+                  rows="2"
+                  value={igPrompt}
+                  onChange={(e) => setIgPrompt(e.target.value)}
+                  placeholder="Contoh: Fokuskan pada ajakan ramah, gunakan gaya bahasa santai..."
+                  className="w-full p-3.5 rounded-xl border border-outline-variant/40 bg-white dark:bg-black/10 focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary text-xs text-on-surface"
+                />
+              </div>
+
+              {/* Predefined Image Selectors */}
+              <div>
+                <label className="block text-[10px] font-bold text-subtext uppercase tracking-wider mb-1.5">Pilih Foto Postingan</label>
+                <div className="grid grid-cols-3 gap-2">
+                  {[
+                    { label: 'Scenic / Umum', url: 'https://images.unsplash.com/photo-1590073844006-33379778ae09?auto=format&fit=crop&w=1200&q=80' },
+                    { label: 'Rumah Ibadah', url: 'https://images.unsplash.com/photo-1478147427282-58a87a120781?auto=format&fit=crop&w=1200&q=80' },
+                    { label: 'Relief Tebing', url: 'https://images.unsplash.com/photo-1608958415123-64a51e605d8f?auto=format&fit=crop&w=1200&q=80' },
+                    { label: 'Monumen Salib', url: 'https://images.unsplash.com/photo-1544865181-a96c6806509f?auto=format&fit=crop&w=1200&q=80' },
+                    { label: 'Air Hangat', url: 'https://images.unsplash.com/photo-1540555700478-4be289fbecef?auto=format&fit=crop&w=1200&q=80' },
+                    { label: 'Custom URL', url: 'custom' },
+                  ].map((img, idx) => {
+                    const isSelected = igImageURL === img.url || (img.url === 'custom' && !['https://images.unsplash.com/photo-1590073844006-33379778ae09?auto=format&fit=crop&w=1200&q=80', 'https://images.unsplash.com/photo-1478147427282-58a87a120781?auto=format&fit=crop&w=1200&q=80', 'https://images.unsplash.com/photo-1608958415123-64a51e605d8f?auto=format&fit=crop&w=1200&q=80', 'https://images.unsplash.com/photo-1544865181-a96c6806509f?auto=format&fit=crop&w=1200&q=80', 'https://images.unsplash.com/photo-1540555700478-4be289fbecef?auto=format&fit=crop&w=1200&q=80'].includes(igImageURL));
+                    return (
+                      <button
+                        key={idx}
+                        type="button"
+                        onClick={() => {
+                          if (img.url === 'custom') {
+                            const customUrl = prompt('Masukkan URL gambar publik Anda:');
+                            if (customUrl) setIgImageURL(customUrl);
+                          } else {
+                            setIgImageURL(img.url);
+                          }
+                        }}
+                        className={`p-2.5 rounded-xl border text-[10px] font-bold text-center truncate transition-all cursor-pointer ${
+                          isSelected 
+                            ? 'bg-[#0F4C81]/15 border-[#0F4C81] text-[#0F4C81] dark:bg-white/10 dark:border-white dark:text-white' 
+                            : 'border-outline-variant/30 text-subtext hover:border-outline-variant/60'
+                        }`}
+                      >
+                        {img.label}
+                      </button>
+                    );
+                  })}
+                </div>
+                {igImageURL && (
+                  <p className="text-[10px] text-subtext mt-2 truncate">
+                    URL Gambar: <a href={igImageURL} target="_blank" rel="noreferrer" className="underline hover:text-on-surface">{igImageURL}</a>
+                  </p>
+                )}
+              </div>
+
+              {/* Generate Trigger */}
+              <button
+                type="button"
+                onClick={handleGenerateCaption}
+                disabled={isGenerating}
+                className="w-full py-3 bg-[#0F4C81] hover:bg-[#0d416f] disabled:bg-slate-350 dark:disabled:bg-neutral-800 disabled:text-slate-500 text-white rounded-full font-body-md font-bold transition-all flex items-center justify-center gap-2 cursor-pointer border-none"
+              >
+                {isGenerating ? (
+                  <>
+                    <span className="material-symbols-outlined text-[16px] animate-spin">sync</span>
+                    Menyusun Draf Caption via AI...
+                  </>
+                ) : (
+                  <>
+                    <span className="material-symbols-outlined text-[16px]">magic_button</span>
+                    Hasilkan Draf Caption via AI Agent (Step 3.7)
+                  </>
+                )}
+              </button>
+
+              {/* Resulting Caption Editor */}
+              {igCaption && (
+                <div className="space-y-1.5 animate-fade-in">
+                  <label className="block text-[10px] font-bold text-subtext uppercase tracking-wider">Hasil Draf Caption Instagram (Bisa Diedit)</label>
+                  <textarea 
+                    rows="5"
+                    required
+                    value={igCaption}
+                    onChange={(e) => setIgCaption(e.target.value)}
+                    className="w-full p-3 rounded-xl border border-outline-variant/50 bg-white dark:bg-black/10 focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary text-xs leading-relaxed text-on-surface"
+                  />
+                </div>
+              )}
+            </div>
+
+            {/* Actions Footer */}
+            <div className="flex justify-end gap-3 pt-4 border-t border-outline-variant/20">
+              <button
+                type="button"
+                onClick={() => setIsIgModalOpen(false)}
+                className="px-5 py-2.5 border border-outline-variant text-subtext rounded-full font-body-md text-xs font-semibold cursor-pointer hover:bg-slate-50 dark:hover:bg-white/5 transition-colors bg-transparent"
+              >
+                Batal
+              </button>
+              <button
+                type="button"
+                onClick={handlePublishInstagram}
+                disabled={isPublishing || !igCaption.trim()}
+                className="px-7 py-2.5 bg-emerald-650 hover:bg-emerald-700 disabled:bg-slate-350 dark:disabled:bg-neutral-800 disabled:text-slate-500 text-white rounded-full font-body-md text-xs font-bold transition-colors flex items-center gap-2 cursor-pointer border-none"
+              >
+                {isPublishing ? (
+                  <>
+                    <span className="material-symbols-outlined text-[16px] animate-spin">sync</span>
+                    Memposting...
+                  </>
+                ) : (
+                  <>
+                    <span className="material-symbols-outlined text-[16px]">send</span>
+                    Publish ke Instagram
+                  </>
+                )}
+              </button>
+            </div>
+
+          </div>
+        </div>
       )}
     </main>
   );
