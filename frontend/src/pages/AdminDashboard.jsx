@@ -99,7 +99,7 @@ export default function AdminDashboard() {
     setIsToastOpen(true);
   };
 
-  const getTelegramShareUrl = (type, contentText, author = '') => {
+  const handleSendToTelegram = async (type, contentText, author = '') => {
     let text = '';
     if (type === 'announcement') {
       text = `Halo @HermesBK_Bot, tolong buat postingan Instagram untuk pengumuman berikut:\n\n"${contentText}"`;
@@ -108,7 +108,18 @@ export default function AdminDashboard() {
     } else {
       text = `Halo @HermesBK_Bot, tolong buat postingan Instagram kustom berikut:\n\n"${contentText}"`;
     }
-    return `https://t.me/share/url?url=&text=${encodeURIComponent(text)}`;
+
+    try {
+      await navigator.clipboard.writeText(text);
+      showToast('Pesan disalin ke clipboard! Membuka bot Telegram Hermes...', 'success');
+      setTimeout(() => {
+        window.open('https://t.me/HermesBK_Bot', '_blank', 'noopener,noreferrer');
+      }, 800);
+    } catch (err) {
+      console.error('Gagal menyalin ke clipboard:', err);
+      // Fallback to share link if clipboard is blocked
+      window.open(`https://t.me/share/url?url=&text=${encodeURIComponent(text)}`, '_blank', 'noopener,noreferrer');
+    }
   };
 
   if (!user || user.role !== 'Pengelola') return null;
@@ -334,17 +345,16 @@ export default function AdminDashboard() {
                       <span className="material-symbols-outlined text-[16px]">share</span>
                       Bagikan via Web Copilot
                     </button>
-                    <a
-                      href={getTelegramShareUrl('announcement', announcement)}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="flex items-center gap-2 bg-[#229ED9]/10 hover:bg-[#229ED9]/20 text-[#229ED9] px-5 py-2.5 rounded-full font-body-md text-xs font-bold transition-all cursor-pointer border-none no-underline"
+                    <button
+                      type="button"
+                      onClick={() => handleSendToTelegram('announcement', announcement)}
+                      className="flex items-center gap-2 bg-[#229ED9]/10 hover:bg-[#229ED9]/20 text-[#229ED9] px-5 py-2.5 rounded-full font-body-md text-xs font-bold transition-all cursor-pointer border-none"
                     >
                       <svg className="w-[16px] h-[16px] fill-current" viewBox="0 0 24 24">
                         <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm4.64 6.8c-.15.82-.77 4.57-1.09 6.27-.14.72-.4 1.1-.66 1.13-.57.06-1 .36-1.55.72-.86.56-1.35.9-2.18 1.45-1 .63-.35.97.22 1.56 1.48 1.53 2.73 2.78 4.2 3.82.26.18.51.27.75.27.27 0 .42-.15.48-.44.13-.6 1.43-6.75 1.54-7.85.01-.1-.02-.2-.08-.28s-.17-.11-.27-.08c-.46.1-3.66 1.44-7.46 3.01l-4.7-1.46c-.95-.3-1.01-1.01.2-1.47 7.9-3.43 13.16-5.71 15.79-6.85.83-.34 1.4-.41 1.73-.2.33.2.39.67.26 1.34z"/>
                       </svg>
                       Kirim ke Telegram Hermes
-                    </a>
+                    </button>
                   </div>
                 </div>
               )}
@@ -385,17 +395,15 @@ export default function AdminDashboard() {
                             >
                               <span className="material-symbols-outlined text-[18px]">share</span>
                             </button>
-                            <a 
-                              href={getTelegramShareUrl('review', rev.text, rev.author)}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="p-2 border border-[#229ED9]/20 text-[#229ED9] hover:bg-[#229ED9]/10 rounded-full flex items-center justify-center cursor-pointer transition-colors no-underline"
+                            <button 
+                              onClick={() => handleSendToTelegram('review', rev.text, rev.author)}
+                              className="p-2 border border-[#229ED9]/20 text-[#229ED9] hover:bg-[#229ED9]/10 rounded-full flex items-center justify-center cursor-pointer transition-colors"
                               title="Kirim Testimoni ke Telegram Hermes"
                             >
                               <svg className="w-[18px] h-[18px] fill-current" viewBox="0 0 24 24">
                                 <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm4.64 6.8c-.15.82-.77 4.57-1.09 6.27-.14.72-.4 1.1-.66 1.13-.57.06-1 .36-1.55.72-.86.56-1.35.9-2.18 1.45-1 .63-.35.97.22 1.56 1.48 1.53 2.73 2.78 4.2 3.82.26.18.51.27.75.27.27 0 .42-.15.48-.44.13-.6 1.43-6.75 1.54-7.85.01-.1-.02-.2-.08-.28s-.17-.11-.27-.08c-.46.1-3.66 1.44-7.46 3.01l-4.7-1.46c-.95-.3-1.01-1.01.2-1.47 7.9-3.43 13.16-5.71 15.79-6.85.83-.34 1.4-.41 1.73-.2.33.2.39.67.26 1.34z"/>
                               </svg>
-                            </a>
+                            </button>
                           </>
                         )}
                         <button 
@@ -665,21 +673,20 @@ export default function AdminDashboard() {
               >
                 Batal
               </button>
-              <a
-                href={getTelegramShareUrl(
+              <button
+                type="button"
+                onClick={() => handleSendToTelegram(
                   igContentType,
                   igCaption || igPrompt || (igContentType === 'announcement' ? announcement : ''),
                   igContentType === 'review' ? reviews.find(r => r.id === igContentId)?.author : ''
                 )}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="px-5 py-2.5 bg-[#229ED9] hover:bg-[#1d8bcb] text-white rounded-full font-body-md text-xs font-bold transition-colors flex items-center gap-2 cursor-pointer border-none no-underline"
+                className="px-5 py-2.5 bg-[#229ED9] hover:bg-[#1d8bcb] text-white rounded-full font-body-md text-xs font-bold transition-colors flex items-center gap-2 cursor-pointer border-none"
               >
                 <svg className="w-4 h-4 fill-current" viewBox="0 0 24 24">
                   <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm4.64 6.8c-.15.82-.77 4.57-1.09 6.27-.14.72-.4 1.1-.66 1.13-.57.06-1 .36-1.55.72-.86.56-1.35.9-2.18 1.45-1 .63-.35.97.22 1.56 1.48 1.53 2.73 2.78 4.2 3.82.26.18.51.27.75.27.27 0 .42-.15.48-.44.13-.6 1.43-6.75 1.54-7.85.01-.1-.02-.2-.08-.28s-.17-.11-.27-.08c-.46.1-3.66 1.44-7.46 3.01l-4.7-1.46c-.95-.3-1.01-1.01.2-1.47 7.9-3.43 13.16-5.71 15.79-6.85.83-.34 1.4-.41 1.73-.2.33.2.39.67.26 1.34z"/>
                 </svg>
                 Kirim ke Telegram
-              </a>
+              </button>
               <button
                 type="button"
                 onClick={handlePublishInstagram}
