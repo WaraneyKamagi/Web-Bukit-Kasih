@@ -4,23 +4,22 @@ import { AppContext } from '../context/AppContext';
 import Toast from '../components/Toast';
 
 export default function AdminDashboard() {
-  const { 
-    user, 
-    announcement, 
-    inquiries, 
-    reviews, 
-    publishAnnouncement, 
-    deleteReview, 
-    replyInquiry,
-    runInstagramAction
+  const {
+    user,
+    announcement,
+    inquiries,
+    reviews,
+    publishAnnouncement,
+    deleteReview,
+    replyInquiry
   } = useContext(AppContext);
 
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('ringkasan');
-  
+
   // Announcement Input
   const [annInput, setAnnInput] = useState(announcement || '');
-  
+
   // Reply State
   const [selectedInqId, setSelectedInqId] = useState(null);
   const [replyText, setReplyText] = useState('');
@@ -30,60 +29,70 @@ export default function AdminDashboard() {
   const [toastType, setToastType] = useState('success');
   const [isToastOpen, setIsToastOpen] = useState(false);
 
-  // Instagram AI Agent State
-  const [isIgModalOpen, setIsIgModalOpen] = useState(false);
-  const [igContentType, setIgContentType] = useState('custom'); // 'announcement', 'review', 'custom'
-  const [igContentId, setIgContentId] = useState(0);
-  const [igCaption, setIgCaption] = useState('');
-  const [igPrompt, setIgPrompt] = useState('');
-  const [igImageURL, setIgImageURL] = useState('https://images.unsplash.com/photo-1590073844006-33379778ae09?auto=format&fit=crop&w=1200&q=80');
-  const [isGenerating, setIsGenerating] = useState(false);
-  const [isPublishing, setIsPublishing] = useState(false);
-
-  const handleOpenIgModal = (type, id = 0, initialPrompt = '') => {
-    setIgContentType(type);
-    setIgContentId(id);
-    setIgPrompt(initialPrompt);
-    setIgCaption('');
-    
-    if (type === 'announcement') {
-      setIgImageURL('https://images.unsplash.com/photo-1540555700478-4be289fbecef?auto=format&fit=crop&w=1200&q=80');
-    } else if (type === 'review') {
-      setIgImageURL('https://images.unsplash.com/photo-1590073844006-33379778ae09?auto=format&fit=crop&w=1200&q=80');
-    } else {
-      setIgImageURL('https://images.unsplash.com/photo-1590073844006-33379778ae09?auto=format&fit=crop&w=1200&q=80');
-    }
-    
-    setIsIgModalOpen(true);
-  };
-
-  const handleGenerateCaption = async () => {
-    setIsGenerating(true);
-    const result = await runInstagramAction('generate', igContentType, igContentId, igPrompt);
-    setIsGenerating(false);
-    if (result.success) {
-      setIgCaption(result.data.caption);
-      showToast('Caption berhasil dibuat oleh AI Agent!', 'success');
-    } else {
-      showToast(result.error || 'Gagal membuat caption', 'error');
-    }
-  };
-
-  const handlePublishInstagram = async (e) => {
-    e.preventDefault();
-    if (!igCaption.trim()) {
-      showToast('Caption tidak boleh kosong', 'error');
+  const handleSendToTelegram = (type, contentText, author = '') => {
+    if (!contentText || !contentText.trim()) {
+      showToast('Pesan tidak boleh kosong!', 'error');
       return;
     }
-    setIsPublishing(true);
-    const result = await runInstagramAction('publish', igContentType, igContentId, '', igCaption, igImageURL);
-    setIsPublishing(false);
-    if (result.success) {
-      showToast(result.data.message || 'Postingan berhasil dipublikasikan!', 'success');
-      setIsIgModalOpen(false);
+
+    let text = '';
+    if (type === 'announcement') {
+      text = `Halo @HermesBK_Bot, tolong buat postingan Instagram untuk pengumuman berikut:\n\n"${contentText}"`;
+    } else if (type === 'review') {
+      text = `Halo @HermesBK_Bot, tolong buat postingan Instagram promosi berdasarkan ulasan dari ${author}:\n\n"${contentText}"`;
     } else {
-      showToast(result.error || 'Gagal memposting ke Instagram', 'error');
+      text = `Halo @HermesBK_Bot, tolong buat postingan Instagram kustom berikut:\n\n"${contentText}"`;
     }
+
+    const fallbackCopy = (str) => {
+      const textArea = document.createElement('textarea');
+      textArea.value = str;
+      textArea.style.position = 'fixed';
+      textArea.style.top = '0';
+      textArea.style.left = '0';
+      textArea.style.width = '2em';
+      textArea.style.height = '2em';
+      textArea.style.padding = '0';
+      textArea.style.border = 'none';
+      textArea.style.outline = 'none';
+      textArea.style.boxShadow = 'none';
+      textArea.style.background = 'transparent';
+      document.body.appendChild(textArea);
+      textArea.focus();
+      textArea.select();
+      try {
+        const successful = document.execCommand('copy');
+        document.body.removeChild(textArea);
+        return successful;
+      } catch (err) {
+        console.error('Fallback copy failed:', err);
+        if (document.body.contains(textArea)) {
+          document.body.removeChild(textArea);
+        }
+        return false;
+      }
+    };
+
+    const copyToClipboard = (str) => {
+      if (navigator.clipboard && window.isSecureContext) {
+        navigator.clipboard.writeText(str).catch((err) => {
+          console.error('navigator.clipboard failed, using fallback:', err);
+          fallbackCopy(str);
+        });
+        return true;
+      }
+      return fallbackCopy(str);
+    };
+
+    const success = copyToClipboard(text);
+    if (success) {
+      showToast('Pesan disalin! Membuka chat bot Hermes...', 'success');
+    } else {
+      showToast('Gagal menyalin otomatis, silakan salin secara manual.', 'error');
+    }
+
+    // Redirect to Telegram app using native protocol handler
+    window.location.href = 'tg://resolve?domain=HermesBK_Bot';
   };
 
   // Route Guard
@@ -97,29 +106,6 @@ export default function AdminDashboard() {
     setToastMessage(message);
     setToastType(type);
     setIsToastOpen(true);
-  };
-
-  const handleSendToTelegram = async (type, contentText, author = '') => {
-    let text = '';
-    if (type === 'announcement') {
-      text = `Halo @HermesBK_Bot, tolong buat postingan Instagram untuk pengumuman berikut:\n\n"${contentText}"`;
-    } else if (type === 'review') {
-      text = `Halo @HermesBK_Bot, tolong buat postingan Instagram promosi berdasarkan ulasan dari ${author}:\n\n"${contentText}"`;
-    } else {
-      text = `Halo @HermesBK_Bot, tolong buat postingan Instagram kustom berikut:\n\n"${contentText}"`;
-    }
-
-    try {
-      await navigator.clipboard.writeText(text);
-      showToast('Pesan disalin ke clipboard! Membuka bot Telegram Hermes...', 'success');
-      setTimeout(() => {
-        window.open('https://t.me/HermesBK_Bot', '_blank', 'noopener,noreferrer');
-      }, 800);
-    } catch (err) {
-      console.error('Gagal menyalin ke clipboard:', err);
-      // Fallback to share link if clipboard is blocked
-      window.open(`https://t.me/share/url?url=&text=${encodeURIComponent(text)}`, '_blank', 'noopener,noreferrer');
-    }
   };
 
   if (!user || user.role !== 'Pengelola') return null;
@@ -157,7 +143,7 @@ export default function AdminDashboard() {
   return (
     <main className="pt-28 min-h-screen pb-20 px-margin-mobile md:px-margin-desktop bg-surface dark:bg-background transition-colors duration-300">
       <div className="max-w-container-max mx-auto text-left">
-        
+
         {/* Title */}
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
           <div>
@@ -172,22 +158,21 @@ export default function AdminDashboard() {
         {/* Tab Headers */}
         <div className="flex border-b border-outline-variant/30 overflow-x-auto hide-scrollbar mb-8 gap-2">
           {['ringkasan', 'pengumuman', 'ulasan', 'pesan'].map((tab) => {
-            const label = tab === 'ringkasan' ? 'Ringkasan' : 
-                          tab === 'pengumuman' ? 'Kelola Pengumuman' : 
-                          tab === 'ulasan' ? 'Moderasi Ulasan' : 'Pesan Masuk';
-            const icon = tab === 'ringkasan' ? 'dashboard' : 
-                         tab === 'pengumuman' ? 'campaign' : 
-                         tab === 'ulasan' ? 'rate_review' : 'mail';
+            const label = tab === 'ringkasan' ? 'Ringkasan' :
+              tab === 'pengumuman' ? 'Kelola Pengumuman' :
+                tab === 'ulasan' ? 'Moderasi Ulasan' : 'Pesan Masuk';
+            const icon = tab === 'ringkasan' ? 'dashboard' :
+              tab === 'pengumuman' ? 'campaign' :
+                tab === 'ulasan' ? 'rate_review' : 'mail';
             const isActive = activeTab === tab;
             return (
-              <button 
+              <button
                 key={tab}
                 onClick={() => setActiveTab(tab)}
-                className={`flex items-center gap-2 px-5 py-3 border-b-2 font-body-md text-sm font-semibold whitespace-nowrap transition-all cursor-pointer ${
-                  isActive 
-                    ? 'border-primary text-primary dark:border-secondary dark:text-secondary-fixed' 
+                className={`flex items-center gap-2 px-5 py-3 border-b-2 font-body-md text-sm font-semibold whitespace-nowrap transition-all cursor-pointer ${isActive
+                    ? 'border-primary text-primary dark:border-secondary dark:text-secondary-fixed'
                     : 'border-transparent text-subtext hover:text-on-surface hover:border-outline-variant/50'
-                }`}
+                  }`}
               >
                 <span className="material-symbols-outlined text-[18px]">{icon}</span>
                 <span>{label}</span>
@@ -203,7 +188,7 @@ export default function AdminDashboard() {
 
         {/* Tab Contents */}
         <div className="animate-fade-in">
-          
+
           {/* TAB 1: SUMMARY */}
           {activeTab === 'ringkasan' && (
             <div className="space-y-8">
@@ -217,7 +202,7 @@ export default function AdminDashboard() {
                   <span className="text-3xl font-extrabold text-on-surface">152</span>
                   <span className="block text-xs text-emerald-600 dark:text-emerald-400 mt-2 font-medium">Uji coba simulasi aktif</span>
                 </div>
-                
+
                 <div className="glass-panel-light dark:glass-panel p-6 rounded-24 shadow-sm border border-outline-variant/20">
                   <div className="flex items-center justify-between mb-4">
                     <span className="text-sm font-bold text-subtext uppercase tracking-wider">Pesan Tertunda</span>
@@ -270,24 +255,47 @@ export default function AdminDashboard() {
                     ))}
                   </div>
                 </div>
-                
-                {/* Instagram Custom Post Card */}
+
+                {/* Telegram Custom Message Card */}
                 <div className="glass-panel-light dark:glass-panel rounded-24 p-6 border border-outline-variant/20 flex flex-col justify-between text-left">
                   <div>
-                    <div className="flex items-center gap-3 mb-3 text-[#E1F5FE] bg-[#0F4C81] w-fit px-3 py-1.5 rounded-xl">
-                      <span className="material-symbols-outlined text-[18px]">smart_toy</span>
-                      <span className="text-[10px] font-bold uppercase tracking-wider text-white">AI Agent Hermes</span>
+                    <div className="flex items-center gap-2 mb-3 text-[#229ED9] bg-[#229ED9]/10 w-fit px-3 py-1 rounded-xl">
+                      <svg className="w-[14px] h-[14px] fill-current" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm4.64 6.8c-.15.82-.77 4.57-1.09 6.27-.14.72-.4 1.1-.66 1.13-.57.06-1 .36-1.55.72-.86.56-1.35.9-2.18 1.45-1 .63-.35.97.22 1.56 1.48 1.53 2.73 2.78 4.2 3.82.26.18.51.27.75.27.27 0 .42-.15.48-.44.13-.6 1.43-6.75 1.54-7.85.01-.1-.02-.2-.08-.28s-.17-.11-.27-.08c-.46.1-3.66 1.44-7.46 3.01l-4.7-1.46c-.95-.3-1.01-1.01.2-1.47 7.9-3.43 13.16-5.71 15.79-6.85.83-.34 1.4-.41 1.73-.2.33.2.39.67.26 1.34z"/></svg>
+                      <span className="text-[10px] font-bold uppercase tracking-wider">Hermes Agent</span>
                     </div>
-                    <h4 className="text-base font-bold text-on-surface mb-2">Buat Postingan Instagram Kustom</h4>
+                    <h4 className="text-base font-bold text-on-surface mb-2">Kirim Pesan Kustom ke Hermes</h4>
                     <p className="text-xs text-subtext leading-relaxed mb-4">
-                      Tulis ide atau topik kustom Anda, lalu AI Agent akan menyusun postingan Instagram lengkap dengan tagar dan emoji secara instan.
+                      Kirim perintah atau ide postingan kustom langsung ke Telegram HP Admin.
                     </p>
+                    <input
+                      type="text"
+                      id="customTelegramMsg"
+                      placeholder="Tulis pesan kustom..."
+                      className="w-full px-3 py-2 text-xs rounded-xl border border-outline-variant/40 bg-white dark:bg-black/10 text-on-surface focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary mb-4"
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter') {
+                          const val = e.target.value;
+                          if (val.trim()) {
+                            handleSendToTelegram('custom', val);
+                            e.target.value = '';
+                          }
+                        }
+                      }}
+                    />
                   </div>
-                  <button 
-                    onClick={() => handleOpenIgModal('custom')}
-                    className="self-start px-5 py-2.5 bg-[#0F4C81] text-white hover:bg-[#0d416f] rounded-full font-body-md text-xs font-bold cursor-pointer transition-colors border-none"
+                  <button
+                    onClick={() => {
+                      const el = document.getElementById('customTelegramMsg');
+                      if (el && el.value.trim()) {
+                        handleSendToTelegram('custom', el.value);
+                        el.value = '';
+                      } else {
+                        showToast('Silakan isi pesan kustom terlebih dahulu!', 'error');
+                      }
+                    }}
+                    className="self-start px-5 py-2 bg-[#229ED9] hover:bg-[#1d8bcb] text-white rounded-full font-body-md text-xs font-bold cursor-pointer transition-colors border-none"
                   >
-                    Tulis Postingan Kustom
+                    Kirim Pesan
                   </button>
                 </div>
               </div>
@@ -299,11 +307,11 @@ export default function AdminDashboard() {
             <div className="glass-panel-light dark:glass-panel rounded-24 p-8 border border-outline-variant/20 max-w-xl">
               <h3 className="text-lg font-bold text-on-surface mb-2">Terbitkan Pengumuman Penting</h3>
               <p className="text-sm text-subtext mb-6">Pengumuman akan langsung muncul sebagai banner peringatan merah di atas halaman Beranda untuk semua pengunjung.</p>
-              
+
               <form onSubmit={handleAnnounceSubmit} className="space-y-4">
                 <div>
                   <label className="block text-xs font-label-caps text-subtext uppercase tracking-wider mb-2">Teks Pengumuman</label>
-                  <textarea 
+                  <textarea
                     rows="3"
                     required
                     value={annInput}
@@ -312,16 +320,16 @@ export default function AdminDashboard() {
                     className="w-full p-4 rounded-xl border border-outline-variant/40 bg-white dark:bg-black/10 focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary font-body-md text-sm text-on-surface"
                   />
                 </div>
-                
+
                 <div className="flex gap-4">
-                  <button 
+                  <button
                     type="submit"
                     className="flex-1 bg-[#0F4C81] text-white py-3 rounded-full hover:bg-primary font-body-md font-semibold transition-colors cursor-pointer text-center"
                   >
                     Perbarui Pengumuman
                   </button>
                   {announcement && (
-                    <button 
+                    <button
                       type="button"
                       onClick={handleClearAnnounce}
                       className="px-6 border border-red-500/30 text-red-650 hover:bg-red-550/10 dark:text-red-400 py-3 rounded-full font-body-md font-semibold transition-colors cursor-pointer text-center"
@@ -334,28 +342,21 @@ export default function AdminDashboard() {
 
               {announcement && (
                 <div className="mt-8 border-t border-outline-variant/30 pt-6">
-                  <h4 className="text-sm font-bold text-on-surface mb-2">Promosikan ke Media Sosial</h4>
-                  <p className="text-xs text-subtext mb-4">Bagikan pengumuman aktif ini ke feed Instagram resmi Bukit Kasih via AI Agent Hermes.</p>
-                  <div className="flex flex-wrap gap-3">
-                    <button
-                      type="button"
-                      onClick={() => handleOpenIgModal('announcement', 0, 'Harap tulis pengumuman ini secara formal namun persuasif')}
-                      className="flex items-center gap-2 bg-[#E1F5FE] hover:bg-[#B3E5FC] text-[#0288D1] dark:bg-[#0288D1]/10 dark:hover:bg-[#0288D1]/20 dark:text-[#E1F5FE] px-5 py-2.5 rounded-full font-body-md text-xs font-bold transition-all cursor-pointer border-none"
-                    >
-                      <span className="material-symbols-outlined text-[16px]">share</span>
-                      Bagikan via Web Copilot
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => handleSendToTelegram('announcement', announcement)}
-                      className="flex items-center gap-2 bg-[#229ED9]/10 hover:bg-[#229ED9]/20 text-[#229ED9] px-5 py-2.5 rounded-full font-body-md text-xs font-bold transition-all cursor-pointer border-none"
-                    >
-                      <svg className="w-[16px] h-[16px] fill-current" viewBox="0 0 24 24">
-                        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm4.64 6.8c-.15.82-.77 4.57-1.09 6.27-.14.72-.4 1.1-.66 1.13-.57.06-1 .36-1.55.72-.86.56-1.35.9-2.18 1.45-1 .63-.35.97.22 1.56 1.48 1.53 2.73 2.78 4.2 3.82.26.18.51.27.75.27.27 0 .42-.15.48-.44.13-.6 1.43-6.75 1.54-7.85.01-.1-.02-.2-.08-.28s-.17-.11-.27-.08c-.46.1-3.66 1.44-7.46 3.01l-4.7-1.46c-.95-.3-1.01-1.01.2-1.47 7.9-3.43 13.16-5.71 15.79-6.85.83-.34 1.4-.41 1.73-.2.33.2.39.67.26 1.34z"/>
-                      </svg>
-                      Kirim ke Telegram Hermes
-                    </button>
-                  </div>
+                  <h4 className="text-sm font-bold text-on-surface mb-2 font-body-lg">Promosikan ke Media Sosial</h4>
+                  <p className="text-xs text-subtext mb-4">Kirim konten pengumuman aktif ini langsung ke Telegram HP Admin untuk diposting oleh Hermes.</p>
+                  <button
+                    type="button"
+                    onClick={() => handleSendToTelegram('announcement', announcement)}
+                    className="flex items-center gap-2 bg-[#229ED9]/10 hover:bg-[#229ED9]/20 text-[#229ED9] px-5 py-2.5 rounded-full font-body-md text-xs font-bold transition-all cursor-pointer border-none"
+                  >
+                    <svg className="w-[16px] h-[16px] fill-current" viewBox="0 0 24 24">
+                      <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm4.64 6.8c-.15.82-.77 4.57-1.09 6.27-.14.72-.4 1.1-.66 1.13-.57.06-1 .36-1.55.72-.86.56-1.35.9-2.18 1.45-1 .63-.35.97.22 1.56 1.48 1.53 2.73 2.78 4.2 3.82.26.18.51.27.75.27.27 0 .42-.15.48-.44.13-.6 1.43-6.75 1.54-7.85.01-.1-.02-.2-.08-.28s-.17-.11-.27-.08c-.46.1-3.66 1.44-7.46 3.01l-4.7-1.46c-.95-.3-1.01-1.01.2-1.47 7.9-3.43 13.16-5.71 15.79-6.85.83-.34 1.4-.41 1.73-.2.33.2.39.67.26 1.34z"/>
+                    </svg>
+                    Kirim ke Telegram Hermes
+                  </button>
+                  <p className="text-[10px] text-amber-600 dark:text-amber-400 mt-3 font-medium">
+                    *Catatan: Pastikan Anda menggunakan akun Telegram dengan User ID yang terdaftar di bot Hermes.
+                  </p>
                 </div>
               )}
             </div>
@@ -368,7 +369,7 @@ export default function AdminDashboard() {
               <div className="space-y-4">
                 {reviews.length > 0 ? (
                   reviews.map((rev) => (
-                    <div 
+                    <div
                       key={rev.id}
                       className="p-5 border border-outline-variant/20 rounded-2xl flex justify-between items-start gap-4 hover:bg-slate-50/50 dark:hover:bg-white/5 transition-colors"
                     >
@@ -387,28 +388,19 @@ export default function AdminDashboard() {
                       </div>
                       <div className="flex gap-2 shrink-0">
                         {rev.rating >= 4 && (
-                          <>
-                            <button 
-                              onClick={() => handleOpenIgModal('review', rev.id, 'Ubah ulasan positif ini menjadi postingan promosi Instagram')}
-                              className="p-2 border border-emerald-500/20 text-emerald-600 hover:bg-emerald-500/10 rounded-full flex items-center justify-center cursor-pointer transition-colors"
-                              title="Bagikan Testimoni via Web Copilot"
-                            >
-                              <span className="material-symbols-outlined text-[18px]">share</span>
-                            </button>
-                            <button 
-                              onClick={() => handleSendToTelegram('review', rev.text, rev.author)}
-                              className="p-2 border border-[#229ED9]/20 text-[#229ED9] hover:bg-[#229ED9]/10 rounded-full flex items-center justify-center cursor-pointer transition-colors"
-                              title="Kirim Testimoni ke Telegram Hermes"
-                            >
-                              <svg className="w-[18px] h-[18px] fill-current" viewBox="0 0 24 24">
-                                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm4.64 6.8c-.15.82-.77 4.57-1.09 6.27-.14.72-.4 1.1-.66 1.13-.57.06-1 .36-1.55.72-.86.56-1.35.9-2.18 1.45-1 .63-.35.97.22 1.56 1.48 1.53 2.73 2.78 4.2 3.82.26.18.51.27.75.27.27 0 .42-.15.48-.44.13-.6 1.43-6.75 1.54-7.85.01-.1-.02-.2-.08-.28s-.17-.11-.27-.08c-.46.1-3.66 1.44-7.46 3.01l-4.7-1.46c-.95-.3-1.01-1.01.2-1.47 7.9-3.43 13.16-5.71 15.79-6.85.83-.34 1.4-.41 1.73-.2.33.2.39.67.26 1.34z"/>
-                              </svg>
-                            </button>
-                          </>
+                          <button
+                            onClick={() => handleSendToTelegram('review', rev.text, rev.author)}
+                            className="p-2 border border-[#229ED9]/20 text-[#229ED9] hover:bg-[#229ED9]/10 rounded-full flex items-center justify-center cursor-pointer transition-colors"
+                            title="Kirim Testimoni ke Telegram Hermes"
+                          >
+                            <svg className="w-[18px] h-[18px] fill-current" viewBox="0 0 24 24">
+                              <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm4.64 6.8c-.15.82-.77 4.57-1.09 6.27-.14.72-.4 1.1-.66 1.13-.57.06-1 .36-1.55.72-.86.56-1.35.9-2.18 1.45-1 .63-.35.97.22 1.56 1.48 1.53 2.73 2.78 4.2 3.82.26.18.51.27.75.27.27 0 .42-.15.48-.44.13-.6 1.43-6.75 1.54-7.85.01-.1-.02-.2-.08-.28s-.17-.11-.27-.08c-.46.1-3.66 1.44-7.46 3.01l-4.7-1.46c-.95-.3-1.01-1.01.2-1.47 7.9-3.43 13.16-5.71 15.79-6.85.83-.34 1.4-.41 1.73-.2.33.2.39.67.26 1.34z"/>
+                            </svg>
+                          </button>
                         )}
-                        <button 
+                        <button
                           onClick={() => handleDeleteReview(rev.id, rev.author)}
-                          className="p-2 border border-red-500/20 text-red-650 hover:bg-red-550/10 rounded-full flex items-center justify-center cursor-pointer transition-colors"
+                          className="p-2 border border-red-500/20 text-red-650 hover:bg-red-500/10 rounded-full flex items-center justify-center cursor-pointer transition-colors"
                           title="Hapus Ulasan"
                         >
                           <span className="material-symbols-outlined text-[18px]">delete</span>
@@ -430,13 +422,12 @@ export default function AdminDashboard() {
               <div className="space-y-6">
                 {inquiries.length > 0 ? (
                   inquiries.map((inq) => (
-                    <div 
+                    <div
                       key={inq.id}
-                      className={`p-6 border rounded-2xl flex flex-col gap-4 text-left transition-colors ${
-                        inq.status === 'Menunggu Balasan' 
-                          ? 'border-amber-500/30 bg-amber-500/5 dark:bg-amber-500/5' 
+                      className={`p-6 border rounded-2xl flex flex-col gap-4 text-left transition-colors ${inq.status === 'Menunggu Balasan'
+                          ? 'border-amber-500/30 bg-amber-500/5 dark:bg-amber-500/5'
                           : 'border-outline-variant/20'
-                      }`}
+                        }`}
                     >
                       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 pb-3 border-b border-outline-variant/10 text-xs">
                         <div className="flex flex-wrap items-center gap-3">
@@ -444,11 +435,10 @@ export default function AdminDashboard() {
                           <span className="text-subtext">({inq.email})</span>
                           <span className="text-subtext">{inq.date}</span>
                         </div>
-                        <span className={`px-3 py-1 rounded-full font-bold uppercase text-[9px] ${
-                          inq.status === 'Menunggu Balasan' 
-                            ? 'bg-amber-500/20 text-amber-700 dark:text-amber-400' 
+                        <span className={`px-3 py-1 rounded-full font-bold uppercase text-[9px] ${inq.status === 'Menunggu Balasan'
+                            ? 'bg-amber-500/20 text-amber-700 dark:text-amber-400'
                             : 'bg-emerald-500/20 text-emerald-700 dark:text-emerald-400'
-                        }`}>
+                          }`}>
                           {inq.status}
                         </span>
                       </div>
@@ -472,7 +462,7 @@ export default function AdminDashboard() {
 
                       {/* Reply Form Trigger */}
                       {inq.status === 'Menunggu Balasan' && selectedInqId !== inq.id && (
-                        <button 
+                        <button
                           onClick={() => {
                             setSelectedInqId(inq.id);
                             setReplyText('');
@@ -488,7 +478,7 @@ export default function AdminDashboard() {
                         <form onSubmit={(e) => handleReplySubmit(inq.id, e)} className="space-y-4 border-t border-outline-variant/10 pt-4">
                           <div>
                             <label className="block text-xs font-label-caps text-subtext uppercase tracking-wider mb-2">Teks Balasan</label>
-                            <textarea 
+                            <textarea
                               rows="2"
                               required
                               value={replyText}
@@ -498,13 +488,13 @@ export default function AdminDashboard() {
                             />
                           </div>
                           <div className="flex gap-3">
-                            <button 
+                            <button
                               type="submit"
                               className="px-6 bg-emerald-600 hover:bg-emerald-700 text-white py-2.5 rounded-full font-body-md text-xs font-semibold cursor-pointer transition-colors"
                             >
                               Kirim Balasan
                             </button>
-                            <button 
+                            <button
                               type="button"
                               onClick={() => setSelectedInqId(null)}
                               className="px-6 border border-outline-variant text-subtext py-2.5 rounded-full font-body-md text-xs transition-colors cursor-pointer"
@@ -529,187 +519,14 @@ export default function AdminDashboard() {
       </div>
 
       {isToastOpen && (
-        <Toast 
-          message={toastMessage} 
-          type={toastType} 
+        <Toast
+          message={toastMessage}
+          type={toastType}
           onClose={() => setIsToastOpen(false)}
         />
       )}
 
-      {/* Instagram Preview & Publish Modal */}
-      {isIgModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-fade-in">
-          <div className="bg-white dark:bg-neutral-900 border border-outline-variant/30 rounded-32 p-6 sm:p-8 max-w-xl w-full shadow-2xl space-y-6 text-left overflow-y-auto max-h-[90vh] font-sans">
-            
-            {/* Header */}
-            <div className="flex justify-between items-center pb-4 border-b border-outline-variant/20">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-full bg-[#0F4C81] flex items-center justify-center text-white">
-                  <span className="material-symbols-outlined text-xl">smart_toy</span>
-                </div>
-                <div>
-                  <h3 className="text-base font-bold text-on-surface">Instagram Copilot (via Hermes)</h3>
-                  <p className="text-[10px] text-subtext">Menyusun & Mempublikasikan Konten via Composio</p>
-                </div>
-              </div>
-              <button 
-                onClick={() => setIsIgModalOpen(false)}
-                className="text-subtext hover:text-on-surface cursor-pointer border-none bg-transparent"
-              >
-                <span className="material-symbols-outlined text-xl">close</span>
-              </button>
-            </div>
 
-            {/* Input Details */}
-            <div className="space-y-4">
-              {/* Type Badge */}
-              <div className="flex gap-2 items-center text-xs">
-                <span className="font-bold text-subtext uppercase tracking-wider">Sumber Konten:</span>
-                <span className={`px-2.5 py-0.5 rounded-full text-[9px] font-extrabold uppercase ${
-                  igContentType === 'announcement' ? 'bg-amber-500/20 text-amber-700 dark:text-amber-400' :
-                  igContentType === 'review' ? 'bg-emerald-500/20 text-emerald-700 dark:text-emerald-400' :
-                  'bg-blue-500/20 text-blue-700 dark:text-blue-400'
-                }`}>
-                  {igContentType}
-                </span>
-              </div>
-
-              {/* Optional Prompt instructions */}
-              <div>
-                <label className="block text-[10px] font-bold text-subtext uppercase tracking-wider mb-1.5">Instruksi Tambahan AI (Opsional)</label>
-                <textarea 
-                  rows="2"
-                  value={igPrompt}
-                  onChange={(e) => setIgPrompt(e.target.value)}
-                  placeholder="Contoh: Fokuskan pada ajakan ramah, gunakan gaya bahasa santai..."
-                  className="w-full p-3.5 rounded-xl border border-outline-variant/40 bg-white dark:bg-black/10 focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary text-xs text-on-surface"
-                />
-              </div>
-
-              {/* Predefined Image Selectors */}
-              <div>
-                <label className="block text-[10px] font-bold text-subtext uppercase tracking-wider mb-1.5">Pilih Foto Postingan</label>
-                <div className="grid grid-cols-3 gap-2">
-                  {[
-                    { label: 'Scenic / Umum', url: 'https://images.unsplash.com/photo-1590073844006-33379778ae09?auto=format&fit=crop&w=1200&q=80' },
-                    { label: 'Rumah Ibadah', url: 'https://images.unsplash.com/photo-1478147427282-58a87a120781?auto=format&fit=crop&w=1200&q=80' },
-                    { label: 'Relief Tebing', url: 'https://images.unsplash.com/photo-1608958415123-64a51e605d8f?auto=format&fit=crop&w=1200&q=80' },
-                    { label: 'Monumen Salib', url: 'https://images.unsplash.com/photo-1544865181-a96c6806509f?auto=format&fit=crop&w=1200&q=80' },
-                    { label: 'Air Hangat', url: 'https://images.unsplash.com/photo-1540555700478-4be289fbecef?auto=format&fit=crop&w=1200&q=80' },
-                    { label: 'Custom URL', url: 'custom' },
-                  ].map((img, idx) => {
-                    const isSelected = igImageURL === img.url || (img.url === 'custom' && !['https://images.unsplash.com/photo-1590073844006-33379778ae09?auto=format&fit=crop&w=1200&q=80', 'https://images.unsplash.com/photo-1478147427282-58a87a120781?auto=format&fit=crop&w=1200&q=80', 'https://images.unsplash.com/photo-1608958415123-64a51e605d8f?auto=format&fit=crop&w=1200&q=80', 'https://images.unsplash.com/photo-1544865181-a96c6806509f?auto=format&fit=crop&w=1200&q=80', 'https://images.unsplash.com/photo-1540555700478-4be289fbecef?auto=format&fit=crop&w=1200&q=80'].includes(igImageURL));
-                    return (
-                      <button
-                        key={idx}
-                        type="button"
-                        onClick={() => {
-                          if (img.url === 'custom') {
-                            const customUrl = prompt('Masukkan URL gambar publik Anda:');
-                            if (customUrl) setIgImageURL(customUrl);
-                          } else {
-                            setIgImageURL(img.url);
-                          }
-                        }}
-                        className={`p-2.5 rounded-xl border text-[10px] font-bold text-center truncate transition-all cursor-pointer ${
-                          isSelected 
-                            ? 'bg-[#0F4C81]/15 border-[#0F4C81] text-[#0F4C81] dark:bg-white/10 dark:border-white dark:text-white' 
-                            : 'border-outline-variant/30 text-subtext hover:border-outline-variant/60'
-                        }`}
-                      >
-                        {img.label}
-                      </button>
-                    );
-                  })}
-                </div>
-                {igImageURL && (
-                  <p className="text-[10px] text-subtext mt-2 truncate">
-                    URL Gambar: <a href={igImageURL} target="_blank" rel="noreferrer" className="underline hover:text-on-surface">{igImageURL}</a>
-                  </p>
-                )}
-              </div>
-
-              {/* Generate Trigger */}
-              <button
-                type="button"
-                onClick={handleGenerateCaption}
-                disabled={isGenerating}
-                className="w-full py-3 bg-[#0F4C81] hover:bg-[#0d416f] disabled:bg-slate-350 dark:disabled:bg-neutral-800 disabled:text-slate-500 text-white rounded-full font-body-md font-bold transition-all flex items-center justify-center gap-2 cursor-pointer border-none"
-              >
-                {isGenerating ? (
-                  <>
-                    <span className="material-symbols-outlined text-[16px] animate-spin">sync</span>
-                    Menyusun Draf Caption via AI...
-                  </>
-                ) : (
-                  <>
-                    <span className="material-symbols-outlined text-[16px]">magic_button</span>
-                    Hasilkan Draf Caption via AI Agent (Step 3.7)
-                  </>
-                )}
-              </button>
-
-              {/* Resulting Caption Editor */}
-              {igCaption && (
-                <div className="space-y-1.5 animate-fade-in">
-                  <label className="block text-[10px] font-bold text-subtext uppercase tracking-wider">Hasil Draf Caption Instagram (Bisa Diedit)</label>
-                  <textarea 
-                    rows="5"
-                    required
-                    value={igCaption}
-                    onChange={(e) => setIgCaption(e.target.value)}
-                    className="w-full p-3 rounded-xl border border-outline-variant/50 bg-white dark:bg-black/10 focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary text-xs leading-relaxed text-on-surface"
-                  />
-                </div>
-              )}
-            </div>
-
-            {/* Actions Footer */}
-            <div className="flex justify-end flex-wrap gap-3 pt-4 border-t border-outline-variant/20">
-              <button
-                type="button"
-                onClick={() => setIsIgModalOpen(false)}
-                className="px-5 py-2.5 border border-outline-variant text-subtext rounded-full font-body-md text-xs font-semibold cursor-pointer hover:bg-slate-50 dark:hover:bg-white/5 transition-colors bg-transparent"
-              >
-                Batal
-              </button>
-              <button
-                type="button"
-                onClick={() => handleSendToTelegram(
-                  igContentType,
-                  igCaption || igPrompt || (igContentType === 'announcement' ? announcement : ''),
-                  igContentType === 'review' ? reviews.find(r => r.id === igContentId)?.author : ''
-                )}
-                className="px-5 py-2.5 bg-[#229ED9] hover:bg-[#1d8bcb] text-white rounded-full font-body-md text-xs font-bold transition-colors flex items-center gap-2 cursor-pointer border-none"
-              >
-                <svg className="w-4 h-4 fill-current" viewBox="0 0 24 24">
-                  <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm4.64 6.8c-.15.82-.77 4.57-1.09 6.27-.14.72-.4 1.1-.66 1.13-.57.06-1 .36-1.55.72-.86.56-1.35.9-2.18 1.45-1 .63-.35.97.22 1.56 1.48 1.53 2.73 2.78 4.2 3.82.26.18.51.27.75.27.27 0 .42-.15.48-.44.13-.6 1.43-6.75 1.54-7.85.01-.1-.02-.2-.08-.28s-.17-.11-.27-.08c-.46.1-3.66 1.44-7.46 3.01l-4.7-1.46c-.95-.3-1.01-1.01.2-1.47 7.9-3.43 13.16-5.71 15.79-6.85.83-.34 1.4-.41 1.73-.2.33.2.39.67.26 1.34z"/>
-                </svg>
-                Kirim ke Telegram
-              </button>
-              <button
-                type="button"
-                onClick={handlePublishInstagram}
-                disabled={isPublishing || !igCaption.trim()}
-                className="px-7 py-2.5 bg-emerald-650 hover:bg-emerald-700 disabled:bg-slate-350 dark:disabled:bg-neutral-800 disabled:text-slate-500 text-white rounded-full font-body-md text-xs font-bold transition-colors flex items-center gap-2 cursor-pointer border-none"
-              >
-                {isPublishing ? (
-                  <>
-                    <span className="material-symbols-outlined text-[16px] animate-spin">sync</span>
-                    Memposting...
-                  </>
-                ) : (
-                  <>
-                    <span className="material-symbols-outlined text-[16px]">send</span>
-                    Publish ke Instagram
-                  </>
-                )}
-              </button>
-            </div>
-
-          </div>
-        </div>
-      )}
     </main>
   );
 }

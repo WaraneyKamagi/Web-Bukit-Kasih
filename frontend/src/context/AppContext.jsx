@@ -79,40 +79,40 @@ export function AppProvider({ children }) {
         'Authorization': `Bearer ${token}`
       }
     })
-    .then(res => {
-      if (!res.ok) {
-        throw new Error('Sesi kedaluwarsa');
-      }
-      return res.json();
-    })
-    .then(profile => {
-      setUser(profile);
-      // Fetch inquiries
-      const url = profile.role === 'Pengelola' 
-        ? '/api/inquiries' 
-        : `/api/inquiries/user/${profile.email}`;
-      
-      return fetch(url, {
-        headers: {
-          'Authorization': `Bearer ${token}`
+      .then(res => {
+        if (!res.ok) {
+          throw new Error('Sesi kedaluwarsa');
         }
-      });
-    })
-    .then(res => {
-      if (res && res.ok) {
         return res.json();
-      }
-      return [];
-    })
-    .then(data => {
-      if (Array.isArray(data)) {
-        setInquiries(mapInquiries(data));
-      }
-    })
-    .catch(err => {
-      console.error('Otorisasi gagal, membersihkan sesi:', err);
-      logout();
-    });
+      })
+      .then(profile => {
+        setUser(profile);
+        // Fetch inquiries
+        const url = profile.role === 'Pengelola'
+          ? '/api/inquiries'
+          : `/api/inquiries/user/${profile.email}`;
+
+        return fetch(url, {
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        });
+      })
+      .then(res => {
+        if (res && res.ok) {
+          return res.json();
+        }
+        return [];
+      })
+      .then(data => {
+        if (Array.isArray(data)) {
+          setInquiries(mapInquiries(data));
+        }
+      })
+      .catch(err => {
+        console.error('Otorisasi gagal, membersihkan sesi:', err);
+        logout();
+      });
   }, [token]);
 
   // Auth Operations
@@ -172,14 +172,14 @@ export function AppProvider({ children }) {
       },
       body: JSON.stringify({ text })
     })
-    .then(res => {
-      if (!res.ok) throw new Error('Gagal memperbarui pengumuman');
-      return res.json();
-    })
-    .then(data => {
-      setAnnouncement(data.announcement || null);
-    })
-    .catch(err => console.error(err));
+      .then(res => {
+        if (!res.ok) throw new Error('Gagal memperbarui pengumuman');
+        return res.json();
+      })
+      .then(data => {
+        setAnnouncement(data.announcement || null);
+      })
+      .catch(err => console.error(err));
   };
 
   // Review Operations
@@ -189,14 +189,14 @@ export function AppProvider({ children }) {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ activityId, author, rating, text })
     })
-    .then(res => {
-      if (!res.ok) throw new Error('Gagal menambahkan ulasan');
-      return res.json();
-    })
-    .then(newReview => {
-      setReviews(prev => [ { ...newReview, id: newReview.ID }, ...prev]);
-    })
-    .catch(err => console.error(err));
+      .then(res => {
+        if (!res.ok) throw new Error('Gagal menambahkan ulasan');
+        return res.json();
+      })
+      .then(newReview => {
+        setReviews(prev => [{ ...newReview, id: newReview.ID }, ...prev]);
+      })
+      .catch(err => console.error(err));
   };
 
   const deleteReview = (reviewId) => {
@@ -206,11 +206,11 @@ export function AppProvider({ children }) {
         'Authorization': `Bearer ${token}`
       }
     })
-    .then(res => {
-      if (!res.ok) throw new Error('Gagal menghapus ulasan');
-      setReviews(prev => prev.filter(r => r.ID !== reviewId && r.id !== reviewId));
-    })
-    .catch(err => console.error(err));
+      .then(res => {
+        if (!res.ok) throw new Error('Gagal menghapus ulasan');
+        setReviews(prev => prev.filter(r => r.ID !== reviewId && r.id !== reviewId));
+      })
+      .catch(err => console.error(err));
   };
 
   // Inquiry Operations
@@ -220,14 +220,14 @@ export function AppProvider({ children }) {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ name, email, message })
     })
-    .then(res => {
-      if (!res.ok) throw new Error('Gagal mengirim pesan');
-      return res.json();
-    })
-    .then(newInq => {
-      setInquiries(prev => [ { ...newInq, id: newInq.ID }, ...prev]);
-    })
-    .catch(err => console.error(err));
+      .then(res => {
+        if (!res.ok) throw new Error('Gagal mengirim pesan');
+        return res.json();
+      })
+      .then(newInq => {
+        setInquiries(prev => [{ ...newInq, id: newInq.ID }, ...prev]);
+      })
+      .catch(err => console.error(err));
   };
 
   const replyInquiry = (inquiryId, replyText) => {
@@ -239,41 +239,19 @@ export function AppProvider({ children }) {
       },
       body: JSON.stringify({ reply: replyText })
     })
-    .then(res => {
-      if (!res.ok) throw new Error('Gagal mengirim balasan');
-      return res.json();
-    })
-    .then(updatedInq => {
-      setInquiries(prev => prev.map(inq => {
-        if (inq.id === inquiryId || inq.ID === inquiryId) {
-          return { ...updatedInq, id: updatedInq.ID };
-        }
-        return inq;
-      }));
-    })
-    .catch(err => console.error(err));
-  };
-
-  // Instagram Operations (Generate & Publish via AI Agent & Composio)
-  const runInstagramAction = async (action, type, id, prompt = '', caption = '', imageUrl = '') => {
-    try {
-      const res = await fetch('/api/admin/instagram/publish', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
-        },
-        body: JSON.stringify({ action, type, id, prompt, caption, imageUrl })
-      });
-      const data = await res.json();
-      if (!res.ok) {
-        return { success: false, error: data.error || 'Terjadi kesalahan sistem' };
-      }
-      return { success: true, data };
-    } catch (err) {
-      console.error('Instagram action failed:', err);
-      return { success: false, error: 'Koneksi ke server gagal' };
-    }
+      .then(res => {
+        if (!res.ok) throw new Error('Gagal mengirim balasan');
+        return res.json();
+      })
+      .then(updatedInq => {
+        setInquiries(prev => prev.map(inq => {
+          if (inq.id === inquiryId || inq.ID === inquiryId) {
+            return { ...updatedInq, id: updatedInq.ID };
+          }
+          return inq;
+        }));
+      })
+      .catch(err => console.error(err));
   };
 
   return (
@@ -289,8 +267,7 @@ export function AppProvider({ children }) {
       addReview,
       deleteReview,
       addInquiry,
-      replyInquiry,
-      runInstagramAction
+      replyInquiry
     }}>
       {children}
     </AppContext.Provider>
