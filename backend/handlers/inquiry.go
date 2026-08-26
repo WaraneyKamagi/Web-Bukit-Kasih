@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"net/http"
+	"strings"
 	"time"
 
 	"bukit-kasih-backend/database"
@@ -59,7 +60,11 @@ func GetInquiriesByUser(c *gin.Context) {
 	currentUserEmail, exists := c.Get("userEmail")
 	currentRole, roleExists := c.Get("userRole")
 
-	if !exists || (currentUserEmail != email && (!roleExists || currentRole != "Pengelola")) {
+	emailStr, ok := currentUserEmail.(string)
+	isOwner := exists && ok && strings.EqualFold(emailStr, email)
+	isAdmin := roleExists && currentRole == "Pengelola"
+
+	if !isOwner && !isAdmin {
 		c.JSON(http.StatusForbidden, gin.H{"error": "Akses ditolak: Anda tidak memiliki wewenang melihat data ini"})
 		return
 	}

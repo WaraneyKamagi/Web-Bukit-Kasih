@@ -25,24 +25,34 @@ Gunakan akun berikut untuk menguji sistem dengan peran (*role*) yang berbeda:
 ### Prasyarat
 1. **Node.js** (v18 atau lebih baru)
 2. **Go (Golang)** (v1.22 atau lebih baru)
-3. **XAMPP / MySQL Server**:
-   * Aktifkan modul **MySQL** pada XAMPP Control Panel.
-   * Buat database baru bernama **`bukit_kasih`** melalui phpMyAdmin (`http://localhost/phpmyadmin`).
+3. **Database Supabase (PostgreSQL Cloud)**:
+   * Proyek database Supabase aktif.
+   * Kredensial URL koneksi sudah terkonfigurasi di file `backend/.env`.
 
 ---
 
-### Langkah 1: Jalankan Backend (Golang API)
-Buka terminal baru di folder proyek Anda:
-```bash
-cd backend
-go run main.go
-```
-*Server API akan berjalan di `http://localhost:8080`. Tabel database akan otomatis termigrasi dan di-seed.*
+### Langkah 1: Konfigurasi & Jalankan Backend (Golang API + Supabase)
+1. Salin konfigurasi environment di folder `backend`:
+   * Buat/buka file `backend/.env` dan pastikan `DB_SOURCE` mengarah ke Supabase Anda:
+   ```env
+   DB_DRIVER=postgres
+   DB_SOURCE=postgresql://postgres.dskntyudaqxqextacdls:[YOUR_PASSWORD]@aws-0-ap-northeast-1.pooler.supabase.com:6543/postgres?sslmode=require
+   PORT=8080
+   ```
+2. Jalankan server backend:
+   ```bash
+   cd backend
+   go run main.go
+   ```
+   *Server API akan berjalan di `http://localhost:8080`. Seluruh tabel skema (`users`, `reviews`, `inquiries`, `announcements`) akan otomatis ter-migrasi dan di-seed di Supabase Cloud.*
+
+---
 
 ### Langkah 2: Jalankan Frontend (React + Vite)
 Buka terminal baru lainnya di folder proyek Anda:
 ```bash
 cd frontend
+npm install
 npm run dev
 ```
 *Buka browser Anda dan masuk ke alamat yang disediakan Vite (biasanya `http://localhost:5173`).*

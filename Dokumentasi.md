@@ -40,8 +40,8 @@ Sistem ini memiliki berbagai fitur unggulan yang dirancang untuk mendukung kebut
 * **Interaksi:** Dilengkapi tombol navigasi kiri/kanan, indikator dot, dan fitur geser otomatis (*auto-slide*) setiap 8 detik.
 
 #### G. Sistem Autentikasi Database & Registrasi Wisatawan (RBAC)
-* **Deskripsi:** Sistem autentikasi berbasis database riil (MySQL/SQLite) menggunakan enkripsi password **bcrypt** dan token **JWT (JSON Web Token)** untuk mengontrol akses berbasis peran (*Role-Based Access Control*).
-* **Fitur Registrasi Baru:** Pengunjung dapat mendaftarkan akun wisatawan baru secara mandiri melalui form pendaftaran gratis pada modal login. Akun baru akan disimpan di database secara otomatis dengan peran *"Wisatawan"*.
+* **Deskripsi:** Sistem autentikasi berbasis basis data cloud terintegrasi (**Supabase PostgreSQL Cloud**) menggunakan enkripsi password **bcrypt** dan token **JWT (JSON Web Token)** untuk mengontrol akses berbasis peran (*Role-Based Access Control*).
+* **Fitur Registrasi Baru:** Pengunjung dapat mendaftarkan akun wisatawan baru secara mandiri melalui form pendaftaran gratis pada modal login. Akun baru akan disimpan di database Supabase secara otomatis dengan peran *"Wisatawan"*.
 * **Peran Wisatawan:** Dapat melakukan bookmark aktivitas, menulis ulasan langsung di modal detail, dan melihat riwayat pertanyaan serta balasan pengelola di halaman profil. (Akun uji default: `wisatawan@gmail.com` / `password`).
 * **Peran Pengelola (Admin):** Memiliki akses terproteksi ke Dashboard Admin untuk menerbitkan pengumuman, memoderasi ulasan, membalas pertanyaan wisatawan, dan melihat analitik ringkasan. (Akun uji default: `pengelola@bukitkasih.com` / `admin`).
 
@@ -82,9 +82,9 @@ Sistem ini dirancang agar siap digunakan sebagai instrumen dalam penelitian kete
   * **Penyimpanan Lokal:** *Web Storage API* (LocalStorage) untuk mempertahankan bookmark dan preferensi tema gelap.
 * **Backend:**
   * **Bahasa Pemrograman:** Go (Golang) versi 1.22+ dengan kerangka kerja **Gin Gonic** untuk performa API super cepat.
-  * **Database ORM:** **GORM** untuk interaksi basis data terstruktur.
-  * **Database Engine:** **MySQL** (lewat XAMPP) dan **SQLite** (sebagai basis data berkas lokal).
-  * **Autentikasi & Keamanan:** **JWT (JSON Web Token)** untuk manajemen sesi aman dan enkripsi password menggunakan **bcrypt**.
+  * **Database ORM:** **GORM** dengan driver PostgreSQL (`gorm.io/driver/postgres`).
+  * **Database Engine:** **Supabase (PostgreSQL Cloud Managed Database)** dengan dukungan Connection Pooling.
+  * **Autentikasi & Keamanan:** **JWT (JSON Web Token)** untuk manajemen sesi aman, enkripsi password menggunakan **bcrypt**, serta penerapan **Row Level Security (RLS)** pada tabel database.
 
 ---
 
@@ -92,26 +92,35 @@ Sistem ini dirancang agar siap digunakan sebagai instrumen dalam penelitian kete
 Bagi pengembang yang ingin menjalankan atau menguji proyek ini di komputer lokal, berikut langkah-langkahnya:
 
 #### Prasyarat
-Pastikan komputer Anda sudah terinstal **Node.js** (versi 18 ke atas disarankan).
+1. **Node.js** (versi 18 ke atas disarankan)
+2. **Go (Golang)** (versi 1.22 ke atas)
+3. Akun dan proyek aktif di **Supabase**.
 
 #### Langkah Instalasi & Pengoperasian
-1. Buka terminal perintah atau command prompt pada folder proyek.
-2. Instal seluruh pustaka dependensi:
-   ```bash
-   npm install
-   ```
-3. Jalankan server pengembangan lokal:
-   ```bash
-   npm run dev
-   ```
-4. Buka peramban (browser) dan akses alamat lokal yang tertera (biasanya `http://localhost:5173`).
+1. **Setup Backend:**
+   * Konfigurasikan kredensial Supabase pada file `backend/.env`.
+   * Jalankan server API backend:
+     ```bash
+     cd backend
+     go run main.go
+     ```
+   * Backend akan berjalan di `http://localhost:8080` dan otomatis melakukan migrasi skema tabel ke Supabase.
+2. **Setup Frontend:**
+   * Buka terminal terpisah di folder `frontend`:
+     ```bash
+     cd frontend
+     npm install
+     npm run dev
+     ```
+   * Buka peramban (browser) dan akses alamat lokal yang tertera (biasanya `http://localhost:5173`).
 
 #### Langkah Build Produksi
-Jika ingin mengompilasi sistem untuk diunggah ke hosting:
+Jika ingin mengompilasi frontend untuk diunggah ke hosting:
 ```bash
+cd frontend
 npm run build
 ```
-Hasil kompilasi final berupa file HTML, CSS, dan JS statis akan tersimpan pada folder `dist` dan siap diunggah ke server web.
+Hasil kompilasi final berupa file HTML, CSS, dan JS statis akan tersimpan pada folder `dist` dan siap diunggah ke server hosting web.
 
 ---
 

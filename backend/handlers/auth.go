@@ -70,7 +70,7 @@ func Login(c *gin.Context) {
 			"name":  user.Name,
 			"role":  user.Role,
 		},
-	}	)
+	})
 }
 
 // GetProfile returns the details of the currently authenticated user

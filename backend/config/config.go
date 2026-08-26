@@ -1,6 +1,10 @@
 package config
 
-import "os"
+import (
+	"os"
+
+	"github.com/joho/godotenv"
+)
 
 type Config struct {
 	DBDriver         string
@@ -16,9 +20,12 @@ type Config struct {
 var AppConfig Config
 
 func InitConfig() {
+	// Load .env file if available
+	_ = godotenv.Load()
+
 	AppConfig = Config{
-		DBDriver:         getEnv("DB_DRIVER", "mysql"),
-		DBSource:         getEnv("DB_SOURCE", "root:@tcp(127.0.0.1:3306)/bukit_kasih?charset=utf8mb4&parseTime=True&loc=Local"),
+		DBDriver:         getEnv("DB_DRIVER", "postgres"),
+		DBSource:         getEnv("DB_SOURCE", "postgresql://postgres.dskntyudaqxqextacdls:[YOUR_PASSWORD]@aws-0-ap-northeast-1.pooler.supabase.com:6543/postgres?sslmode=require"),
 		JWTSecret:        []byte(getEnv("JWT_SECRET", "bukit-kasih-super-secret-key-12345")),
 		Port:             getEnv("PORT", "8080"),
 		GroqAPIKey:       getEnv("GROQ_API_KEY", "YOUR_GROQ_API_KEY"),
@@ -34,3 +41,4 @@ func getEnv(key, fallback string) string {
 	}
 	return fallback
 }
+

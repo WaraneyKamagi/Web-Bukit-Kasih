@@ -22,9 +22,14 @@ func main() {
 
 	r := routes.SetupRouter()
 
-	// Start server on port 8080
-	log.Println("Server started on http://localhost:8080")
-	if err := r.Run(":8080"); err != nil {
+	port := config.AppConfig.Port
+	if port == "" {
+		port = "8080"
+	}
+
+	// Start server
+	log.Printf("Server started on http://localhost:%s\n", port)
+	if err := r.Run(":" + port); err != nil {
 		log.Fatalf("Failed to run server: %v", err)
 	}
 }

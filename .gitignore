@@ -9,7 +9,9 @@ backend/*.exe
 backend/*.test
 backend/*.out
 backend/bukit_kasih.db
+backend/.env*
 
 # OS Files
 .DS_Store
 Thumbs.db
+

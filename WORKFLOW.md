@@ -18,7 +18,7 @@ Dokumen ini memuat panduan komprehensif mengenai seluruh alur kerja (*workflow*)
 
 ## 1. Arsitektur Sistem & Alur Komunikasi Data
 
-Sistem dibangun menggunakan pola arsitektur *Decoupled Client-Server* (Frontend SPA dan Backend RESTful API):
+Sistem dibangun menggunakan pola arsitektur *Decoupled Client-Server* (Frontend SPA dan Backend RESTful API) yang terhubung ke Cloud Database:
 
 ```mermaid
 graph TD
@@ -32,11 +32,11 @@ graph TD
         Router[Gin Router & CORS]
         MW[JWT Auth & RBAC Middleware]
         Handlers[Handlers: Auth, Reviews, Inquiries, Chat]
-        ORM[GORM ORM Layer]
+        ORM[GORM PostgreSQL Driver]
     end
 
-    subgraph Storage["Data Persistence"]
-        DB[(MySQL / SQLite Database)]
+    subgraph Storage["Cloud Data Persistence"]
+        DB[(Supabase Cloud Database - PostgreSQL)]
     end
 
     UI <--> Ctx
@@ -45,7 +45,7 @@ graph TD
     Router --> MW
     MW --> Handlers
     Handlers --> ORM
-    ORM <--> DB
+    ORM <-->|Encrypted Connection Pooler / SSL| DB
 ```
 
 ---
@@ -105,11 +105,11 @@ flowchart TD
     AdminDash --> Tab4[Tab 4: Respon Pesan Masuk]
 
     Tab2 --> PubAnnounce[Ketik & Simpan Pengumuman Baru]
-    PubAnnounce --> AnnounceDB[(Database Updated)]
+    PubAnnounce --> AnnounceDB[(Supabase DB Updated)]
     AnnounceDB --> BroadcastBanner[Banner Tampil Otomatis di Beranda Wisatawan]
 
     Tab3 --> DeleteReview[Hapus Ulasan yang Tidak Sesuai / Spam]
-    DeleteReview --> RemoveDB[(Dihapus dari Database)]
+    DeleteReview --> RemoveDB[(Dihapus dari Supabase DB)]
 
     Tab4 --> ReadInquiry[Baca Pesan Masuk Wisatawan]
     ReadInquiry --> WriteReply[Kirim Teks Balasan Pengelola]
@@ -121,7 +121,7 @@ flowchart TD
 
 ## 4. Alur Kerja Autentikasi & Otorisasi (Auth & RBAC)
 
-Sistem menggunakan standar autentikasi **JSON Web Token (JWT)** dengan enkripsi kata sandi menggunakan **bcrypt**.
+Sistem menggunakan standar autentikasi **JSON Web Token (JWT)** dengan enkripsi kata sandi menggunakan **bcrypt** dan penyimpanan data di **Supabase Cloud Database**.
 
 ```mermaid
 sequenceDiagram
@@ -130,7 +130,7 @@ sequenceDiagram
     participant Client as Frontend (React App)
     participant AuthAPI as API /api/auth
     participant MW as Middleware (JWT & Role)
-    participant DB as Basis Data (MySQL/SQLite)
+    participant DB as Supabase DB (PostgreSQL)
 
     Note over User,Client: Proses Registrasi Akun Baru
     User->>Client: Input Nama, Email, Password
@@ -156,7 +156,7 @@ sequenceDiagram
     else Token Valid tapi Role Tidak Memadai (Wisatawan akses rute Admin)
         MW-->>Client: 403 Forbidden
     else Akses Sah
-        MW->>DB: Eksekusi Operasi Data
+        MW->>DB: Eksekusi Operasi Data (GORM Query)
         DB-->>Client: 200 OK (Data Dikembalikan)
     end
 ```
@@ -213,20 +213,20 @@ sequenceDiagram
 
 ```mermaid
 flowchart LR
-    A[Clone Repositori] --> B[Jalankan MySQL / XAMPP]
+    A[Clone Repositori] --> B[Setup .env Supabase]
     B --> C[Backend: go run main.go]
     C --> D[Frontend: npm install && npm run dev]
     D --> E[Akses http://localhost:5173]
 ```
 
-1. **Persiapan Database:**
-   - Nyalakan **Apache & MySQL** di XAMPP.
-   - Buat database: `bukit_kasih` pada phpMyAdmin.
+1. **Konfigurasi Database Cloud (Supabase):**
+   - Pastikan URL koneksi database Supabase sudah diisi pada file `backend/.env`.
 2. **Menjalankan Backend (Port 8080):**
    ```bash
    cd backend
    go run main.go
    ```
+   *(Backend akan otomatis melakukan koneksi dan migrasi tabel ke Supabase Cloud).*
 3. **Menjalankan Frontend (Port 5173):**
    ```bash
    cd frontend
@@ -253,14 +253,19 @@ gitGraph
     commit id: "feat: jwt & admin dashboard"
     checkout develop
     merge feature/auth-rbac
+    branch feature/supabase-migration
+    checkout feature/supabase-migration
+    commit id: "feat: migrate mysql to supabase"
+    checkout develop
+    merge feature/supabase-migration
     checkout main
-    merge develop tag: "v1.1.0-release"
+    merge develop tag: "v1.2.0-release"
 ```
 
 * **Format Pesan Commit:**
-  * `feat:` Menambahkan fitur baru (contoh: `feat: integrasi chatbot ai kawan kasih`)
+  * `feat:` Menambahkan fitur baru (contoh: `feat: migrasi database ke supabase postgresql`)
   * `fix:` Memperbaiki kutu/bug (contoh: `fix: perbaikan sinkronisasi state ulasan`)
-  * `docs:` Perubahan dokumentasi (contoh: `docs: update workflow dan panduan instalasi`)
+  * `docs:` Perubahan dokumentasi (contoh: `docs: update dokumentasi arsitektur supabase`)
   * `refactor:` Restrukturisasi kode tanpa mengubah fungsionalitas.
 
 ### 7.3 Jaminan Mutu Kode (QA & Code Validation)

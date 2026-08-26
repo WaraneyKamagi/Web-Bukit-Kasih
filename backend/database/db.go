@@ -7,8 +7,7 @@ import (
 	"bukit-kasih-backend/models"
 
 	"golang.org/x/crypto/bcrypt"
-	"github.com/glebarez/sqlite"
-	"gorm.io/driver/mysql"
+	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 )
 
@@ -17,17 +16,16 @@ var DB *gorm.DB
 // InitDB initializes database and runs auto migrations
 func InitDB() {
 	var err error
-	if config.AppConfig.DBDriver == "mysql" {
-		DB, err = gorm.Open(mysql.Open(config.AppConfig.DBSource), &gorm.Config{})
-	} else {
-		DB, err = gorm.Open(sqlite.Open(config.AppConfig.DBSource), &gorm.Config{})
-	}
+	DB, err = gorm.Open(postgres.New(postgres.Config{
+		DSN:                  config.AppConfig.DBSource,
+		PreferSimpleProtocol: true, // Disables prepared statements cache for Supabase PgBouncer pooler
+	}), &gorm.Config{})
 
 	if err != nil {
-		log.Fatalf("Failed to connect to database: %v", err)
+		log.Fatalf("Failed to connect to Supabase database: %v", err)
 	}
 
-	log.Printf("Database connection established successfully using %s driver.\n", config.AppConfig.DBDriver)
+	log.Println("Database connection to Supabase established successfully.")
 
 	// Run migrations
 	err = DB.AutoMigrate(
