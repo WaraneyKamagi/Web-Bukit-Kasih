@@ -1,74 +1,22 @@
-import { useState, useEffect, useContext } from 'react';
+import { useState } from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import LoginModal from './LoginModal';
-import {
-  getNotificationPermission,
-  requestNotificationPermission,
-  sendBrowserNotification,
-  playNotificationChime
-} from '../utils/notification';
+import { useTheme } from '../hooks/useTheme';
+import { useScroll } from '../hooks/useScroll';
+import { useNotificationSettings } from '../hooks/useNotificationSettings';
 
 export default function Navigation() {
   const [isOpen, setIsOpen] = useState(false);
-  const [scrolled, setScrolled] = useState(false);
   const [isLoginOpen, setIsLoginOpen] = useState(false);
   const [isProfileDropdownOpen, setIsProfileDropdownOpen] = useState(false);
-  const [notifPerm, setNotifPerm] = useState(() => getNotificationPermission());
+
+  const { theme, toggleTheme } = useTheme();
+  const scrolled = useScroll(50);
+  const { notifPerm, handleToggleNotification } = useNotificationSettings();
 
   const { user, logout } = useAuth();
   const navigate = useNavigate();
-
-  const handleToggleNotification = async () => {
-    if (notifPerm === 'granted') {
-      sendBrowserNotification(
-        '🔔 Notifikasi Bukit Kasih Aktif',
-        'Anda akan menerima pemberitahuan langsung saat ada pengumuman darurat atau cuaca.'
-      );
-      playNotificationChime();
-    } else {
-      const res = await requestNotificationPermission();
-      setNotifPerm(res);
-      if (res === 'granted') {
-        sendBrowserNotification(
-          '✅ Notifikasi Berhasil Diaktifkan',
-          'Terima kasih! Anda akan menerima update penting pengelola secara instan.'
-        );
-        playNotificationChime();
-      }
-    }
-  };
-
-  // Dark Mode State
-  const [theme, setTheme] = useState(
-    localStorage.getItem('theme') || 
-    (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light')
-  );
-
-  useEffect(() => {
-    const handleScroll = () => {
-      if (window.scrollY > 50) {
-        setScrolled(true);
-      } else {
-        setScrolled(false);
-      }
-    };
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
-
-  useEffect(() => {
-    if (theme === 'dark') {
-      document.documentElement.classList.add('dark');
-    } else {
-      document.documentElement.classList.remove('dark');
-    }
-    localStorage.setItem('theme', theme);
-  }, [theme]);
-
-  const toggleTheme = () => {
-    setTheme(prev => prev === 'dark' ? 'light' : 'dark');
-  };
 
   const handleLogout = () => {
     logout();

@@ -34,8 +34,8 @@ func InitConfig() {
 		GroqModel:            getEnv("GROQ_MODEL", "llama-3.3-70b-versatile"),
 		ComposioAPIKey:       getEnv("COMPOSIO_API_KEY", "YOUR_COMPOSIO_API_KEY"),
 		OpenRouterAPIKey:     getEnv("OPENROUTER_API_KEY", "YOUR_OPENROUTER_API_KEY"),
-		TelegramBotToken:     getEnv("TELEGRAM_BOT_TOKEN", "8640822059:AAHMxGufIc33Im4Y9FnH2iygGHEZWEncA-M"),
-		TelegramAdminChatID: getEnv("TELEGRAM_ADMIN_CHAT_ID", "8638663050"),
+		TelegramBotToken:     getEnv("TELEGRAM_BOT_TOKEN", "YOUR_TELEGRAM_BOT_TOKEN"),
+		TelegramAdminChatID: getEnv("TELEGRAM_ADMIN_CHAT_ID", "YOUR_TELEGRAM_ADMIN_CHAT_ID"),
 	}
 }
 

@@ -1,4 +1,4 @@
-import { useState, useContext, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useAnnouncement } from '../context/AnnouncementContext';
 
 export default function AnnouncementBanner() {

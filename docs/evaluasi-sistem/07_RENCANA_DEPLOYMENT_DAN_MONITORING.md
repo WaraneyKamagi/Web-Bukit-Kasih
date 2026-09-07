@@ -48,8 +48,8 @@ flowchart LR
 | `DB_SOURCE` | `postgresql://postgres.[id]:[pass]@[pooler-host]:6543/postgres?sslmode=require` | String koneksi terenkripsi SSL ke Supabase PgBouncer. |
 | `JWT_SECRET` | *(Random 64-char string)* | Kunci rahasia berkekuatan tinggi untuk sign JWT. |
 | `GROQ_API_KEY` | `gsk_...` | API Key resmi Groq AI Cloud. |
-| `TELEGRAM_BOT_TOKEN` | `8640822059:...` | Token bot Telegram `@HermesBKUK_bot`. |
-| `TELEGRAM_ADMIN_CHAT_ID` | `8638663050` | ID Chat Telegram admin yang berwenang. |
+| `TELEGRAM_BOT_TOKEN` | `YOUR_TELEGRAM_BOT_TOKEN` | Token bot Telegram `@HermesBKUK_bot`. |
+| `TELEGRAM_ADMIN_CHAT_ID` | `YOUR_TELEGRAM_ADMIN_CHAT_ID` | ID Chat Telegram admin yang berwenang. |
 
 ---
 
