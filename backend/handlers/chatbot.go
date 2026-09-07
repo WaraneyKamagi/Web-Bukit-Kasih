@@ -3,6 +3,7 @@ package handlers
 import (
 	"bytes"
 	"encoding/json"
+	"fmt"
 	"io"
 	"log"
 	"net/http"
@@ -10,6 +11,8 @@ import (
 	"time"
 
 	"bukit-kasih-backend/config"
+	"bukit-kasih-backend/models"
+	"bukit-kasih-backend/services"
 
 	"github.com/gin-gonic/gin"
 )
@@ -39,10 +42,16 @@ type GroqResponse struct {
 	} `json:"error,omitempty"`
 }
 
-const SystemPrompt = `Anda adalah "Kawan Kasih", asisten pemandu wisata digital resmi untuk portal pariwisata religi dan alam Bukit Kasih Kanonang di Minahasa, Sulawesi Utara.
+type DocumentCitation struct {
+	ID       uint   `json:"id"`
+	Title    string `json:"title"`
+	Category string `json:"category"`
+}
+
+const BaseSystemPrompt = `Anda adalah "Kawan Kasih", asisten pemandu wisata digital resmi untuk portal pariwisata religi dan alam Bukit Kasih Kanonang di Minahasa, Sulawesi Utara.
 
 TUGAS UTAMA:
-Membantu wisatawan menjawab pertanyaan seputar objek wisata Bukit Kasih Kanonang secara ramah, ringkas, jelas, dan akurat berdasarkan KONTEKS PENGETAHUAN RESMI yang disediakan di bawah ini.
+Membantu wisatawan menjawab pertanyaan seputar objek wisata Bukit Kasih Kanonang secara ramah, ringkas, jelas, dan akurat berdasarkan DOKUMEN PENGETAHUAN RESMI yang disediakan oleh sistem pencarian semantik (RAG) di bawah ini.
 
 PANDUAN PERCAKAPAN & GAYA BAHASA (SANGAT PENTING):
 1. SAPAAN & PERKENALAN:
@@ -53,39 +62,13 @@ PANDUAN PERCAKAPAN & GAYA BAHASA (SANGAT PENTING):
    - Hindari jawaban yang terlalu panjang atau bertele-tele jika pertanyaan pengguna sederhana.
 3. KELUASAN & BAHASA:
    - Gunakan Bahasa Indonesia yang baik, sopan, dan bersahabat.
-   - JANGAN PERNAH menyebutkan istilah teknis internal seperti "berdasarkan Knowledge Base", "data sistem", atau "sesuai instruksi". Bicaralah secara alami layaknya staf pemandu wisata sungguhan.
+   - JANGAN PERNAH menyebutkan istilah teknis internal seperti "berdasarkan database RAG", "data sistem", atau "sesuai instruksi". Bicaralah secara alami layaknya staf pemandu wisata sungguhan.
 4. REGULASI BATASAN (GUARDRAILS):
    - Anda HANYA melayani informasi seputar Bukit Kasih Kanonang.
    - Jika pengguna menanyakan hal yang sama sekali di luar topik Bukit Kasih (seperti politik, coding/pemrograman, resep masakan daerah lain, tempat wisata di kota lain, rumus matematika, dll), tolaklah dengan sangat sopan dan arahkan kembali:
-     "Maaf, saya hanya dapat memberikan informasi seputar objek wisata Bukit Kasih Kanonang. Ada yang bisa saya bantu terkait kunjungan atau fasilitas di sini?"
+     "Maaf, saya hanya dapat memberikan informasi seputar objek wisata Bukit Kasih Kanonang. Ada yang bisa saya bantu terkait kunjungan atau fasilitas di sini?"`
 
-=== KONTEKS PENGETAHUAN RESMI BUKIT KASIH KANONANG ===
-1. LOKASI & TIKET:
-   - Lokasi: Desa Kanonang, Kecamatan Kawangkoan, Kabupaten Minahasa, Sulawesi Utara.
-   - Tiket Masuk: Rp 10.000 per orang (pembelian di loket Gerbang Utama).
-   - Jam Buka: Buka setiap hari 24 jam. Waktu terbaik berkunjung adalah pagi (06:00-09:00) atau sore hari (15:00-17:30) agar cuaca sejuk.
-
-2. 5 POS LANDMARK UTAMA (JALUR PENDAKIAN 2.400 ANAK TANGGA):
-   - Pos 1 (Gerbang Utama): Pintu masuk kawasan wisata dan loket tiket.
-   - Pos 2 (Terapi Air Panas): Kolam rendam air belerang alami hangat untuk relaksasi otot kaki setelah mendaki dan bermanfaat untuk kesehatan kulit.
-   - Pos 3 (Tebing Relief Wajah): Dinding tebing belerang dengan pahatan wajah leluhur Minahasa, yaitu Toar dan Limimuut.
-   - Pos 4 (Monumen Salib Kasih): Salib putih megah setinggi 53 meter sebagai simbol cinta kasih dan perdamaian yang terlihat dari kejauhan.
-   - Pos 5 (Puncak Lima Rumah Ibadah): Simbol utama toleransi beragama di Sulawesi Utara dengan 5 rumah ibadah (Masjid, Gereja Katolik, Gereja Protestan, Vihara, dan Pura) yang berdiri berdampingan secara damai di puncak bukit.
-
-3. RUTE & TIPS PENDAKIAN:
-   - Memiliki total 2.400 anak tangga (sering disebut tangga seribu) dengan estimasi waktu mendaki 45 menit hingga 1,5 jam.
-   - Tips: Gunakan sepatu olahraga yang nyaman, bawa air minum, dan berhati-hati saat hujan karena anak tangga batu bisa licin. Tersedia shelter peristirahatan di sepanjang rute.
-
-4. SEJARAH & NILAI TOLERANSI:
-   - Didirikan pada tahun 2002 atas prakarsa Drs. Adolf Jouke Sondakh (Gubernur Sulawesi Utara saat itu).
-   - 'Bukit Kasih' dibangun sebagai simbol persatuan, kerukunan, dan toleransi antarumat beragama di Tanah Minahasa.
-
-5. FASILITAS & KULINER:
-   - Fasilitas: Toilet umum, shelter/pos istirahat, sewa pakaian adat Minahasa untuk foto, dan jasa fotografer lokal cetak kilat.
-   - Kuliner Lokal: Pisang goreng khas dengan sambal roa, kelapa muda segar, mie cakalang, kopi jahe, dan aneka minuman hangat.
-===================================================`
-
-// Chatbot handles requests from logged-in tourists for information about Bukit Kasih
+// Chatbot handles requests from logged-in tourists for information about Bukit Kasih using RAG
 func Chatbot(c *gin.Context) {
 	// Verify user role
 	role, exists := c.Get("userRole")
@@ -106,16 +89,37 @@ func Chatbot(c *gin.Context) {
 		return
 	}
 
+	// 1. Dynamic RAG Context Retrieval from Database
+	retrievedDocs, contextStr := services.RetrieveRelevantContext(userMsg, 3)
+
+	var citations []DocumentCitation
+	for _, doc := range retrievedDocs {
+		citations = append(citations, DocumentCitation{
+			ID:       doc.ID,
+			Title:    doc.Title,
+			Category: doc.Category,
+		})
+	}
+
+	dynamicSystemPrompt := BaseSystemPrompt
+	if contextStr != "" {
+		dynamicSystemPrompt += "\n\n=== DOKUMEN PENGETAHUAN TERKAIT (RAG DYNAMIC CONTEXT) ===\n" + contextStr + "\n==================================================="
+	}
+
 	apiKey := config.AppConfig.GroqAPIKey
 	model := config.AppConfig.GroqModel
 	if model == "" {
 		model = "llama-3.3-70b-versatile"
 	}
 
-	// If API Key is empty or placeholder, fallback to the simulator
+	// If API Key is empty or placeholder, fallback to the simulator with RAG context
 	if apiKey == "" || strings.Contains(apiKey, "YOUR_") || apiKey == "gsk_placeholder" {
-		responseMsg := runChatbotSimulator(userMsg)
-		c.JSON(http.StatusOK, gin.H{"reply": responseMsg, "source": "simulated"})
+		responseMsg := runChatbotSimulator(userMsg, retrievedDocs)
+		c.JSON(http.StatusOK, gin.H{
+			"reply":     responseMsg,
+			"source":    "simulated_rag",
+			"citations": citations,
+		})
 		return
 	}
 
@@ -125,7 +129,7 @@ func Chatbot(c *gin.Context) {
 		Messages: []GroqMessage{
 			{
 				Role:    "system",
-				Content: SystemPrompt,
+				Content: dynamicSystemPrompt,
 			},
 			{
 				Role:    "user",
@@ -154,8 +158,8 @@ func Chatbot(c *gin.Context) {
 	resp, err := client.Do(httpReq)
 	if err != nil {
 		// Fallback to simulator on network failure
-		responseMsg := runChatbotSimulator(userMsg)
-		c.JSON(http.StatusOK, gin.H{"reply": responseMsg, "source": "simulated_fallback"})
+		responseMsg := runChatbotSimulator(userMsg, retrievedDocs)
+		c.JSON(http.StatusOK, gin.H{"reply": responseMsg, "source": "simulated_fallback", "citations": citations})
 		return
 	}
 	defer resp.Body.Close()
@@ -176,8 +180,8 @@ func Chatbot(c *gin.Context) {
 		}
 		log.Printf("Groq API error (Status %d): %s\n", resp.StatusCode, errMsg)
 		
-		responseMsg := runChatbotSimulator(userMsg)
-		c.JSON(http.StatusOK, gin.H{"reply": responseMsg, "source": "simulated_fallback"})
+		responseMsg := runChatbotSimulator(userMsg, retrievedDocs)
+		c.JSON(http.StatusOK, gin.H{"reply": responseMsg, "source": "simulated_fallback", "citations": citations})
 		return
 	}
 
@@ -188,17 +192,17 @@ func Chatbot(c *gin.Context) {
 	}
 
 	if len(groqResp.Choices) == 0 {
-		responseMsg := runChatbotSimulator(userMsg)
-		c.JSON(http.StatusOK, gin.H{"reply": responseMsg, "source": "simulated_fallback"})
+		responseMsg := runChatbotSimulator(userMsg, retrievedDocs)
+		c.JSON(http.StatusOK, gin.H{"reply": responseMsg, "source": "simulated_fallback", "citations": citations})
 		return
 	}
 
 	replyText := groqResp.Choices[0].Message.Content
-	c.JSON(http.StatusOK, gin.H{"reply": replyText, "source": "groq_api"})
+	c.JSON(http.StatusOK, gin.H{"reply": replyText, "source": "groq_api", "citations": citations})
 }
 
-// runChatbotSimulator is a keyword-matching fallback router that strictly follows our knowledge base constraints
-func runChatbotSimulator(message string) string {
+// runChatbotSimulator is a keyword & RAG matching fallback router that strictly follows our knowledge base constraints
+func runChatbotSimulator(message string, retrievedDocs []models.KnowledgeDocument) string {
 	msgLower := strings.TrimSpace(strings.ToLower(message))
 
 	// 1. Identitas Bot ("kamu siapa", "anda siapa", "siapa kamu", "nama kamu")
@@ -216,6 +220,23 @@ func runChatbotSimulator(message string) string {
 		strings.Contains(msgLower, "selamat sore") || strings.Contains(msgLower, "selamat malam") ||
 		strings.Contains(msgLower, "apa kabar") {
 		return "Halo! Saya Kawan Kasih. Ada yang bisa saya bantu terkait informasi wisata, rute pendakian 2.400 anak tangga, fasilitas, atau sejarah Bukit Kasih Kanonang?"
+	}
+
+	// If RAG documents are available, use the most relevant document's concise summary
+	if len(retrievedDocs) > 0 {
+		topDoc := retrievedDocs[0]
+		// If query has strong relevance to top doc
+		if strings.Contains(msgLower, "tiket") || strings.Contains(msgLower, "harga") ||
+			strings.Contains(msgLower, "biaya") || strings.Contains(msgLower, "tangga") ||
+			strings.Contains(msgLower, "rute") || strings.Contains(msgLower, "belerang") ||
+			strings.Contains(msgLower, "air panas") || strings.Contains(msgLower, "salib") ||
+			strings.Contains(msgLower, "ibadah") || strings.Contains(msgLower, "masjid") ||
+			strings.Contains(msgLower, "gereja") || strings.Contains(msgLower, "sejarah") ||
+			strings.Contains(msgLower, "toar") || strings.Contains(msgLower, "makan") ||
+			strings.Contains(msgLower, "kuliner") || strings.Contains(msgLower, "foto") ||
+			strings.Contains(msgLower, "pakaian") || strings.Contains(msgLower, "jam") {
+			return fmt.Sprintf("Berdasarkan informasi %s: %s", topDoc.Title, topDoc.Content)
+		}
 	}
 
 	// 3. Tiket & Biaya Masuk

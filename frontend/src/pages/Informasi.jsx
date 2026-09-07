@@ -1,5 +1,5 @@
 import { useState, useContext } from 'react';
-import { AppContext } from '../context/AppContext';
+import { useFeedback } from '../context/FeedbackContext';
 import Toast from '../components/Toast';
 import heroBg from '../assets/hero_bukit_kasih.png';
 import belerangImg from '../assets/belerang.png';
@@ -7,7 +7,7 @@ import ibadahImg from '../assets/ibadah.png';
 import reliefImg from '../assets/relief.png';
 
 export default function Informasi() {
-  const { addInquiry } = useContext(AppContext);
+  const { addInquiry } = useFeedback();
   const [inquiry, setInquiry] = useState({
     name: '',
     email: '',

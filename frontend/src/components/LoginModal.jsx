@@ -1,8 +1,8 @@
 import { useState, useContext, useEffect } from 'react';
-import { AppContext } from '../context/AppContext';
+import { useAuth } from '../context/AuthContext';
 
 export default function LoginModal({ isOpen, onClose }) {
-  const { login, register } = useContext(AppContext);
+  const { login, register } = useAuth();
   const [isRegistering, setIsRegistering] = useState(false);
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');

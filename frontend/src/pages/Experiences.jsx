@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef, useContext } from 'react';
-import { AppContext } from '../context/AppContext';
+import { useAuth } from '../context/AuthContext';
+import { useFeedback } from '../context/FeedbackContext';
 import Toast from '../components/Toast';
 import Modal from '../components/Modal';
 import { activities } from '../data/activities';
@@ -20,7 +21,8 @@ export default function Experiences() {
   const [selectedActivity, setSelectedActivity] = useState(null);
 
   // Global Context & Review Forms State
-  const { reviews, addReview, user } = useContext(AppContext);
+  const { user } = useAuth();
+  const { reviews, addReview } = useFeedback();
   const [ratingInput, setRatingInput] = useState(5);
   const [reviewTextInput, setReviewTextInput] = useState('');
 

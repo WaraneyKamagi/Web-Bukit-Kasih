@@ -1,16 +1,43 @@
 import { useState, useEffect, useContext } from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
-import { AppContext } from '../context/AppContext';
+import { useAuth } from '../context/AuthContext';
 import LoginModal from './LoginModal';
+import {
+  getNotificationPermission,
+  requestNotificationPermission,
+  sendBrowserNotification,
+  playNotificationChime
+} from '../utils/notification';
 
 export default function Navigation() {
   const [isOpen, setIsOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [isLoginOpen, setIsLoginOpen] = useState(false);
   const [isProfileDropdownOpen, setIsProfileDropdownOpen] = useState(false);
+  const [notifPerm, setNotifPerm] = useState(() => getNotificationPermission());
 
-  const { user, logout } = useContext(AppContext);
+  const { user, logout } = useAuth();
   const navigate = useNavigate();
+
+  const handleToggleNotification = async () => {
+    if (notifPerm === 'granted') {
+      sendBrowserNotification(
+        '🔔 Notifikasi Bukit Kasih Aktif',
+        'Anda akan menerima pemberitahuan langsung saat ada pengumuman darurat atau cuaca.'
+      );
+      playNotificationChime();
+    } else {
+      const res = await requestNotificationPermission();
+      setNotifPerm(res);
+      if (res === 'granted') {
+        sendBrowserNotification(
+          '✅ Notifikasi Berhasil Diaktifkan',
+          'Terima kasih! Anda akan menerima update penting pengelola secara instan.'
+        );
+        playNotificationChime();
+      }
+    }
+  };
 
   // Dark Mode State
   const [theme, setTheme] = useState(
@@ -90,7 +117,30 @@ export default function Navigation() {
           </div>
 
           {/* Right Section */}
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2 md:gap-3">
+            {/* Notification Permission Toggle */}
+            <button
+              onClick={handleToggleNotification}
+              title={
+                notifPerm === 'granted'
+                  ? 'Notifikasi Pengumuman: Aktif (Klik untuk uji notifikasi)'
+                  : 'Aktifkan Notifikasi Pengumuman Wisata'
+              }
+              className={`w-10 h-10 rounded-full flex items-center justify-center border transition-all cursor-pointer relative ${
+                notifPerm === 'granted'
+                  ? 'border-emerald-500/40 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-500/20'
+                  : 'border-outline-variant/30 bg-white/10 dark:bg-white/5 hover:bg-white/40 dark:hover:bg-white/10 text-primary dark:text-secondary-fixed-dim'
+              }`}
+              aria-label="Toggle Push Notification"
+            >
+              <span className="material-symbols-outlined text-[20px] select-none">
+                {notifPerm === 'granted' ? 'notifications_active' : 'notifications'}
+              </span>
+              {notifPerm === 'granted' && (
+                <span className="absolute top-2 right-2 w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+              )}
+            </button>
+
             {/* Dark Mode Toggle */}
             <button 
               onClick={toggleTheme}

@@ -1,8 +1,8 @@
 import { useState, useEffect, useRef, useContext } from 'react';
-import { AppContext } from '../context/AppContext';
+import { useAuth } from '../context/AuthContext';
 
 export default function ChatbotWidget() {
-  const { user } = useContext(AppContext);
+  const { user } = useAuth();
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState([
     {

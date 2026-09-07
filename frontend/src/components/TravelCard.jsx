@@ -19,6 +19,8 @@ export default function TravelCard({ title, image, altText, onClick }) {
       {/* Background Image */}
       <img 
         alt={title} 
+        loading="lazy"
+        decoding="async"
         className={`absolute inset-0 w-full h-full object-cover group-hover:scale-110 transition-transform duration-700 ${
           loaded ? 'opacity-100' : 'opacity-0'
         }`}

@@ -1,12 +1,14 @@
 import { useState, useContext, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { AppContext } from '../context/AppContext';
+import { useAuth } from '../context/AuthContext';
+import { useFeedback } from '../context/FeedbackContext';
 import Toast from '../components/Toast';
 import Modal from '../components/Modal';
 import { activities } from '../data/activities';
 
 export default function Profile() {
-  const { user, inquiries } = useContext(AppContext);
+  const { user } = useAuth();
+  const { inquiries } = useFeedback();
   const navigate = useNavigate();
   
   // Local Bookmarks state

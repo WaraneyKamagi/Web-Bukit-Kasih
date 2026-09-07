@@ -50,6 +50,8 @@ export default function Sejarah() {
             <div className="md:col-span-2 group relative rounded-xl overflow-hidden shadow-[0_40px_40px_-10px_rgba(15,76,129,0.08)] bg-surface-container-lowest h-[400px]">
               <img
                 alt="Tempat ibadah berdampingan di Bukit Kasih"
+                loading="lazy"
+                decoding="async"
                 className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
                 src={ibadahImg}
               />
@@ -64,6 +66,8 @@ export default function Sejarah() {
             <div className="group relative rounded-xl overflow-hidden shadow-[0_40px_40px_-10px_rgba(15,76,129,0.08)] bg-surface-container-lowest h-[400px]">
               <img
                 alt="Monumen salib putih di Bukit Kasih"
+                loading="lazy"
+                decoding="async"
                 className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
                 src={salibImg}
               />
@@ -78,6 +82,8 @@ export default function Sejarah() {
             <div className="group relative rounded-xl overflow-hidden shadow-[0_40px_40px_-10px_rgba(15,76,129,0.08)] bg-surface-container-lowest h-[400px]">
               <img
                 alt="Ukiran relief leluhur Minahasa"
+                loading="lazy"
+                decoding="async"
                 className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
                 src={reliefImg}
               />
