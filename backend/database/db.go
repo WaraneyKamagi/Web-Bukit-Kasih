@@ -46,6 +46,7 @@ func InitDB() {
 		&models.Announcement{},
 		&models.HermesMessage{},
 		&models.KnowledgeDocument{},
+		&models.Bookmark{},
 	)
 	if err != nil {
 		log.Fatalf("AutoMigration failed: %v", err)

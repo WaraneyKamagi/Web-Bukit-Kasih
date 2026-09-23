@@ -8,6 +8,8 @@ import { AuthProvider } from './context/AuthContext';
 import { AnnouncementProvider } from './context/AnnouncementContext';
 import { FeedbackProvider } from './context/FeedbackContext';
 
+import { BookmarkProvider } from './context/BookmarkContext';
+
 // Route-based Code Splitting & Lazy Loading
 const Home = lazy(() => import('./pages/Home'));
 const Experiences = lazy(() => import('./pages/Experiences'));
@@ -32,26 +34,28 @@ function App() {
     <AuthProvider>
       <AnnouncementProvider>
         <FeedbackProvider>
-          <Router>
-        <div className="min-h-screen flex flex-col bg-background text-on-surface">
-          <Navigation />
-          <AnnouncementBanner />
-          <div className="flex-grow">
-            <Suspense fallback={<PageLoader />}>
-              <Routes>
-                <Route path="/" element={<Home />} />
-                <Route path="/experiences" element={<Experiences />} />
-                <Route path="/informasi" element={<Informasi />} />
-                <Route path="/sejarah" element={<Sejarah />} />
-                <Route path="/admin" element={<AdminDashboard />} />
-                <Route path="/profile" element={<Profile />} />
-              </Routes>
-            </Suspense>
-          </div>
-          <ChatbotWidget />
-          <Footer />
-        </div>
-      </Router>
+          <BookmarkProvider>
+            <Router>
+              <div className="min-h-screen flex flex-col bg-background text-on-surface">
+                <Navigation />
+                <AnnouncementBanner />
+                <div className="flex-grow">
+                  <Suspense fallback={<PageLoader />}>
+                    <Routes>
+                      <Route path="/" element={<Home />} />
+                      <Route path="/experiences" element={<Experiences />} />
+                      <Route path="/informasi" element={<Informasi />} />
+                      <Route path="/sejarah" element={<Sejarah />} />
+                      <Route path="/admin" element={<AdminDashboard />} />
+                      <Route path="/profile" element={<Profile />} />
+                    </Routes>
+                  </Suspense>
+                </div>
+                <ChatbotWidget />
+                <Footer />
+              </div>
+            </Router>
+          </BookmarkProvider>
         </FeedbackProvider>
       </AnnouncementProvider>
     </AuthProvider>

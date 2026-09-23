@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useFeedback } from '../context/FeedbackContext';
+import { useBookmark } from '../context/BookmarkContext';
 import Toast from '../components/Toast';
 import Modal from '../components/Modal';
 import { activities } from '../data/activities';
@@ -9,13 +10,8 @@ import { activities } from '../data/activities';
 export default function Profile() {
   const { user } = useAuth();
   const { inquiries } = useFeedback();
+  const { bookmarkedIds, toggleBookmark } = useBookmark();
   const navigate = useNavigate();
-  
-  // Local Bookmarks state
-  const [bookmarkedIds, setBookmarkedIds] = useState(() => {
-    const saved = localStorage.getItem('bukit_kasih_bookmarks');
-    return saved ? JSON.parse(saved) : [];
-  });
   
   // Modal State
   const [selectedAct, setSelectedAct] = useState(null);
@@ -41,15 +37,12 @@ export default function Profile() {
 
   if (!user) return null;
 
-  const handleRemoveBookmark = (id, title, e) => {
+  const handleRemoveBookmark = async (id, title, e) => {
     e.stopPropagation(); // Avoid opening modal
-    const updated = bookmarkedIds.filter(item => item !== id);
-    setBookmarkedIds(updated);
-    localStorage.setItem('bukit_kasih_bookmarks', JSON.stringify(updated));
-    
-    // Dispatch event to update other pages (like Experiences) if open
-    window.dispatchEvent(new Event('storage'));
-    showToast(`"${title}" dihapus dari rencana perjalanan.`, 'info');
+    const added = await toggleBookmark(id, title);
+    if (!added) {
+      showToast(`"${title}" dihapus dari rencana perjalanan.`, 'info');
+    }
   };
 
   const handleCardClick = (act) => {

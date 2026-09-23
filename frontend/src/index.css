@@ -81,17 +81,36 @@
 }
 
 @keyframes fadeUp {
-  from { opacity: 0; transform: translateY(30px); }
-  to { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 @keyframes float {
-  0% { transform: translateY(0px); }
-  50% { transform: translateY(-10px); }
-  100% { transform: translateY(0px); }
+  0% {
+    transform: translateY(0px);
+  }
+
+  50% {
+    transform: translateY(-10px);
+  }
+
+  100% {
+    transform: translateY(0px);
+  }
 }
 
-/* Custom CSS Classes */
+html,
+body {
+  overflow-x: hidden;
+}
+
 body {
   font-family: 'Inter', sans-serif;
   background-color: var(--color-background);
@@ -102,7 +121,7 @@ body {
 .dark {
   --color-background: #0b111e;
   --color-on-background: #f3f0ef;
-  
+
   --color-surface: #121b2d;
   --color-surface-bright: #1b283f;
   --color-surface-dim: #0f172a;
@@ -111,21 +130,21 @@ body {
   --color-surface-container-lowest: #0e1726;
   --color-surface-container-high: #233554;
   --color-surface-container-highest: #2e3f5b;
-  
+
   --color-on-surface: #f3f0ef;
   --color-on-surface-variant: #cbd5e1;
   --color-subtext: #94a3b8;
-  
+
   --color-primary: #9cd6ff;
   --color-on-primary: #0b111e;
   --color-primary-container: #1e3a5f;
   --color-on-primary-container: #e6f1ff;
-  
+
   --color-secondary: #68b0d8;
   --color-on-secondary: #0b111e;
   --color-secondary-container: #1b3548;
   --color-on-secondary-container: #9cd6ff;
-  
+
   --color-outline-variant: #334155;
 }
 
@@ -162,6 +181,7 @@ body {
 .hide-scrollbar::-webkit-scrollbar {
   display: none;
 }
+
 .hide-scrollbar {
   -ms-overflow-style: none;
   scrollbar-width: none;
@@ -181,9 +201,11 @@ body {
 .delay-100 {
   animation-delay: 100ms;
 }
+
 .delay-200 {
   animation-delay: 200ms;
 }
+
 .delay-300 {
   animation-delay: 300ms;
 }

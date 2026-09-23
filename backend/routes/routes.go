@@ -66,6 +66,11 @@ func SetupRouter() *gin.Engine {
 		api.DELETE("/hermes/messages", middleware.AuthMiddleware(), middleware.AdminOnly(), handlers.ClearHermesMessages)
 		api.POST("/hermes/test-connection", middleware.AuthMiddleware(), middleware.AdminOnly(), handlers.TestHermesTelegramConnection)
 		api.POST("/hermes/telegram-webhook", handlers.TelegramWebhook)
+
+		// Bookmark routes
+		api.GET("/bookmarks", middleware.AuthMiddleware(), handlers.GetUserBookmarks)
+		api.POST("/bookmarks/toggle", middleware.AuthMiddleware(), handlers.ToggleBookmark)
+		api.GET("/bookmarks/stats", middleware.AuthMiddleware(), middleware.AdminOnly(), handlers.GetBookmarkStats)
 	}
 
 	return r

@@ -1,6 +1,7 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useMemo } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useFeedback } from '../context/FeedbackContext';
+import { useBookmark } from '../context/BookmarkContext';
 import Toast from '../components/Toast';
 import Modal from '../components/Modal';
 import { activities } from '../data/activities';
@@ -21,28 +22,42 @@ export default function Experiences() {
   const [selectedActivity, setSelectedActivity] = useState(null);
 
   // Global Context & Review Forms State
-  const { user } = useAuth();
+  const { user, token } = useAuth();
   const { reviews, addReview } = useFeedback();
+  const { bookmarkedIds, toggleBookmark } = useBookmark();
   const [ratingInput, setRatingInput] = useState(5);
   const [reviewTextInput, setReviewTextInput] = useState('');
 
-  // Bookmark State
-  const [bookmarks, setBookmarks] = useState(() => {
-    const saved = localStorage.getItem('bukit_kasih_bookmarks');
-    return saved ? JSON.parse(saved) : [];
-  });
-
   // Testimonials State
+  const displayTestimonials = useMemo(() => {
+    const goodReviews = reviews
+      .filter(r => r.rating >= 4)
+      .map(r => ({
+        text: r.text,
+        author: r.author,
+        role: 'Pengunjung',
+        rating: r.rating
+      }));
+
+    if (goodReviews.length >= 1) {
+      return goodReviews;
+    }
+    return testimonials;
+  }, [reviews]);
+
   const [activeSlide, setActiveSlide] = useState(0);
+
+  // Ensure activeSlide is within bounds when displayTestimonials changes
+  useEffect(() => {
+    if (activeSlide >= displayTestimonials.length) {
+      setActiveSlide(0);
+    }
+  }, [displayTestimonials.length, activeSlide]);
 
   const sectionRef = useRef(null);
   const testimonialRef = useRef(null);
   const [sectionActive, setSectionActive] = useState(false);
   const [testimonialActive, setTestimonialActive] = useState(false);
-
-  useEffect(() => {
-    localStorage.setItem('bukit_kasih_bookmarks', JSON.stringify(bookmarks));
-  }, [bookmarks]);
 
   useEffect(() => {
     const currentSection = sectionRef.current;
@@ -93,14 +108,13 @@ export default function Experiences() {
     setRatingInput(5);
   };
 
-  const toggleBookmark = (id, title, e) => {
+  const handleToggleBookmark = async (id, title, e) => {
     e.stopPropagation(); // Prevent modal opening when bookmark is clicked
-    if (bookmarks.includes(id)) {
-      setBookmarks(prev => prev.filter(item => item !== id));
-      showToast(`Aktivitas "${title}" dihapus dari rencana perjalanan.`, 'info');
-    } else {
-      setBookmarks(prev => [...prev, id]);
+    const added = await toggleBookmark(id, title);
+    if (added) {
       showToast(`Aktivitas "${title}" ditambahkan ke rencana perjalanan!`, 'success');
+    } else {
+      showToast(`Aktivitas "${title}" dihapus dari rencana perjalanan.`, 'info');
     }
   };
 
@@ -117,11 +131,11 @@ export default function Experiences() {
   };
 
   const handlePrevTestimonial = () => {
-    setActiveSlide(prev => (prev - 1 + testimonials.length) % testimonials.length);
+    setActiveSlide(prev => (prev - 1 + displayTestimonials.length) % displayTestimonials.length);
   };
 
   const handleNextTestimonial = () => {
-    setActiveSlide(prev => (prev + 1) % testimonials.length);
+    setActiveSlide(prev => (prev + 1) % displayTestimonials.length);
   };
 
   return (
@@ -188,7 +202,7 @@ export default function Experiences() {
         <div className="grid grid-cols-1 md:grid-cols-12 gap-gutter auto-rows-[400px] transition-all duration-500">
           {filteredActivities.length > 0 ? (
             filteredActivities.map((act) => {
-              const isBookmarked = bookmarks.includes(act.id);
+              const isBookmarked = bookmarkedIds.includes(act.id);
               // Handle layout span based on item index or custom settings
               const spanClass = act.gridSpan || (filteredActivities.length === 1 ? 'md:col-span-12' : 'md:col-span-6');
               
@@ -212,7 +226,7 @@ export default function Experiences() {
                         {act.meta}
                       </span>
                       <button 
-                        onClick={(e) => toggleBookmark(act.id, act.title, e)}
+                        onClick={(e) => handleToggleBookmark(act.id, act.title, e)}
                         className="w-10 h-10 rounded-full glass-panel flex items-center justify-center hover:bg-white/90 dark:hover:bg-white/20 transition-all cursor-pointer group/btn active:scale-95 shadow-sm"
                         aria-label="Bookmark"
                       >
@@ -300,7 +314,7 @@ export default function Experiences() {
             {/* Carousel Active Slide */}
             <div className="min-h-[160px] flex flex-col justify-center transition-all duration-500">
               <p className="font-headline-md text-headline-md text-primary dark:text-secondary-fixed mb-8 leading-relaxed italic text-lg md:text-xl">
-                "{testimonials[activeSlide].text}"
+                "{displayTestimonials[activeSlide]?.text}"
               </p>
               <div className="flex flex-col items-center">
                 <div className="w-14 h-14 rounded-full overflow-hidden mb-3 border-2 border-white dark:border-slate-800 shadow-sm bg-primary/10 flex items-center justify-center">
@@ -309,17 +323,17 @@ export default function Experiences() {
                   </span>
                 </div>
                 <h4 className="font-bold text-on-surface text-base md:text-lg">
-                  {testimonials[activeSlide].author}
+                  {displayTestimonials[activeSlide]?.author}
                 </h4>
                 <span className="font-body-md text-body-md text-subtext dark:text-slate-400 text-xs md:text-sm">
-                  {testimonials[activeSlide].role}
+                  {displayTestimonials[activeSlide]?.role}
                 </span>
               </div>
             </div>
             
             {/* Carousel Indicators */}
             <div className="flex justify-center gap-2.5 mt-8 z-20">
-              {testimonials.map((_, idx) => (
+              {displayTestimonials.map((_, idx) => (
                 <button 
                   key={idx}
                   onClick={() => setActiveSlide(idx)}
