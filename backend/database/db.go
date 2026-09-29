@@ -2,6 +2,7 @@ package database
 
 import (
 	"log"
+	"os"
 	"time"
 
 	"bukit-kasih-backend/config"
@@ -39,27 +40,39 @@ func InitDB() {
 	log.Println("Database connection to Supabase established successfully.")
 
 	// Run migrations
-	err = DB.AutoMigrate(
-		&models.User{},
-		&models.Review{},
-		&models.Inquiry{},
-		&models.Announcement{},
-		&models.HermesMessage{},
-		&models.KnowledgeDocument{},
-		&models.Bookmark{},
-	)
-	if err != nil {
-		log.Fatalf("AutoMigration failed: %v", err)
+	if os.Getenv("AUTO_MIGRATE") == "true" {
+		err = DB.AutoMigrate(
+			&models.User{},
+			&models.Review{},
+			&models.Inquiry{},
+			&models.Announcement{},
+			&models.HermesMessage{},
+			&models.KnowledgeDocument{},
+			&models.Bookmark{},
+			&models.Activity{},
+			&models.Destination{},
+		)
+		if err != nil {
+			log.Fatalf("AutoMigration failed: %v", err)
+		}
+		log.Println("Database schemas auto-migrated successfully.")
+	} else {
+		log.Println("AutoMigrate diabaikan (AUTO_MIGRATE != true).")
 	}
 
-	log.Println("Database schemas auto-migrated successfully.")
-
 	// Seed initial data
-	seedUsers()
-	seedReviews()
-	seedInquiries()
-	seedAnnouncements()
-	seedKnowledgeDocuments()
+	if os.Getenv("SEED_DATA") == "true" {
+		seedUsers()
+		seedReviews()
+		seedInquiries()
+		seedAnnouncements()
+		seedKnowledgeDocuments()
+		seedActivities()
+		seedDestinations()
+		log.Println("Database seeded successfully.")
+	} else {
+		log.Println("Seed data diabaikan (SEED_DATA != true).")
+	}
 }
 
 func hashPassword(password string) string {

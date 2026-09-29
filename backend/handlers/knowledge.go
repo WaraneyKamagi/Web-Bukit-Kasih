@@ -3,8 +3,7 @@ package handlers
 import (
 	"net/http"
 
-	"bukit-kasih-backend/database"
-	"bukit-kasih-backend/models"
+	"bukit-kasih-backend/services"
 
 	"github.com/gin-gonic/gin"
 )
@@ -13,13 +12,8 @@ import (
 func GetAllKnowledgeDocuments(c *gin.Context) {
 	category := c.Query("category")
 
-	var docs []models.KnowledgeDocument
-	query := database.DB.Order("created_at desc")
-	if category != "" {
-		query = query.Where("category = ?", category)
-	}
-
-	if err := query.Find(&docs).Error; err != nil {
+	docs, err := services.GetAllKnowledgeDocuments(category)
+	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Gagal mengambil dokumen pengetahuan"})
 		return
 	}
@@ -31,8 +25,8 @@ func GetAllKnowledgeDocuments(c *gin.Context) {
 func GetKnowledgeDocumentByID(c *gin.Context) {
 	id := c.Param("id")
 
-	var doc models.KnowledgeDocument
-	if err := database.DB.First(&doc, id).Error; err != nil {
+	doc, err := services.GetKnowledgeDocumentByID(id)
+	if err != nil {
 		c.JSON(http.StatusNotFound, gin.H{"error": "Dokumen pengetahuan tidak ditemukan"})
 		return
 	}
@@ -54,14 +48,8 @@ func CreateKnowledgeDocument(c *gin.Context) {
 		return
 	}
 
-	doc := models.KnowledgeDocument{
-		Title:    input.Title,
-		Category: input.Category,
-		Content:  input.Content,
-		Keywords: input.Keywords,
-	}
-
-	if err := database.DB.Create(&doc).Error; err != nil {
+	doc, err := services.CreateKnowledgeDocument(input.Title, input.Category, input.Content, input.Keywords)
+	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Gagal menyimpan dokumen pengetahuan baru"})
 		return
 	}
@@ -72,12 +60,6 @@ func CreateKnowledgeDocument(c *gin.Context) {
 // UpdateKnowledgeDocument allows Admin to update an existing article in the RAG knowledge base
 func UpdateKnowledgeDocument(c *gin.Context) {
 	id := c.Param("id")
-
-	var doc models.KnowledgeDocument
-	if err := database.DB.First(&doc, id).Error; err != nil {
-		c.JSON(http.StatusNotFound, gin.H{"error": "Dokumen pengetahuan tidak ditemukan"})
-		return
-	}
 
 	var input struct {
 		Title    string `json:"title" binding:"required"`
@@ -91,12 +73,9 @@ func UpdateKnowledgeDocument(c *gin.Context) {
 		return
 	}
 
-	doc.Title = input.Title
-	doc.Category = input.Category
-	doc.Content = input.Content
-	doc.Keywords = input.Keywords
-
-	if err := database.DB.Save(&doc).Error; err != nil {
+	doc, err := services.UpdateKnowledgeDocument(id, input.Title, input.Category, input.Content, input.Keywords)
+	if err != nil {
+		// Could be not found or save error
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Gagal memperbarui dokumen pengetahuan"})
 		return
 	}
@@ -108,13 +87,7 @@ func UpdateKnowledgeDocument(c *gin.Context) {
 func DeleteKnowledgeDocument(c *gin.Context) {
 	id := c.Param("id")
 
-	var doc models.KnowledgeDocument
-	if err := database.DB.First(&doc, id).Error; err != nil {
-		c.JSON(http.StatusNotFound, gin.H{"error": "Dokumen pengetahuan tidak ditemukan"})
-		return
-	}
-
-	if err := database.DB.Delete(&doc).Error; err != nil {
+	if err := services.DeleteKnowledgeDocument(id); err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Gagal menghapus dokumen pengetahuan"})
 		return
 	}

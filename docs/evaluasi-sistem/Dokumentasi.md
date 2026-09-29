@@ -25,7 +25,7 @@ Sistem ini memiliki berbagai fitur unggulan yang dirancang untuk mendukung kebut
 
 #### C. Filter Dinamis & Rencana Perjalanan (Bookmark)
 * **Deskripsi:** Menu khusus untuk memilah aktivitas perjalanan berdasarkan kategori (*Ziarah*, *Rekreasi*, *Budaya*, dan *Kuliner*).
-* **Fitur Rencana Perjalanan:** Wisatawan dapat menyimpan aktivitas pilihan mereka ke dalam daftar rencana perjalanan pribadi menggunakan fitur penanda (*bookmark*). Status tersimpan ini disimpan secara permanen di memori lokal browser.
+* **Fitur Rencana Perjalanan:** Wisatawan dapat menyimpan aktivitas pilihan mereka ke dalam daftar rencana perjalanan pribadi menggunakan fitur penanda (*bookmark*). Status tersimpan ini disimpan secara aman di dalam database server dan tersinkronisasi untuk setiap akun wisatawan.
 
 #### D. Popup Informasi Detail (Modal Dialog)
 * **Deskripsi:** Menggantikan notifikasi bawaan browser yang mengganggu dengan jendela detail kustom.
@@ -79,7 +79,7 @@ Sistem ini dirancang agar siap digunakan sebagai instrumen dalam penelitian kete
   * **Library Utama:** React (v19) untuk manajemen status antarmuka yang reaktif.
   * **Alat Pembangunan (Bundler):** Vite (v8) untuk kompilasi kode super cepat.
   * **Kerangka Desain CSS:** Tailwind CSS (v4) untuk penyusunan antarmuka responsif dan modern.
-  * **Penyimpanan Lokal:** *Web Storage API* (LocalStorage) untuk mempertahankan bookmark dan preferensi tema gelap.
+  * **Penyimpanan Lokal:** *Web Storage API* (LocalStorage) untuk menyimpan Token Sesi Autentikasi (JWT) dan mempertahankan preferensi tema gelap.
 * **Backend:**
   * **Bahasa Pemrograman:** Go (Golang) versi 1.22+ dengan kerangka kerja **Gin Gonic** untuk performa API super cepat.
   * **Database ORM:** **GORM** dengan driver PostgreSQL (`gorm.io/driver/postgres`).

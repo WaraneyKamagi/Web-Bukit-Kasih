@@ -2,23 +2,12 @@ package handlers
 
 import (
 	"net/http"
-	"time"
+	"strings"
 
-	"bukit-kasih-backend/config"
-	"bukit-kasih-backend/database"
-	"bukit-kasih-backend/models"
+	"bukit-kasih-backend/services"
 
-	"github.com/golang-jwt/jwt/v5"
 	"github.com/gin-gonic/gin"
-	"golang.org/x/crypto/bcrypt"
 )
-
-type Claims struct {
-	Email string `json:"email"`
-	Name  string `json:"name"`
-	Role  string `json:"role"`
-	jwt.RegisteredClaims
-}
 
 // Login authenticates credentials and returns a JWT token
 func Login(c *gin.Context) {
@@ -32,34 +21,13 @@ func Login(c *gin.Context) {
 		return
 	}
 
-	var user models.User
-	if err := database.DB.Where("email = ?", input.Email).First(&user).Error; err != nil {
-		c.JSON(http.StatusUnauthorized, gin.H{"error": "Email atau password salah!"})
-		return
-	}
-
-	// Verify password
-	if err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(input.Password)); err != nil {
-		c.JSON(http.StatusUnauthorized, gin.H{"error": "Email atau password salah!"})
-		return
-	}
-
-	// Generate JWT Token (Expires in 24 hours)
-	expirationTime := time.Now().Add(24 * time.Hour)
-	claims := &Claims{
-		Email: user.Email,
-		Name:  user.Name,
-		Role:  user.Role,
-		RegisteredClaims: jwt.RegisteredClaims{
-			ExpiresAt: jwt.NewNumericDate(expirationTime),
-			IssuedAt:  jwt.NewNumericDate(time.Now()),
-		},
-	}
-
-	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-	tokenString, err := token.SignedString(config.AppConfig.JWTSecret)
+	tokenString, user, err := services.Login(input.Email, input.Password)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Gagal membuat token autentikasi"})
+		if err.Error() == "Email atau password salah!" {
+			c.JSON(http.StatusUnauthorized, gin.H{"error": err.Error()})
+		} else {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Gagal membuat token autentikasi"})
+		}
 		return
 	}
 
@@ -81,8 +49,8 @@ func GetProfile(c *gin.Context) {
 		return
 	}
 
-	var user models.User
-	if err := database.DB.Where("email = ?", userEmail).First(&user).Error; err != nil {
+	user, err := services.GetProfile(userEmail.(string))
+	if err != nil {
 		c.JSON(http.StatusNotFound, gin.H{"error": "Pengguna tidak ditemukan"})
 		return
 	}
@@ -107,30 +75,13 @@ func Register(c *gin.Context) {
 		return
 	}
 
-	// Check if user already exists
-	var existingUser models.User
-	if err := database.DB.Where("email = ?", input.Email).First(&existingUser).Error; err == nil {
-		c.JSON(http.StatusConflict, gin.H{"error": "Email ini sudah terdaftar!"})
-		return
-	}
-
-	// Hash password
-	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(input.Password), bcrypt.DefaultCost)
+	err := services.Register(input.Name, input.Email, input.Password)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Gagal memproses password"})
-		return
-	}
-
-	// Create user (always Wisatawan)
-	newUser := models.User{
-		Email:    input.Email,
-		Name:     input.Name,
-		Password: string(hashedPassword),
-		Role:     "Wisatawan",
-	}
-
-	if err := database.DB.Create(&newUser).Error; err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Gagal menyimpan akun baru"})
+		if strings.Contains(err.Error(), "terdaftar") {
+			c.JSON(http.StatusConflict, gin.H{"error": err.Error()})
+		} else {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Gagal menyimpan akun baru"})
+		}
 		return
 	}
 

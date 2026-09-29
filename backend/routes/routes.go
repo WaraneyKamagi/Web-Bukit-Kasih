@@ -14,11 +14,19 @@ import (
 func SetupRouter() *gin.Engine {
 	r := gin.Default()
 
+	// Trust all proxies for MVP cloud deployment (e.g. Render, Vercel)
+	// This ensures client IP is read correctly from X-Forwarded-For headers
+	r.ForwardedByClientIP = true
+	r.SetTrustedProxies(nil)
+
 	// Apply CORS middleware globally
 	r.Use(middleware.CORSMiddleware())
 
-	// API Routes Group
-	api := r.Group("/api")
+	// Serve uploaded files statically
+	r.Static("/uploads", "./uploads")
+
+	// API Routes Group Version 1
+	api := r.Group("/api/v1")
 	{
 		// Health check
 		api.GET("/health", func(c *gin.Context) {
@@ -41,7 +49,8 @@ func SetupRouter() *gin.Engine {
 		// Review routes
 		api.GET("/reviews", handlers.GetAllReviews)
 		api.GET("/reviews/activity/:activityId", handlers.GetReviewsByActivity)
-		api.POST("/reviews", handlers.CreateReview)
+		// Apply rate limiter to review submission (reusing authLimiter or general limiter)
+		api.POST("/reviews", authLimiter, middleware.AuthMiddleware(), handlers.CreateReview)
 		api.DELETE("/reviews/:id", middleware.AuthMiddleware(), middleware.AdminOnly(), handlers.DeleteReview)
 
 		// Inquiry routes
@@ -71,6 +80,20 @@ func SetupRouter() *gin.Engine {
 		api.GET("/bookmarks", middleware.AuthMiddleware(), handlers.GetUserBookmarks)
 		api.POST("/bookmarks/toggle", middleware.AuthMiddleware(), handlers.ToggleBookmark)
 		api.GET("/bookmarks/stats", middleware.AuthMiddleware(), middleware.AdminOnly(), handlers.GetBookmarkStats)
+
+		// Content Management routes (Activities and Destinations)
+		api.GET("/activities", handlers.GetActivities)
+		api.POST("/activities", middleware.AuthMiddleware(), middleware.AdminOnly(), handlers.CreateActivity)
+		api.PUT("/activities/:id", middleware.AuthMiddleware(), middleware.AdminOnly(), handlers.UpdateActivity)
+		api.DELETE("/activities/:id", middleware.AuthMiddleware(), middleware.AdminOnly(), handlers.DeleteActivity)
+
+		api.GET("/destinations", handlers.GetDestinations)
+		api.POST("/destinations", middleware.AuthMiddleware(), middleware.AdminOnly(), handlers.CreateDestination)
+		api.PUT("/destinations/:id", middleware.AuthMiddleware(), middleware.AdminOnly(), handlers.UpdateDestination)
+		api.DELETE("/destinations/:id", middleware.AuthMiddleware(), middleware.AdminOnly(), handlers.DeleteDestination)
+
+		// Upload Image route
+		api.POST("/upload", middleware.AuthMiddleware(), middleware.AdminOnly(), handlers.UploadImage)
 	}
 
 	return r

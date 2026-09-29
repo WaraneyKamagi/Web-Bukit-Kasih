@@ -1,5 +1,6 @@
 import { createContext, useState, useEffect, useContext, useCallback } from 'react';
 import { useAuth } from './AuthContext';
+import { bookmarkService } from '../services/api';
 
 export const BookmarkContext = createContext();
 
@@ -8,65 +9,80 @@ export const useBookmark = () => useContext(BookmarkContext);
 export function BookmarkProvider({ children }) {
   const { token, user } = useAuth();
   
-  // Initialize with localStorage
-  const [bookmarkedIds, setBookmarkedIds] = useState(() => {
-    const saved = localStorage.getItem('bukit_kasih_bookmarks');
-    return saved ? JSON.parse(saved) : [];
-  });
+  const getStorageKey = useCallback(() => {
+    return user && user.email ? `bukit_kasih_bookmarks_${user.email}` : 'bukit_kasih_bookmarks_guest';
+  }, [user]);
+
+  const [bookmarkedIds, setBookmarkedIds] = useState([]);
+
+  // Initialize and switch localStorage when user changes
+  useEffect(() => {
+    const key = getStorageKey();
+    try {
+      const saved = localStorage.getItem(key);
+      if (saved) {
+        setBookmarkedIds(JSON.parse(saved));
+      } else {
+        setBookmarkedIds([]);
+      }
+    } catch (e) {
+      console.warn("Storage access blocked.");
+      setBookmarkedIds([]);
+    }
+  }, [getStorageKey]);
 
   // Fetch bookmarks from API when user logs in
   const fetchBookmarks = useCallback(async () => {
     if (!token || !user) return;
     try {
-      const res = await fetch('/api/bookmarks', {
-        headers: { 'Authorization': `Bearer ${token}` }
-      });
-      if (res.ok) {
-        const data = await res.json();
-        // data should be an array of activity IDs
-        if (Array.isArray(data)) {
-          setBookmarkedIds(data);
-          localStorage.setItem('bukit_kasih_bookmarks', JSON.stringify(data));
-        }
+      const data = await bookmarkService.getAll();
+      if (Array.isArray(data)) {
+        setBookmarkedIds(data);
+        try {
+          localStorage.setItem(getStorageKey(), JSON.stringify(data));
+        } catch (e) {}
       }
     } catch (error) {
       console.error("Gagal mengambil bookmark dari server:", error);
     }
-  }, [token, user]);
+  }, [token, user, getStorageKey]);
 
   useEffect(() => {
     fetchBookmarks();
   }, [fetchBookmarks]);
 
   const toggleBookmark = async (id, title) => {
-    // Optimistic UI update
-    let updatedBookmarks;
-    if (bookmarkedIds.includes(id)) {
-      updatedBookmarks = bookmarkedIds.filter(item => item !== id);
-    } else {
-      updatedBookmarks = [...bookmarkedIds, id];
-    }
+    const key = getStorageKey();
+    const isCurrentlyBookmarked = bookmarkedIds.includes(id);
+    
+    // 1. Optimistic UI update
+    const updatedBookmarks = isCurrentlyBookmarked 
+      ? bookmarkedIds.filter(item => item !== id)
+      : [...bookmarkedIds, id];
+      
     setBookmarkedIds(updatedBookmarks);
-    localStorage.setItem('bukit_kasih_bookmarks', JSON.stringify(updatedBookmarks));
+    try {
+      localStorage.setItem(key, JSON.stringify(updatedBookmarks));
+    } catch (e) {}
 
-    // Sync with backend if logged in
+    // 2. Sync with backend if logged in
     if (user && token) {
       try {
-        await fetch('/api/bookmarks/toggle', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`
-          },
-          body: JSON.stringify({ activityId: id, title: title })
-        });
+        await bookmarkService.toggle(id);
       } catch (error) {
         console.error("Gagal menyinkronkan bookmark dengan server:", error);
-        // Revert on error if desired, but for now we keep the optimistic update
+        
+        // REVERT state on error (Rollback)
+        setBookmarkedIds(bookmarkedIds);
+        try {
+          localStorage.setItem(key, JSON.stringify(bookmarkedIds));
+        } catch (e) {}
+        
+        throw new Error('Koneksi terputus atau terjadi kesalahan server. Gagal menyimpan rencana perjalanan.');
       }
     }
     
-    return !bookmarkedIds.includes(id); // Return true if added, false if removed
+    return !isCurrentlyBookmarked; // Return true if added, false if removed
   };
 
   return (

@@ -3,17 +3,14 @@ package handlers
 import (
 	"net/http"
 
-	"bukit-kasih-backend/database"
-	"bukit-kasih-backend/models"
+	"bukit-kasih-backend/services"
 
 	"github.com/gin-gonic/gin"
 )
 
 // GetActiveAnnouncement retrieves the currently active announcement
 func GetActiveAnnouncement(c *gin.Context) {
-	var announcement models.Announcement
-	// Find the latest active announcement
-	err := database.DB.Where("is_active = ?", true).Order("updated_at desc").First(&announcement).Error
+	announcement, err := services.GetActiveAnnouncement()
 	if err != nil {
 		c.JSON(http.StatusOK, gin.H{
 			"announcement": nil,
@@ -37,19 +34,10 @@ func UpdateAnnouncement(c *gin.Context) {
 		return
 	}
 
-	// Deactivate all previous active announcements
-	database.DB.Model(&models.Announcement{}).Where("is_active = ?", true).Update("is_active", false)
-
-	// Create new active announcement if text is not empty
-	if input.Text != "" {
-		announcement := models.Announcement{
-			Text:     input.Text,
-			IsActive: true,
-		}
-		if err := database.DB.Create(&announcement).Error; err != nil {
-			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to create announcement"})
-			return
-		}
+	_, err := services.UpdateAnnouncement(input.Text)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to create announcement"})
+		return
 	}
 
 	c.JSON(http.StatusOK, gin.H{

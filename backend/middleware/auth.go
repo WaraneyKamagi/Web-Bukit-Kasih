@@ -5,7 +5,7 @@ import (
 	"strings"
 
 	"bukit-kasih-backend/config"
-	"bukit-kasih-backend/handlers"
+	"bukit-kasih-backend/services"
 
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/gin-gonic/gin"
@@ -29,7 +29,7 @@ func AuthMiddleware() gin.HandlerFunc {
 		}
 
 		tokenString := parts[1]
-		claims := &handlers.Claims{}
+		claims := &services.Claims{}
 
 		token, err := jwt.ParseWithClaims(tokenString, claims, func(token *jwt.Token) (interface{}, error) {
 			return config.AppConfig.JWTSecret, nil

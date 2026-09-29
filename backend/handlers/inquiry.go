@@ -3,10 +3,8 @@ package handlers
 import (
 	"net/http"
 	"strings"
-	"time"
 
-	"bukit-kasih-backend/database"
-	"bukit-kasih-backend/models"
+	"bukit-kasih-backend/services"
 
 	"github.com/gin-gonic/gin"
 )
@@ -24,16 +22,8 @@ func CreateInquiry(c *gin.Context) {
 		return
 	}
 
-	inquiry := models.Inquiry{
-		Name:    input.Name,
-		Email:   input.Email,
-		Message: input.Message,
-		Status:  "Menunggu Balasan",
-		Reply:   nil,
-		Date:    time.Now().Format("2006-01-02"),
-	}
-
-	if err := database.DB.Create(&inquiry).Error; err != nil {
+	inquiry, err := services.CreateInquiry(input.Name, input.Email, input.Message)
+	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to save inquiry"})
 		return
 	}
@@ -43,8 +33,8 @@ func CreateInquiry(c *gin.Context) {
 
 // GetInquiries retrieves all inquiries (for admin dashboard)
 func GetInquiries(c *gin.Context) {
-	var inquiries []models.Inquiry
-	if err := database.DB.Order("created_at desc").Find(&inquiries).Error; err != nil {
+	inquiries, err := services.GetAllInquiries()
+	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch inquiries"})
 		return
 	}
@@ -69,8 +59,8 @@ func GetInquiriesByUser(c *gin.Context) {
 		return
 	}
 
-	var inquiries []models.Inquiry
-	if err := database.DB.Where("email = ?", email).Order("created_at desc").Find(&inquiries).Error; err != nil {
+	inquiries, err := services.GetInquiriesByUser(email)
+	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch user inquiries"})
 		return
 	}
@@ -91,18 +81,10 @@ func ReplyInquiry(c *gin.Context) {
 		return
 	}
 
-	var inquiry models.Inquiry
-	if err := database.DB.First(&inquiry, id).Error; err != nil {
-		c.JSON(http.StatusNotFound, gin.H{"error": "Inquiry not found"})
-		return
-	}
-
-	// Update status and reply
-	inquiry.Status = "Dijawab"
-	inquiry.Reply = &input.Reply
-
-	if err := database.DB.Save(&inquiry).Error; err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to save reply"})
+	inquiry, err := services.ReplyInquiry(id, input.Reply)
+	if err != nil {
+		// Could be not found or save error, assuming simple err response here
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to save reply or inquiry not found"})
 		return
 	}
 

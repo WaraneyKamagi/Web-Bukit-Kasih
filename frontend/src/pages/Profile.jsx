@@ -5,7 +5,7 @@ import { useFeedback } from '../context/FeedbackContext';
 import { useBookmark } from '../context/BookmarkContext';
 import Toast from '../components/Toast';
 import Modal from '../components/Modal';
-import { activities } from '../data/activities';
+import { activityService } from '../services/api';
 
 export default function Profile() {
   const { user } = useAuth();
@@ -39,9 +39,13 @@ export default function Profile() {
 
   const handleRemoveBookmark = async (id, title, e) => {
     e.stopPropagation(); // Avoid opening modal
-    const added = await toggleBookmark(id, title);
-    if (!added) {
-      showToast(`"${title}" dihapus dari rencana perjalanan.`, 'info');
+    try {
+      const added = await toggleBookmark(id, title);
+      if (!added) {
+        showToast(`"${title}" dihapus dari rencana perjalanan.`, 'info');
+      }
+    } catch (error) {
+      showToast(error.message || `Gagal menghapus "${title}".`, 'error');
     }
   };
 
@@ -49,6 +53,26 @@ export default function Profile() {
     setSelectedAct(act);
     setIsModalOpen(true);
   };
+
+  const [activities, setActivities] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [fetchError, setFetchError] = useState(null);
+  
+  useEffect(() => {
+    setIsLoading(true);
+    activityService.getAll()
+      .then(data => {
+        setActivities(data || []);
+        setFetchError(null);
+      })
+      .catch(err => {
+        console.error(err);
+        setFetchError(err.message || 'Gagal memuat data aktivitas');
+      })
+      .finally(() => {
+        setIsLoading(false);
+      });
+  }, []);
 
   // Filter bookmarks data
   const bookmarkedActivities = activities.filter((act) =>
@@ -89,7 +113,17 @@ export default function Profile() {
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              {bookmarkedActivities.length > 0 ? (
+              {isLoading ? (
+                <div className="col-span-1 sm:col-span-2 flex flex-col items-center justify-center p-12 border border-dashed border-outline-variant/30 rounded-24 bg-slate-50 dark:bg-white/5">
+                  <span className="material-symbols-outlined text-4xl text-primary mb-2 animate-spin">refresh</span>
+                  <p className="text-sm text-subtext dark:text-slate-400">Memuat rencana perjalanan...</p>
+                </div>
+              ) : fetchError ? (
+                <div className="col-span-1 sm:col-span-2 flex flex-col items-center justify-center p-12 border border-dashed border-red-500/30 rounded-24 bg-red-50 dark:bg-red-500/10">
+                  <span className="material-symbols-outlined text-4xl text-red-500 mb-2">error</span>
+                  <p className="text-sm text-red-500">{fetchError}</p>
+                </div>
+              ) : bookmarkedActivities.length > 0 ? (
                 bookmarkedActivities.map((act) => (
                   <div 
                     key={act.id}
@@ -123,7 +157,7 @@ export default function Profile() {
                   </div>
                 ))
               ) : (
-                <div className="col-span-2 flex flex-col items-center justify-center p-12 border border-dashed border-outline-variant/30 rounded-24 bg-white/30 dark:bg-black/5">
+                <div className="col-span-1 sm:col-span-2 flex flex-col items-center justify-center p-12 border border-dashed border-outline-variant/30 rounded-24 bg-white/30 dark:bg-black/5">
                   <span className="material-symbols-outlined text-4xl text-subtext mb-2">bookmark_border</span>
                   <p className="text-sm text-subtext dark:text-slate-400">Rencana perjalanan Anda masih kosong.</p>
                   <button 

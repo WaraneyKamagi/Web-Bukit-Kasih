@@ -1,15 +1,33 @@
 import { useRef, useEffect, useState } from 'react';
 import TravelCard from './TravelCard';
 import Modal from './Modal';
-import { destinations } from '../data/destinations';
+import { destinationService } from '../services/api';
 
 export default function DestinationPanel() {
   const sectionRef = useRef(null);
   const [isActive, setIsActive] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedCat, setSelectedCat] = useState(null);
+  const [destinations, setDestinations] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [fetchError, setFetchError] = useState(null);
 
   useEffect(() => {
+    setIsLoading(true);
+    // Fetch destinations from API
+    destinationService.getAll()
+      .then(data => {
+        setDestinations(data || []);
+        setFetchError(null);
+      })
+      .catch(err => {
+        console.error("Error fetching destinations:", err);
+        setFetchError(err.message || 'Gagal memuat data destinasi');
+      })
+      .finally(() => {
+        setIsLoading(false);
+      });
+      
     const currentSection = sectionRef.current;
     const observer = new IntersectionObserver(
       ([entry]) => {
@@ -61,15 +79,32 @@ export default function DestinationPanel() {
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-        {destinations.map((cat) => (
-          <TravelCard 
-            key={cat.title}
-            title={cat.title}
-            image={cat.image}
-            altText={cat.altText}
-            onClick={() => handleCardClick(cat)}
-          />
-        ))}
+        {isLoading ? (
+          <div className="col-span-1 sm:col-span-2 lg:col-span-4 flex flex-col items-center justify-center p-20 bg-slate-50 dark:bg-white/5 rounded-24">
+            <span className="material-symbols-outlined text-[48px] text-primary mb-2 animate-spin">refresh</span>
+            <p className="text-subtext dark:text-slate-400">Memuat landmark...</p>
+          </div>
+        ) : fetchError ? (
+          <div className="col-span-1 sm:col-span-2 lg:col-span-4 flex flex-col items-center justify-center p-20 bg-red-50 dark:bg-red-500/10 rounded-24">
+            <span className="material-symbols-outlined text-[48px] text-red-500 mb-2">error</span>
+            <p className="text-red-500">{fetchError}</p>
+          </div>
+        ) : destinations.length > 0 ? (
+          destinations.map((cat) => (
+            <TravelCard 
+              key={cat.ID || cat.title}
+              title={cat.title}
+              image={cat.image}
+              altText={cat.altText}
+              onClick={() => handleCardClick(cat)}
+            />
+          ))
+        ) : (
+          <div className="col-span-1 sm:col-span-2 lg:col-span-4 flex flex-col items-center justify-center p-20 bg-slate-50 dark:bg-white/5 rounded-24">
+            <span className="material-symbols-outlined text-[48px] text-subtext mb-2">sentiment_dissatisfied</span>
+            <p className="text-subtext dark:text-slate-400">Tidak ada landmark ditemukan.</p>
+          </div>
+        )}
       </div>
 
       {/* Modal Detail Tengara */}
@@ -92,10 +127,10 @@ export default function DestinationPanel() {
             {/* Modal Descriptions */}
             <div className="space-y-4">
               <h3 className="text-xl font-bold text-primary dark:text-secondary-fixed-dim">
-                {selectedCat.details.title}
+                {selectedCat.detailsTitle}
               </h3>
-              <p className="font-body-md text-body-md text-on-surface-variant dark:text-slate-300 leading-relaxed">
-                {selectedCat.details.text}
+              <p className="font-body-md text-body-md text-on-surface-variant dark:text-slate-300 leading-relaxed whitespace-pre-wrap">
+                {selectedCat.detailsText}
               </p>
               
               {/* Highlight Metas */}
@@ -105,29 +140,31 @@ export default function DestinationPanel() {
                     <span className="material-symbols-outlined text-[18px]">schedule</span>
                     <span className="font-semibold">Jam Operasional</span>
                   </div>
-                  <p className="text-subtext dark:text-slate-400">{selectedCat.details.hours}</p>
+                  <p className="text-subtext dark:text-slate-400">{selectedCat.detailsHours}</p>
                 </div>
                 <div className="space-y-2">
                   <div className="flex items-center gap-2 text-primary dark:text-secondary-fixed">
                     <span className="material-symbols-outlined text-[18px]">hiking</span>
                     <span className="font-semibold">Tingkat Pendakian</span>
                   </div>
-                  <p className="text-subtext dark:text-slate-400">{selectedCat.details.difficulty}</p>
+                  <p className="text-subtext dark:text-slate-400">{selectedCat.detailsDifficulty}</p>
                 </div>
               </div>
 
               {/* Tips Section */}
-              <div className="bg-primary/5 dark:bg-white/5 border border-primary/10 dark:border-white/10 rounded-2xl p-5 mt-4">
-                <div className="flex items-start gap-3">
-                  <span className="material-symbols-outlined text-primary dark:text-secondary-fixed-dim mt-0.5">tips_and_updates</span>
-                  <div className="text-left">
-                    <h4 className="font-bold text-primary dark:text-secondary-fixed-dim text-sm mb-1">Tips Berkunjung:</h4>
-                    <p className="font-body-md text-body-md text-on-surface-variant dark:text-slate-300 text-xs leading-relaxed">
-                      {selectedCat.details.tips}
-                    </p>
+              {selectedCat.detailsTips && (
+                <div className="bg-primary/5 dark:bg-white/5 border border-primary/10 dark:border-white/10 rounded-2xl p-5 mt-4">
+                  <div className="flex items-start gap-3">
+                    <span className="material-symbols-outlined text-primary dark:text-secondary-fixed-dim mt-0.5">tips_and_updates</span>
+                    <div className="text-left">
+                      <h4 className="font-bold text-primary dark:text-secondary-fixed-dim text-sm mb-1">Tips Berkunjung:</h4>
+                      <p className="font-body-md text-body-md text-on-surface-variant dark:text-slate-300 text-xs leading-relaxed whitespace-pre-wrap">
+                        {selectedCat.detailsTips}
+                      </p>
+                    </div>
                   </div>
                 </div>
-              </div>
+              )}
 
             </div>
           </div>

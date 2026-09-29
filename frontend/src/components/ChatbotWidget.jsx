@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { useAuth } from '../context/AuthContext';
+import { chatService } from '../services/api';
 
 export default function ChatbotWidget() {
   const { user } = useAuth();
@@ -38,22 +39,7 @@ export default function ChatbotWidget() {
     setIsLoading(true);
 
     try {
-      // Get token from localStorage
-      const token = localStorage.getItem('bukit_kasih_token');
-      const res = await fetch('/api/chat', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
-        },
-        body: JSON.stringify({ message: userMessage })
-      });
-
-      const data = await res.json();
-      if (!res.ok) {
-        throw new Error(data.error || 'Gagal mengirim pesan');
-      }
-
+      const data = await chatService.sendMessage(userMessage);
       setMessages(prev => [...prev, { id: 'bot_' + Date.now(), role: 'assistant', content: data.reply }]);
     } catch (err) {
       setMessages(prev => [...prev, { 

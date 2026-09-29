@@ -1,5 +1,6 @@
 import { createContext, useState, useEffect, useRef, useContext, useMemo, useCallback } from 'react';
 import { supabase } from '../utils/supabaseClient';
+import { announcementService } from '../services/api';
 import { sendBrowserNotification, playNotificationChime } from '../utils/notification';
 import { useAuth } from './AuthContext';
 
@@ -15,11 +16,8 @@ export function AnnouncementProvider({ children }) {
   useEffect(() => {
     async function fetchAnnouncement() {
       try {
-        const res = await fetch('/api/announcements/active');
-        if (res.ok) {
-          const data = await res.json();
-          setAnnouncement(data.announcement || null);
-        }
+        const data = await announcementService.getActive();
+        setAnnouncement(data?.announcement || null);
       } catch (err) {
         console.error('Gagal mengambil pengumuman:', err);
       }
@@ -73,17 +71,8 @@ export function AnnouncementProvider({ children }) {
 
   const publishAnnouncement = useCallback(async (text) => {
     try {
-      const res = await fetch('/api/announcements', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`
-        },
-        body: JSON.stringify({ text })
-      });
-      if (!res.ok) throw new Error('Gagal memperbarui pengumuman');
-      const data = await res.json();
-      const updatedText = data.announcement || null;
+      const data = await announcementService.update({ text });
+      const updatedText = data?.announcement || null;
       setAnnouncement(updatedText);
 
       if (updatedText) {
@@ -114,7 +103,7 @@ export function AnnouncementProvider({ children }) {
       console.error('Publish announcement error:', err);
       return { success: false, error: err.message };
     }
-  }, [token]);
+  }, []);
 
   const value = useMemo(() => ({
     announcement, publishAnnouncement

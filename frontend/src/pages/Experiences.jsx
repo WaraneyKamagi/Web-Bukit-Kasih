@@ -4,8 +4,8 @@ import { useFeedback } from '../context/FeedbackContext';
 import { useBookmark } from '../context/BookmarkContext';
 import Toast from '../components/Toast';
 import Modal from '../components/Modal';
-import { activities } from '../data/activities';
 import { testimonials } from '../data/testimonials';
+import { activityService } from '../services/api';
 
 // Import Assets
 import heroBg from '../assets/hero_bukit_kasih.png';
@@ -44,6 +44,26 @@ export default function Experiences() {
     }
     return testimonials;
   }, [reviews]);
+
+  const [activities, setActivities] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [fetchError, setFetchError] = useState(null);
+
+  useEffect(() => {
+    setIsLoading(true);
+    activityService.getAll()
+      .then(data => {
+        setActivities(data || []);
+        setFetchError(null);
+      })
+      .catch(err => {
+        console.error("Failed to load activities:", err);
+        setFetchError(err.message || 'Gagal memuat data aktivitas');
+      })
+      .finally(() => {
+        setIsLoading(false);
+      });
+  }, []);
 
   const [activeSlide, setActiveSlide] = useState(0);
 
@@ -110,11 +130,15 @@ export default function Experiences() {
 
   const handleToggleBookmark = async (id, title, e) => {
     e.stopPropagation(); // Prevent modal opening when bookmark is clicked
-    const added = await toggleBookmark(id, title);
-    if (added) {
-      showToast(`Aktivitas "${title}" ditambahkan ke rencana perjalanan!`, 'success');
-    } else {
-      showToast(`Aktivitas "${title}" dihapus dari rencana perjalanan.`, 'info');
+    try {
+      const added = await toggleBookmark(id, title);
+      if (added) {
+        showToast(`Aktivitas "${title}" ditambahkan ke rencana perjalanan!`, 'success');
+      } else {
+        showToast(`Aktivitas "${title}" dihapus dari rencana perjalanan.`, 'info');
+      }
+    } catch (error) {
+      showToast(error.message || `Gagal mengubah rencana perjalanan untuk "${title}".`, 'error');
     }
   };
 
@@ -200,7 +224,17 @@ export default function Experiences() {
 
         {/* Bento Grid Layout (Dynamic based on filter) */}
         <div className="grid grid-cols-1 md:grid-cols-12 gap-gutter auto-rows-[400px] transition-all duration-500">
-          {filteredActivities.length > 0 ? (
+          {isLoading ? (
+            <div className="col-span-12 flex flex-col items-center justify-center p-20 bg-slate-50 dark:bg-white/5 rounded-24">
+              <span className="material-symbols-outlined text-[48px] text-primary mb-2 animate-spin">refresh</span>
+              <p className="text-subtext dark:text-slate-400">Memuat aktivitas...</p>
+            </div>
+          ) : fetchError ? (
+            <div className="col-span-12 flex flex-col items-center justify-center p-20 bg-red-50 dark:bg-red-500/10 rounded-24">
+              <span className="material-symbols-outlined text-[48px] text-red-500 mb-2">error</span>
+              <p className="text-red-500">{fetchError}</p>
+            </div>
+          ) : filteredActivities.length > 0 ? (
             filteredActivities.map((act) => {
               const isBookmarked = bookmarkedIds.includes(act.id);
               // Handle layout span based on item index or custom settings

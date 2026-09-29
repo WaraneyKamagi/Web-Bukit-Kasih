@@ -1,5 +1,6 @@
 import { createContext, useState, useEffect, useContext, useMemo, useCallback } from 'react';
 import { useAuth } from './AuthContext';
+import { reviewService, inquiryService } from '../services/api';
 
 export const FeedbackContext = createContext();
 
@@ -16,11 +17,8 @@ export function FeedbackProvider({ children }) {
   useEffect(() => {
     async function fetchReviews() {
       try {
-        const res = await fetch('/api/reviews');
-        if (res.ok) {
-          const data = await res.json();
-          if (Array.isArray(data)) setReviews(mapReviews(data));
-        }
+        const data = await reviewService.getAll();
+        if (Array.isArray(data)) setReviews(mapReviews(data));
       } catch (err) {
         console.error('Gagal mengambil ulasan:', err);
       }
@@ -36,18 +34,11 @@ export function FeedbackProvider({ children }) {
 
     async function fetchInquiries() {
       try {
-        const url = user.role === 'Pengelola'
-          ? '/api/inquiries'
-          : `/api/inquiries/user/${user.email}`;
+        const data = user.role === 'Pengelola'
+          ? await inquiryService.getAll()
+          : await inquiryService.getByUser(user.email);
 
-        const inquiriesRes = await fetch(url, {
-          headers: { Authorization: `Bearer ${token}` }
-        });
-
-        if (inquiriesRes.ok) {
-          const data = await inquiriesRes.json();
-          if (Array.isArray(data)) setInquiries(mapInquiries(data));
-        }
+        if (Array.isArray(data)) setInquiries(mapInquiries(data));
       } catch (err) {
         console.error('Gagal mengambil inquiry:', err);
       }
@@ -58,13 +49,7 @@ export function FeedbackProvider({ children }) {
 
   const addReview = useCallback(async (activityId, author, rating, text) => {
     try {
-      const res = await fetch('/api/reviews', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ activityId, author, rating, text })
-      });
-      if (!res.ok) throw new Error('Gagal menambahkan ulasan');
-      const newReview = await res.json();
+      const newReview = await reviewService.create({ activityId, author, rating, text });
       setReviews((prev) => [{ ...newReview, id: newReview.ID || newReview.id }, ...prev]);
     } catch (err) {
       console.error('Add review error:', err);
@@ -73,26 +58,16 @@ export function FeedbackProvider({ children }) {
 
   const deleteReview = useCallback(async (reviewId) => {
     try {
-      const res = await fetch(`/api/reviews/${reviewId}`, {
-        method: 'DELETE',
-        headers: { Authorization: `Bearer ${token}` }
-      });
-      if (!res.ok) throw new Error('Gagal menghapus ulasan');
+      await reviewService.delete(reviewId);
       setReviews((prev) => prev.filter((r) => r.ID !== reviewId && r.id !== reviewId));
     } catch (err) {
       console.error('Delete review error:', err);
     }
-  }, [token]);
+  }, []);
 
   const addInquiry = useCallback(async (name, email, message) => {
     try {
-      const res = await fetch('/api/inquiries', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name, email, message })
-      });
-      if (!res.ok) throw new Error('Gagal mengirim pesan');
-      const newInq = await res.json();
+      const newInq = await inquiryService.create({ name, email, message });
       setInquiries((prev) => [{ ...newInq, id: newInq.ID || newInq.id }, ...prev]);
     } catch (err) {
       console.error('Add inquiry error:', err);
@@ -101,16 +76,7 @@ export function FeedbackProvider({ children }) {
 
   const replyInquiry = useCallback(async (inquiryId, replyText) => {
     try {
-      const res = await fetch(`/api/inquiries/${inquiryId}/reply`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`
-        },
-        body: JSON.stringify({ reply: replyText })
-      });
-      if (!res.ok) throw new Error('Gagal mengirim balasan');
-      const updatedInq = await res.json();
+      const updatedInq = await inquiryService.reply(inquiryId, replyText);
       setInquiries((prev) =>
         prev.map((inq) => {
           if (inq.id === inquiryId || inq.ID === inquiryId) {
@@ -122,7 +88,7 @@ export function FeedbackProvider({ children }) {
     } catch (err) {
       console.error('Reply inquiry error:', err);
     }
-  }, [token]);
+  }, []);
 
   const value = useMemo(() => ({
     inquiries, reviews, addReview, deleteReview, addInquiry, replyInquiry

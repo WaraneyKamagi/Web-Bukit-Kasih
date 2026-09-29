@@ -3,8 +3,7 @@ package handlers
 import (
 	"net/http"
 
-	"bukit-kasih-backend/database"
-	"bukit-kasih-backend/models"
+	"bukit-kasih-backend/services"
 
 	"github.com/gin-gonic/gin"
 )
@@ -29,78 +28,25 @@ func ToggleBookmark(c *gin.Context) {
 		return
 	}
 
-	var existingBookmark models.Bookmark
-	// Check if it exists
-	result := database.DB.Where("email = ? AND activity_id = ?", userEmail, req.ActivityID).First(&existingBookmark)
+	status, err := services.ToggleBookmark(userEmail, req.ActivityID, req.Title)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Gagal menyimpan bookmark"})
+		return
+	}
 
-	if result.RowsAffected > 0 {
-		// It exists, so we remove it (toggle off)
-		database.DB.Delete(&existingBookmark)
+	if status == "removed" {
 		c.JSON(http.StatusOK, gin.H{"status": "removed", "message": "Bookmark dihapus"})
 	} else {
-		// It doesn't exist, create it (toggle on)
-		newBookmark := models.Bookmark{
-			Email:      userEmail,
-			ActivityID: req.ActivityID,
-			Title:      req.Title,
-		}
-		database.DB.Create(&newBookmark)
 		c.JSON(http.StatusOK, gin.H{"status": "added", "message": "Bookmark ditambahkan"})
 	}
 }
 
-// BookmarkStat represents the aggregated result for the dashboard
-type BookmarkStat struct {
-	Name    string `json:"name"`
-	Count   int    `json:"count"`
-	Percent int    `json:"percent"`
-	Color   string `json:"color"`
-}
-
 // GetBookmarkStats returns aggregated bookmark statistics for the admin dashboard
 func GetBookmarkStats(c *gin.Context) {
-	// Query to group by activity_id and title, order by count descending
-	type Result struct {
-		Title string
-		Count int
-	}
-
-	var results []Result
-	database.DB.Model(&models.Bookmark{}).
-		Select("title, count(*) as count").
-		Group("title").
-		Order("count desc").
-		Limit(4).
-		Scan(&results)
-
-	// Colors to match the original mock UI
-	colors := []string{"bg-primary", "bg-emerald-500", "bg-amber-500", "bg-purple-500"}
-
-	// Find the max count to calculate percentage relative to the most popular
-	maxCount := 1
-	if len(results) > 0 && results[0].Count > 0 {
-		maxCount = results[0].Count
-	}
-
-	var stats []BookmarkStat
-	for i, r := range results {
-		percent := (r.Count * 100) / maxCount
-		// Default base percentage just in case there's only 1 click so it doesn't look empty
-		if r.Count > 0 && percent < 10 {
-			percent = 10
-		}
-		
-		color := "bg-primary"
-		if i < len(colors) {
-			color = colors[i]
-		}
-
-		stats = append(stats, BookmarkStat{
-			Name:    r.Title,
-			Count:   r.Count,
-			Percent: percent,
-			Color:   color,
-		})
+	stats, err := services.GetBookmarkStats()
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Gagal mengambil statistik"})
+		return
 	}
 
 	c.JSON(http.StatusOK, stats)
@@ -115,17 +61,10 @@ func GetUserBookmarks(c *gin.Context) {
 	}
 	userEmail := email.(string)
 
-	var bookmarks []models.Bookmark
-	database.DB.Where("email = ?", userEmail).Find(&bookmarks)
-
-	// Return an array of activity IDs for easy frontend matching
-	var activityIDs []string
-	for _, b := range bookmarks {
-		activityIDs = append(activityIDs, b.ActivityID)
-	}
-
-	if activityIDs == nil {
-		activityIDs = []string{}
+	activityIDs, err := services.GetUserBookmarks(userEmail)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Gagal mengambil bookmark"})
+		return
 	}
 
 	c.JSON(http.StatusOK, activityIDs)

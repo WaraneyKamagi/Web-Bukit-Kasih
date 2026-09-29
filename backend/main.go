@@ -17,9 +17,6 @@ func main() {
 	// Initialize Database
 	database.InitDB()
 
-	// Set Gin to release mode in production, default to debug mode
-	gin.SetMode(gin.DebugMode)
-
 	r := routes.SetupRouter()
 
 	port := config.AppConfig.Port

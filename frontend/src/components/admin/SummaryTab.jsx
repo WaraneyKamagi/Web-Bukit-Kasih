@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { useAnnouncement } from '../../context/AnnouncementContext';
 import { useFeedback } from '../../context/FeedbackContext';
+import { bookmarkService } from '../../services/api';
 
 export default function SummaryTab() {
   const { user, token } = useAuth();
@@ -14,16 +15,9 @@ export default function SummaryTab() {
     if (user && user.role === 'Pengelola') {
       const fetchBookmarkStats = async () => {
         try {
-          const res = await fetch('/api/bookmarks/stats', {
-            headers: {
-              'Authorization': `Bearer ${token}`
-            }
-          });
-          if (res.ok) {
-            const data = await res.json();
-            if (data && data.length > 0) {
-              setBookmarkStats(data);
-            }
+          const data = await bookmarkService.getStats();
+          if (data && data.length > 0) {
+            setBookmarkStats(data);
           }
         } catch (error) {
           console.error("Gagal mengambil statistik bookmark:", error);

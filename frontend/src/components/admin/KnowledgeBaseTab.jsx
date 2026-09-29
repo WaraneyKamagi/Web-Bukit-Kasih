@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '../../context/AuthContext';
+import { knowledgeService } from '../../services/api';
 
 export default function KnowledgeBaseTab({ showToast }) {
   const { token, user } = useAuth();
@@ -15,11 +16,8 @@ export default function KnowledgeBaseTab({ showToast }) {
 
   const fetchKnowledgeDocs = async () => {
     try {
-      const res = await fetch('/api/knowledge', {
-        headers: { 'Authorization': `Bearer ${token}` }
-      });
-      if (res.ok) {
-        const data = await res.json();
+      const data = await knowledgeService.getAll();
+      if (Array.isArray(data)) {
         setKnowledgeDocs(data);
       }
     } catch (error) {
@@ -36,29 +34,20 @@ export default function KnowledgeBaseTab({ showToast }) {
   const handleSaveKnowledge = async (e) => {
     e.preventDefault();
     const payload = { title: kTitle, category: kCategory, content: kContent, keywords: kKeywords };
-    const method = editingDocId ? 'PUT' : 'POST';
-    const url = editingDocId ? `/api/knowledge/${editingDocId}` : '/api/knowledge';
 
     try {
-      const res = await fetch(url, {
-        method,
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
-        },
-        body: JSON.stringify(payload)
-      });
-      if (res.ok) {
-        showToast(`Artikel berhasil ${editingDocId ? 'diperbarui' : 'ditambahkan'}.`, 'success');
-        setShowKnowledgeForm(false);
-        setEditingDocId(null);
-        setKTitle(''); setKCategory(''); setKContent(''); setKKeywords('');
-        fetchKnowledgeDocs();
+      if (editingDocId) {
+        await knowledgeService.update(editingDocId, payload);
       } else {
-        showToast('Gagal menyimpan artikel.', 'error');
+        await knowledgeService.create(payload);
       }
+      showToast(`Artikel berhasil ${editingDocId ? 'diperbarui' : 'ditambahkan'}.`, 'success');
+      setShowKnowledgeForm(false);
+      setEditingDocId(null);
+      setKTitle(''); setKCategory(''); setKContent(''); setKKeywords('');
+      fetchKnowledgeDocs();
     } catch (error) {
-      showToast('Terjadi kesalahan jaringan.', 'error');
+      showToast('Gagal menyimpan artikel: ' + error.message, 'error');
     }
   };
 
@@ -66,20 +55,11 @@ export default function KnowledgeBaseTab({ showToast }) {
     if (!window.confirm(`Apakah Anda yakin ingin menghapus dokumen "${title}"?`)) return;
 
     try {
-      const res = await fetch(`/api/knowledge/${id}`, {
-        method: 'DELETE',
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
-      });
-      if (res.ok) {
-        showToast(`Artikel "${title}" berhasil dihapus.`, 'info');
-        fetchKnowledgeDocs();
-      } else {
-        showToast('Gagal menghapus artikel.', 'error');
-      }
+      await knowledgeService.delete(id);
+      showToast(`Artikel "${title}" berhasil dihapus.`, 'info');
+      fetchKnowledgeDocs();
     } catch (error) {
-      showToast('Terjadi kesalahan jaringan.', 'error');
+      showToast('Gagal menghapus artikel.', 'error');
     }
   };
 

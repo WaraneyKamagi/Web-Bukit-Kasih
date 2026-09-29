@@ -11,6 +11,7 @@ import AnnouncementTab from '../components/admin/AnnouncementTab';
 import KnowledgeBaseTab from '../components/admin/KnowledgeBaseTab';
 import ReviewModerationTab from '../components/admin/ReviewModerationTab';
 import InquiriesTab from '../components/admin/InquiriesTab';
+import ContentManagementTab from '../components/admin/ContentManagementTab';
 
 export default function AdminDashboard() {
   const { user } = useAuth();
@@ -146,11 +147,13 @@ export default function AdminDashboard() {
 
         {/* Tab Headers */}
         <div className="flex border-b border-outline-variant/30 overflow-x-auto hide-scrollbar mb-8 gap-2">
-          {['ringkasan', 'hermes', 'pengumuman', 'knowledge', 'ulasan', 'pesan'].map((tab) => {
+          {['ringkasan', 'konten', 'hermes', 'pengumuman', 'knowledge', 'ulasan', 'pesan'].map((tab) => {
             const label =
               tab === 'ringkasan'
                 ? 'Ringkasan'
-                : tab === 'hermes'
+                : tab === 'konten'
+                  ? 'Kelola Konten'
+                  : tab === 'hermes'
                   ? 'Hermes AI Studio'
                   : tab === 'pengumuman'
                     ? 'Kelola Pengumuman'
@@ -162,7 +165,9 @@ export default function AdminDashboard() {
             const icon =
               tab === 'ringkasan'
                 ? 'dashboard'
-                : tab === 'hermes'
+                : tab === 'konten'
+                  ? 'edit_document'
+                  : tab === 'hermes'
                   ? 'smart_toy'
                   : tab === 'pengumuman'
                     ? 'campaign'
@@ -202,6 +207,9 @@ export default function AdminDashboard() {
         <div className="animate-fade-in">
           {/* TAB 1: SUMMARY */}
           {activeTab === 'ringkasan' && <SummaryTab />}
+
+          {/* TAB 1.5: CONTENT MANAGEMENT */}
+          {activeTab === 'konten' && <ContentManagementTab />}
 
           {/* TAB 2: HERMES AI STUDIO (CLEAN CONSOLE CHAT LAUNCHER) */}
           {activeTab === 'hermes' && (

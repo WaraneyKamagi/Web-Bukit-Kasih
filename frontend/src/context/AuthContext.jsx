@@ -1,4 +1,5 @@
 import { createContext, useState, useEffect, useCallback, useContext, useMemo } from 'react';
+import { authService } from '../services/api';
 
 export const AuthContext = createContext();
 
@@ -37,11 +38,7 @@ export function AuthProvider({ children }) {
 
     async function loadUserSession() {
       try {
-        const profileRes = await fetch('/api/auth/profile', {
-          headers: { Authorization: `Bearer ${token}` }
-        });
-        if (!profileRes.ok) throw new Error('Sesi kedaluwarsa');
-        const profile = await profileRes.json();
+        const profile = await authService.getProfile();
         setUser(profile);
       } catch (err) {
         console.error('Otorisasi gagal, membersihkan sesi:', err);
@@ -53,13 +50,7 @@ export function AuthProvider({ children }) {
 
   const login = useCallback(async (email, password) => {
     try {
-      const res = await fetch('/api/auth/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password })
-      });
-      const data = await res.json();
-      if (!res.ok) return { success: false, error: data.error || 'Email atau password salah!' };
+      const data = await authService.login({ email, password });
       localStorage.setItem('bukit_kasih_token', data.token);
       localStorage.setItem('bukit_kasih_user', JSON.stringify(data.user));
       setToken(data.token);
@@ -67,23 +58,17 @@ export function AuthProvider({ children }) {
       return { success: true };
     } catch (err) {
       console.error('Login error:', err);
-      return { success: false, error: 'Koneksi ke server gagal' };
+      return { success: false, error: err.message || 'Koneksi ke server gagal' };
     }
   }, []);
 
   const register = useCallback(async (name, email, password) => {
     try {
-      const res = await fetch('/api/auth/register', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name, email, password })
-      });
-      const data = await res.json();
-      if (!res.ok) return { success: false, error: data.error || 'Registrasi gagal' };
+      const data = await authService.register({ name, email, password });
       return { success: true, message: data.message };
     } catch (err) {
       console.error('Register error:', err);
-      return { success: false, error: 'Koneksi ke server gagal' };
+      return { success: false, error: err.message || 'Registrasi gagal' };
     }
   }, []);
 

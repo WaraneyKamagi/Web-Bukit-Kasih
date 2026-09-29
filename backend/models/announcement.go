@@ -1,9 +1,16 @@
 package models
 
-import "gorm.io/gorm"
+import (
+	"time"
+
+	"gorm.io/gorm"
+)
 
 type Announcement struct {
-	gorm.Model
-	Text     string `gorm:"not null" json:"text"`
-	IsActive bool   `gorm:"not null;index" json:"isActive"`
+	ID        uint           `gorm:"primarykey" json:"id"`
+	CreatedAt time.Time      `json:"createdAt"`
+	UpdatedAt time.Time      `json:"-"`
+	DeletedAt gorm.DeletedAt `gorm:"index" json:"-"`
+	Text      string         `gorm:"not null" json:"text"`
+	IsActive  bool           `gorm:"not null;index" json:"isActive"`
 }

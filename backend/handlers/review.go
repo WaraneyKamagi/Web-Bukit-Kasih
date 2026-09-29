@@ -2,10 +2,8 @@ package handlers
 
 import (
 	"net/http"
-	"time"
 
-	"bukit-kasih-backend/database"
-	"bukit-kasih-backend/models"
+	"bukit-kasih-backend/services"
 
 	"github.com/gin-gonic/gin"
 )
@@ -14,8 +12,8 @@ import (
 func GetReviewsByActivity(c *gin.Context) {
 	activityID := c.Param("activityId")
 
-	var reviews []models.Review
-	if err := database.DB.Where("activity_id = ?", activityID).Order("created_at desc").Find(&reviews).Error; err != nil {
+	reviews, err := services.GetReviewsByActivity(activityID)
+	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch reviews"})
 		return
 	}
@@ -25,8 +23,8 @@ func GetReviewsByActivity(c *gin.Context) {
 
 // GetAllReviews retrieves all reviews in the database (for admin moderation)
 func GetAllReviews(c *gin.Context) {
-	var reviews []models.Review
-	if err := database.DB.Order("created_at desc").Find(&reviews).Error; err != nil {
+	reviews, err := services.GetAllReviews()
+	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch reviews"})
 		return
 	}
@@ -48,15 +46,8 @@ func CreateReview(c *gin.Context) {
 		return
 	}
 
-	review := models.Review{
-		ActivityID: input.ActivityID,
-		Author:     input.Author,
-		Rating:     input.Rating,
-		Text:       input.Text,
-		Date:       time.Now().Format("2006-01-02"),
-	}
-
-	if err := database.DB.Create(&review).Error; err != nil {
+	review, err := services.CreateReview(input.ActivityID, input.Author, input.Text, input.Rating)
+	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to save review"})
 		return
 	}
@@ -68,13 +59,9 @@ func CreateReview(c *gin.Context) {
 func DeleteReview(c *gin.Context) {
 	id := c.Param("id")
 
-	var review models.Review
-	if err := database.DB.First(&review, id).Error; err != nil {
-		c.JSON(http.StatusNotFound, gin.H{"error": "Review not found"})
-		return
-	}
-
-	if err := database.DB.Delete(&review).Error; err != nil {
+	err := services.DeleteReview(id)
+	if err != nil {
+		// Depending on error type, might be NotFound or InternalServer
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to delete review"})
 		return
 	}
