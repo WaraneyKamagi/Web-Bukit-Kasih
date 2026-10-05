@@ -1,7 +1,9 @@
 package handlers
 
 import (
+	"log"
 	"net/http"
+	"os"
 
 	"bukit-kasih-backend/services"
 
@@ -43,7 +45,8 @@ func SendHermesMessage(c *gin.Context) {
 func TestHermesTelegramConnection(c *gin.Context) {
 	chatID, err := services.TestHermesTelegramConnection()
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		log.Printf("[HERMES ERROR] Test telegram connection failed: %v", err)
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Gagal menghubungi bot Telegram. Pastikan konfigurasi bot token dan chat ID valid."})
 		return
 	}
 
@@ -64,6 +67,16 @@ func ClearHermesMessages(c *gin.Context) {
 
 // TelegramWebhook handles webhook updates if configured
 func TelegramWebhook(c *gin.Context) {
+	// Security: Validate secret token header if configured in environment
+	expectedSecret := os.Getenv("TELEGRAM_WEBHOOK_SECRET")
+	if expectedSecret != "" {
+		incomingToken := c.GetHeader("X-Telegram-Bot-Api-Secret-Token")
+		if incomingToken != expectedSecret {
+			c.JSON(http.StatusUnauthorized, gin.H{"error": "Akses ditolak: Token webhook tidak valid"})
+			return
+		}
+	}
+
 	var update services.TelegramUpdate
 	if err := c.ShouldBindJSON(&update); err != nil {
 		c.JSON(http.StatusOK, gin.H{"status": "ignored"})

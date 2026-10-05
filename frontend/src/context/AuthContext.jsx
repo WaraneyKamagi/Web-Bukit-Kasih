@@ -25,11 +25,15 @@ export function AuthProvider({ children }) {
     else localStorage.removeItem('bukit_kasih_token');
   }, [token]);
 
-  const logout = useCallback(() => {
-    setUser(null);
-    setToken(null);
-    localStorage.removeItem('bukit_kasih_user');
-    localStorage.removeItem('bukit_kasih_token');
+  const logout = useCallback(async () => {
+    try {
+      await authService.logout().catch(() => {});
+    } finally {
+      setUser(null);
+      setToken(null);
+      localStorage.removeItem('bukit_kasih_user');
+      localStorage.removeItem('bukit_kasih_token');
+    }
   }, []);
 
   // Fetch profile when token changes

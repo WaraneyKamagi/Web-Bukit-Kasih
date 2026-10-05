@@ -6,8 +6,6 @@ import (
 	"bukit-kasih-backend/config"
 	"bukit-kasih-backend/database"
 	"bukit-kasih-backend/routes"
-
-	"github.com/gin-gonic/gin"
 )
 
 func main() {

@@ -2,7 +2,6 @@ import { createContext, useState, useEffect, useRef, useContext, useMemo, useCal
 import { supabase } from '../utils/supabaseClient';
 import { announcementService } from '../services/api';
 import { sendBrowserNotification, playNotificationChime } from '../utils/notification';
-import { useAuth } from './AuthContext';
 
 export const AnnouncementContext = createContext();
 
@@ -11,7 +10,6 @@ export const useAnnouncement = () => useContext(AnnouncementContext);
 export function AnnouncementProvider({ children }) {
   const [announcement, setAnnouncement] = useState(null);
   const realtimeChannelRef = useRef(null);
-  const { token } = useAuth();
 
   useEffect(() => {
     async function fetchAnnouncement() {
@@ -39,17 +37,7 @@ export function AnnouncementProvider({ children }) {
       };
     }
 
-    const channel = supabase.channel('bukit-kasih-announcements', {
-      config: { broadcast: { self: true } }
-    })
-      .on('broadcast', { event: 'announcement_update' }, (payload) => {
-        const newText = payload?.payload?.text || null;
-        setAnnouncement(newText);
-        if (newText) {
-          sendBrowserNotification('⚠️ Peringatan Pengelola Bukit Kasih', newText);
-          playNotificationChime();
-        }
-      })
+    const channel = supabase.channel('bukit-kasih-announcements')
       .on('postgres_changes', { event: '*', schema: 'public', table: 'announcements' }, (payload) => {
         if (payload?.new?.is_active) {
           const newText = payload.new.text;
@@ -86,17 +74,9 @@ export function AnnouncementProvider({ children }) {
           localBc.postMessage({ text: updatedText, is_active: !!updatedText });
           localBc.close();
         }
-      } catch (bcErr) {}
-
-      try {
-        if (realtimeChannelRef.current) {
-          await realtimeChannelRef.current.send({
-            type: 'broadcast',
-            event: 'announcement_update',
-            payload: { text: updatedText, is_active: !!updatedText }
-          });
-        }
-      } catch (realtimeErr) {}
+      } catch {
+        // BroadcastChannel optional fallback
+      }
 
       return { success: true, announcement: updatedText };
     } catch (err) {

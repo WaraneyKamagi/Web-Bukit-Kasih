@@ -1,7 +1,9 @@
 package handlers
 
 import (
+	"fmt"
 	"net/http"
+	"strings"
 
 	"bukit-kasih-backend/services"
 
@@ -36,19 +38,32 @@ func GetAllReviews(c *gin.Context) {
 func CreateReview(c *gin.Context) {
 	var input struct {
 		ActivityID string `json:"activityId" binding:"required"`
-		Author     string `json:"author" binding:"required"`
+		Author     string `json:"author"`
 		Rating     int    `json:"rating" binding:"required,min=1,max=5"`
 		Text       string `json:"text" binding:"required"`
 	}
 
 	if err := c.ShouldBindJSON(&input); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Format data ulasan tidak valid. Pastikan rating (1-5) dan teks ulasan telah diisi."})
 		return
 	}
 
-	review, err := services.CreateReview(input.ActivityID, input.Author, input.Text, input.Rating)
+	// Security: If user is authenticated via JWT, lock author to verified userName
+	authorName := strings.TrimSpace(input.Author)
+	if jwtName, exists := c.Get("userName"); exists {
+		if nameStr, ok := jwtName.(string); ok && strings.TrimSpace(nameStr) != "" {
+			authorName = strings.TrimSpace(nameStr)
+		}
+	}
+
+	if authorName == "" {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Nama penulis (author) tidak boleh kosong"})
+		return
+	}
+
+	review, err := services.CreateReview(input.ActivityID, authorName, input.Text, input.Rating)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to save review"})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Gagal menyimpan ulasan ke database"})
 		return
 	}
 
@@ -65,6 +80,9 @@ func DeleteReview(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to delete review"})
 		return
 	}
+
+	adminEmail, _ := c.Get("userEmail")
+	services.LogAdminAction(fmt.Sprintf("%v", adminEmail), "DELETE_REVIEW", "ReviewID: "+id, c.ClientIP())
 
 	c.JSON(http.StatusOK, gin.H{"message": "Review deleted successfully"})
 }

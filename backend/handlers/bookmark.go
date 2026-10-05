@@ -10,7 +10,7 @@ import (
 
 type ToggleBookmarkRequest struct {
 	ActivityID string `json:"activityId" binding:"required"`
-	Title      string `json:"title" binding:"required"`
+	Title      string `json:"title"`
 }
 
 // ToggleBookmark adds or removes a bookmark for the current user
@@ -26,6 +26,10 @@ func ToggleBookmark(c *gin.Context) {
 	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Format request tidak valid"})
 		return
+	}
+
+	if req.Title == "" {
+		req.Title = "Aktivitas Wisata"
 	}
 
 	status, err := services.ToggleBookmark(userEmail, req.ActivityID, req.Title)

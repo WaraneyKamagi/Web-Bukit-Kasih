@@ -21,7 +21,7 @@ func GetActivities(c *gin.Context) {
 func CreateActivity(c *gin.Context) {
 	var input dto.ActivityDTO
 	if err := c.ShouldBindJSON(&input); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Format data aktivitas tidak valid. Pastikan semua field wajib terisi dengan benar."})
 		return
 	}
 	
@@ -38,7 +38,7 @@ func UpdateActivity(c *gin.Context) {
 	var input dto.ActivityDTO
 	
 	if err := c.ShouldBindJSON(&input); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Format data aktivitas tidak valid. Pastikan semua field wajib terisi dengan benar."})
 		return
 	}
 	
@@ -73,7 +73,7 @@ func GetDestinations(c *gin.Context) {
 func CreateDestination(c *gin.Context) {
 	var input dto.DestinationDTO
 	if err := c.ShouldBindJSON(&input); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Format data destinasi tidak valid. Pastikan semua field wajib terisi dengan benar."})
 		return
 	}
 	
@@ -90,7 +90,7 @@ func UpdateDestination(c *gin.Context) {
 	var input dto.DestinationDTO
 	
 	if err := c.ShouldBindJSON(&input); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Format data destinasi tidak valid. Pastikan semua field wajib terisi dengan benar."})
 		return
 	}
 	

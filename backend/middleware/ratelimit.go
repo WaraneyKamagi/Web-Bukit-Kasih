@@ -59,3 +59,26 @@ func ResetRateLimiter() {
 	defer rateMutex.Unlock()
 	clients = make(map[string]*clientRecord)
 }
+
+// CleanExpiredClients evicts client records that have been idle longer than maxAge
+func CleanExpiredClients(maxAge time.Duration) {
+	rateMutex.Lock()
+	defer rateMutex.Unlock()
+
+	now := time.Now()
+	for ip, record := range clients {
+		if now.Sub(record.lastReset) > maxAge {
+			delete(clients, ip)
+		}
+	}
+}
+
+func init() {
+	// Background garbage collection routine to prevent unbounded memory growth
+	go func() {
+		ticker := time.NewTicker(10 * time.Minute)
+		for range ticker.C {
+			CleanExpiredClients(10 * time.Minute)
+		}
+	}()
+}

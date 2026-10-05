@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"log"
 	"net/http"
 	"strings"
 
@@ -36,7 +37,8 @@ func Chatbot(c *gin.Context) {
 
 	reply, source, citations, err := services.ProcessChat(userMsg)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		log.Printf("[CHATBOT ERROR] %v", err)
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Gagal memproses pesan chatbot. Silakan coba beberapa saat lagi."})
 		return
 	}
 

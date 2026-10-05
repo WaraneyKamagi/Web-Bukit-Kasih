@@ -5,7 +5,6 @@ Sistem Minimum Viable Product (MVP) untuk platform informasi pariwisata Bukit Ka
 ## Struktur Proyek
 - `frontend/` - Berisi aplikasi web React.
 - `backend/` - Berisi server API Golang.
-- `TECHNICAL_DEBT.md` - Catatan arsitektur dan perbaikan skala besar di masa depan.
 
 ---
 

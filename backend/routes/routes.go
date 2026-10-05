@@ -2,6 +2,8 @@ package routes
 
 import (
 	"net/http"
+	"os"
+	"path/filepath"
 	"time"
 
 	"bukit-kasih-backend/handlers"
@@ -14,19 +16,30 @@ import (
 func SetupRouter() *gin.Engine {
 	r := gin.Default()
 
-	// Trust all proxies for MVP cloud deployment (e.g. Render, Vercel)
+	// Trust private network proxies (Render, Vercel, Docker, Reverse Proxies)
 	// This ensures client IP is read correctly from X-Forwarded-For headers
 	r.ForwardedByClientIP = true
-	r.SetTrustedProxies(nil)
+	_ = r.SetTrustedProxies([]string{"127.0.0.1", "::1", "10.0.0.0/8", "172.16.0.0/12", "192.168.0.0/16"})
 
-	// Apply CORS middleware globally
+	// Apply Security, HTTPS redirect, and CORS middleware globally
+	r.Use(middleware.HTTPSRedirectMiddleware())
 	r.Use(middleware.CORSMiddleware())
+	r.Use(middleware.SecurityHeadersMiddleware())
 
-	// Serve uploaded files statically
-	r.Static("/uploads", "./uploads")
+	// Serve uploaded files statically with directory listing disabled (OWASP A05)
+	r.GET("/uploads/*filepath", func(c *gin.Context) {
+		targetPath := filepath.Join("./uploads", filepath.Clean(c.Param("filepath")))
+		info, err := os.Stat(targetPath)
+		if err != nil || info.IsDir() {
+			c.AbortWithStatus(http.StatusNotFound)
+			return
+		}
+		c.File(targetPath)
+	})
 
 	// API Routes Group Version 1
 	api := r.Group("/api/v1")
+	api.Use(middleware.CSRFProtection())
 	{
 		// Health check
 		api.GET("/health", func(c *gin.Context) {
@@ -40,6 +53,7 @@ func SetupRouter() *gin.Engine {
 		authLimiter := middleware.RateLimiter(10, 1*time.Minute)
 		api.POST("/auth/login", authLimiter, handlers.Login)
 		api.POST("/auth/register", authLimiter, handlers.Register)
+		api.POST("/auth/logout", handlers.Logout)
 		api.GET("/auth/profile", middleware.AuthMiddleware(), handlers.GetProfile)
 
 		// Announcement routes
@@ -53,14 +67,16 @@ func SetupRouter() *gin.Engine {
 		api.POST("/reviews", authLimiter, middleware.AuthMiddleware(), handlers.CreateReview)
 		api.DELETE("/reviews/:id", middleware.AuthMiddleware(), middleware.AdminOnly(), handlers.DeleteReview)
 
-		// Inquiry routes
+		// Inquiry routes (with rate limiting against bot spam: 10 requests per minute)
+		inquiryLimiter := middleware.RateLimiter(10, 1*time.Minute)
 		api.GET("/inquiries", middleware.AuthMiddleware(), middleware.AdminOnly(), handlers.GetInquiries)
 		api.GET("/inquiries/user/:email", middleware.AuthMiddleware(), handlers.GetInquiriesByUser)
-		api.POST("/inquiries", handlers.CreateInquiry)
+		api.POST("/inquiries", inquiryLimiter, handlers.CreateInquiry)
 		api.PUT("/inquiries/:id/reply", middleware.AuthMiddleware(), middleware.AdminOnly(), handlers.ReplyInquiry)
 
-		// Chatbot route (RAG-enhanced)
-		api.POST("/chat", middleware.AuthMiddleware(), handlers.Chatbot)
+		// Chatbot route (RAG-enhanced with rate limiter to protect Groq AI quota: 20 req/min)
+		chatLimiter := middleware.RateLimiter(20, 1*time.Minute)
+		api.POST("/chat", chatLimiter, middleware.AuthMiddleware(), handlers.Chatbot)
 
 		// RAG Knowledge Base routes
 		api.GET("/knowledge", handlers.GetAllKnowledgeDocuments)

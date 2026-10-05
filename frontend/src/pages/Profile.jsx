@@ -29,13 +29,31 @@ export default function Profile() {
     }
   }, [user, navigate]);
 
+  // Activities Fetch State (placed before early return to follow Rules of Hooks)
+  const [activities, setActivities] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [fetchError, setFetchError] = useState(null);
+
+  useEffect(() => {
+    activityService.getAll()
+      .then(data => {
+        setActivities(data || []);
+        setFetchError(null);
+      })
+      .catch(err => {
+        console.error(err);
+        setFetchError(err.message || 'Gagal memuat data aktivitas');
+      })
+      .finally(() => {
+        setIsLoading(false);
+      });
+  }, []);
+
   const showToast = (message, type = 'success') => {
     setToastMessage(message);
     setToastType(type);
     setIsToastOpen(true);
   };
-
-  if (!user) return null;
 
   const handleRemoveBookmark = async (id, title, e) => {
     e.stopPropagation(); // Avoid opening modal
@@ -54,25 +72,7 @@ export default function Profile() {
     setIsModalOpen(true);
   };
 
-  const [activities, setActivities] = useState([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [fetchError, setFetchError] = useState(null);
-  
-  useEffect(() => {
-    setIsLoading(true);
-    activityService.getAll()
-      .then(data => {
-        setActivities(data || []);
-        setFetchError(null);
-      })
-      .catch(err => {
-        console.error(err);
-        setFetchError(err.message || 'Gagal memuat data aktivitas');
-      })
-      .finally(() => {
-        setIsLoading(false);
-      });
-  }, []);
+  if (!user) return null;
 
   // Filter bookmarks data
   const bookmarkedActivities = activities.filter((act) =>

@@ -8,7 +8,7 @@ export const useBookmark = () => useContext(BookmarkContext);
 
 export function BookmarkProvider({ children }) {
   const { token, user } = useAuth();
-  
+
   const getStorageKey = useCallback(() => {
     return user && user.email ? `bukit_kasih_bookmarks_${user.email}` : 'bukit_kasih_bookmarks_guest';
   }, [user]);
@@ -40,7 +40,7 @@ export function BookmarkProvider({ children }) {
         setBookmarkedIds(data);
         try {
           localStorage.setItem(getStorageKey(), JSON.stringify(data));
-        } catch (e) {}
+        } catch (e) { }
       }
     } catch (error) {
       console.error("Gagal mengambil bookmark dari server:", error);
@@ -54,34 +54,34 @@ export function BookmarkProvider({ children }) {
   const toggleBookmark = async (id, title) => {
     const key = getStorageKey();
     const isCurrentlyBookmarked = bookmarkedIds.includes(id);
-    
+
     // 1. Optimistic UI update
-    const updatedBookmarks = isCurrentlyBookmarked 
+    const updatedBookmarks = isCurrentlyBookmarked
       ? bookmarkedIds.filter(item => item !== id)
       : [...bookmarkedIds, id];
-      
+
     setBookmarkedIds(updatedBookmarks);
     try {
       localStorage.setItem(key, JSON.stringify(updatedBookmarks));
-    } catch (e) {}
+    } catch (e) { }
 
     // 2. Sync with backend if logged in
     if (user && token) {
       try {
-        await bookmarkService.toggle(id);
+        await bookmarkService.toggle(id, title || 'Aktivitas Wisata');
       } catch (error) {
         console.error("Gagal menyinkronkan bookmark dengan server:", error);
-        
+
         // REVERT state on error (Rollback)
         setBookmarkedIds(bookmarkedIds);
         try {
           localStorage.setItem(key, JSON.stringify(bookmarkedIds));
-        } catch (e) {}
-        
+        } catch (e) { }
+
         throw new Error('Koneksi terputus atau terjadi kesalahan server. Gagal menyimpan rencana perjalanan.');
       }
     }
-    
+
     return !isCurrentlyBookmarked; // Return true if added, false if removed
   };
 

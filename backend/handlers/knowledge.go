@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"fmt"
 	"net/http"
 
 	"bukit-kasih-backend/services"
@@ -54,6 +55,9 @@ func CreateKnowledgeDocument(c *gin.Context) {
 		return
 	}
 
+	adminEmail, _ := c.Get("userEmail")
+	services.LogAdminAction(fmt.Sprintf("%v", adminEmail), "CREATE_KNOWLEDGE_DOC", input.Title, c.ClientIP())
+
 	c.JSON(http.StatusCreated, doc)
 }
 
@@ -80,6 +84,9 @@ func UpdateKnowledgeDocument(c *gin.Context) {
 		return
 	}
 
+	adminEmail, _ := c.Get("userEmail")
+	services.LogAdminAction(fmt.Sprintf("%v", adminEmail), "UPDATE_KNOWLEDGE_DOC", "DocID: "+id+" ("+input.Title+")", c.ClientIP())
+
 	c.JSON(http.StatusOK, doc)
 }
 
@@ -91,6 +98,9 @@ func DeleteKnowledgeDocument(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Gagal menghapus dokumen pengetahuan"})
 		return
 	}
+
+	adminEmail, _ := c.Get("userEmail")
+	services.LogAdminAction(fmt.Sprintf("%v", adminEmail), "DELETE_KNOWLEDGE_DOC", "DocID: "+id, c.ClientIP())
 
 	c.JSON(http.StatusOK, gin.H{"message": "Dokumen pengetahuan berhasil dihapus"})
 }

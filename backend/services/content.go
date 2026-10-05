@@ -137,7 +137,6 @@ func GetDestinations() ([]dto.DestinationDTO, error) {
 func CreateDestination(input dto.DestinationDTO) (dto.DestinationDTO, error) {
 	dest := MapDTOToDestination(input)
 	err := database.DB.Create(&dest).Error
-	dest.ID = dest.ID // GORM updates the ID after create
 	return MapDestinationToDTO(dest), err
 }
 

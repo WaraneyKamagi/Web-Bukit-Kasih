@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"fmt"
 	"net/http"
 	"strings"
 
@@ -18,7 +19,7 @@ func CreateInquiry(c *gin.Context) {
 	}
 
 	if err := c.ShouldBindJSON(&input); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Format input pesan tidak valid. Pastikan semua kolom terisi dengan benar."})
 		return
 	}
 
@@ -77,7 +78,7 @@ func ReplyInquiry(c *gin.Context) {
 	}
 
 	if err := c.ShouldBindJSON(&input); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Format balasan tidak valid. Pesan balasan wajib diisi."})
 		return
 	}
 
@@ -87,6 +88,9 @@ func ReplyInquiry(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to save reply or inquiry not found"})
 		return
 	}
+
+	adminEmail, _ := c.Get("userEmail")
+	services.LogAdminAction(fmt.Sprintf("%v", adminEmail), "REPLY_INQUIRY", "InquiryID: "+id, c.ClientIP())
 
 	c.JSON(http.StatusOK, inquiry)
 }

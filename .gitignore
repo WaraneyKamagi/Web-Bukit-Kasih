@@ -2,6 +2,7 @@
 frontend/node_modules/
 frontend/dist/
 frontend/.env*
+!frontend/.env.example
 
 # Golang
 backend/server.exe
@@ -10,8 +11,21 @@ backend/*.test
 backend/*.out
 backend/bukit_kasih.db
 backend/.env*
+!backend/.env.example
 
 # OS Files
 .DS_Store
 Thumbs.db
 
+# Logs & Database Test Drills
+*.log
+backend/logs/
+backend/tests/logs/
+backend/scratch_*.db
+backend/*.db
+
+# Local Reports & Audit Documents (not pushed to remote)
+LAPORAN_PERBAIKAN.md
+docs/
+PERENCANAAN.MD
+TECHNICAL_DEBT.md

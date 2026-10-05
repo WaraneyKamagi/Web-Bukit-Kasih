@@ -11,24 +11,36 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-// AuthMiddleware validates the JWT token in Authorization header
+// AuthMiddleware validates the JWT token in Authorization header or HttpOnly cookie (Hybrid approach)
 func AuthMiddleware() gin.HandlerFunc {
 	return func(c *gin.Context) {
+		var tokenString string
+
 		authHeader := c.GetHeader("Authorization")
-		if authHeader == "" {
+		if authHeader != "" {
+			parts := strings.SplitN(authHeader, " ", 2)
+			if len(parts) == 2 && parts[0] == "Bearer" {
+				tokenString = parts[1]
+			} else {
+				c.JSON(http.StatusUnauthorized, gin.H{"error": "Format header Authorization tidak valid"})
+				c.Abort()
+				return
+			}
+		}
+
+		// Fallback to HttpOnly cookie if header is not present (transparent dual-token)
+		if tokenString == "" {
+			if cookieToken, err := c.Cookie("token"); err == nil && cookieToken != "" {
+				tokenString = cookieToken
+			}
+		}
+
+		if tokenString == "" {
 			c.JSON(http.StatusUnauthorized, gin.H{"error": "Token otorisasi diperlukan"})
 			c.Abort()
 			return
 		}
 
-		parts := strings.SplitN(authHeader, " ", 2)
-		if !(len(parts) == 2 && parts[0] == "Bearer") {
-			c.JSON(http.StatusUnauthorized, gin.H{"error": "Format header Authorization tidak valid"})
-			c.Abort()
-			return
-		}
-
-		tokenString := parts[1]
 		claims := &services.Claims{}
 
 		token, err := jwt.ParseWithClaims(tokenString, claims, func(token *jwt.Token) (interface{}, error) {
