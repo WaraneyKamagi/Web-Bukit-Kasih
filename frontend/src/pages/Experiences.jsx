@@ -6,6 +6,7 @@ import Toast from '../components/Toast';
 import Modal from '../components/Modal';
 import { testimonials } from '../data/testimonials';
 import { activityService } from '../services/api';
+import { resolveImageUrl } from '../utils/imageHelper';
 
 // Import Assets
 import heroBg from '../assets/hero_bukit_kasih.png';
@@ -31,7 +32,7 @@ export default function Experiences() {
   // Testimonials State
   const displayTestimonials = useMemo(() => {
     const goodReviews = reviews
-      .filter(r => r.rating >= 4)
+      .filter(r => r.rating >= 4 && r.status !== 'HIDDEN')
       .map(r => ({
         text: r.text,
         author: r.author,
@@ -249,7 +250,7 @@ export default function Experiences() {
                   <img 
                     alt={act.title} 
                     className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" 
-                    src={act.image}
+                    src={resolveImageUrl(act.image)}
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/95 via-black/30 to-transparent"></div>
                   
@@ -442,13 +443,13 @@ export default function Experiences() {
               <div className="border-t border-outline-variant/20 pt-6 mt-6">
                 <h4 className="font-bold text-on-surface text-base mb-4 flex items-center gap-2 text-left">
                   <span className="material-symbols-outlined text-primary dark:text-secondary-fixed text-[20px]">rate_review</span>
-                  <span>Ulasan Pengunjung ({reviews.filter(r => r.activityId === selectedActivity.id).length})</span>
+                  <span>Ulasan Pengunjung ({reviews.filter(r => r.activityId === selectedActivity.id && r.status !== 'HIDDEN').length})</span>
                 </h4>
                 
                 {/* List of reviews */}
                 <div className="space-y-4 mb-6 max-h-48 overflow-y-auto pr-2">
-                  {reviews.filter(r => r.activityId === selectedActivity.id).length > 0 ? (
-                    reviews.filter(r => r.activityId === selectedActivity.id).map((rev) => (
+                  {reviews.filter(r => r.activityId === selectedActivity.id && r.status !== 'HIDDEN').length > 0 ? (
+                    reviews.filter(r => r.activityId === selectedActivity.id && r.status !== 'HIDDEN').map((rev) => (
                       <div key={rev.id} className="p-4 rounded-xl border border-outline-variant/15 bg-slate-50/30 dark:bg-white/5 space-y-1 text-left">
                         <div className="flex justify-between items-center text-xs">
                           <span className="font-bold text-on-surface">{rev.author}</span>

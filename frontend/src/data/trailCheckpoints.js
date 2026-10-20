@@ -33,7 +33,7 @@ export const trailCheckpoints = [
     duration: '25 Menit (Anak Tangga Ke-500)',
     difficulty: 'Sedang',
     tips: 'Uap belerang di sini cukup pekat. Pengguna dengan masalah pernapasan disarankan membawa masker kain penutup hidung.',
-    icon: 'sculpture'
+    icon: 'history_edu'
   },
   {
     title: 'Monumen Salib Kasih',

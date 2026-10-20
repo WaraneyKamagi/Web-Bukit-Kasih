@@ -65,6 +65,7 @@ func SetupRouter() *gin.Engine {
 		api.GET("/reviews/activity/:activityId", handlers.GetReviewsByActivity)
 		// Apply rate limiter to review submission (reusing authLimiter or general limiter)
 		api.POST("/reviews", authLimiter, middleware.AuthMiddleware(), handlers.CreateReview)
+		api.PATCH("/reviews/:id/status", middleware.AuthMiddleware(), middleware.AdminOnly(), handlers.UpdateReviewStatus)
 		api.DELETE("/reviews/:id", middleware.AuthMiddleware(), middleware.AdminOnly(), handlers.DeleteReview)
 
 		// Inquiry routes (with rate limiting against bot spam: 10 requests per minute)

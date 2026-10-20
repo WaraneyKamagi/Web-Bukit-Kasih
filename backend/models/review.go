@@ -16,4 +16,5 @@ type Review struct {
 	Rating     int            `gorm:"not null" json:"rating"`
 	Text       string         `gorm:"not null" json:"text"`
 	Date       string         `gorm:"not null" json:"date"`
+	Status     string         `gorm:"type:varchar(20);default:'VISIBLE';index" json:"status"`
 }

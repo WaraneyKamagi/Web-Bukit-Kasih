@@ -90,9 +90,28 @@ export function FeedbackProvider({ children }) {
     }
   }, []);
 
+  const updateReviewStatus = useCallback(async (reviewId, newStatus) => {
+    try {
+      const res = await reviewService.updateStatus(reviewId, newStatus);
+      const updated = res.review || { id: reviewId, status: newStatus };
+      setReviews((prev) =>
+        prev.map((r) => {
+          if (r.id === reviewId || r.ID === reviewId) {
+            return { ...r, ...updated, id: updated.id || updated.ID || reviewId, status: newStatus };
+          }
+          return r;
+        })
+      );
+      return true;
+    } catch (err) {
+      console.error('Update review status error:', err);
+      throw err;
+    }
+  }, []);
+
   const value = useMemo(() => ({
-    inquiries, reviews, addReview, deleteReview, addInquiry, replyInquiry
-  }), [inquiries, reviews, addReview, deleteReview, addInquiry, replyInquiry]);
+    inquiries, reviews, addReview, updateReviewStatus, deleteReview, addInquiry, replyInquiry
+  }), [inquiries, reviews, addReview, updateReviewStatus, deleteReview, addInquiry, replyInquiry]);
 
   return (
     <FeedbackContext.Provider value={value}>

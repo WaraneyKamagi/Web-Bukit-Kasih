@@ -1,31 +1,27 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { resolveImageUrl } from '../utils/imageHelper';
+import heroBg from '../assets/hero_bukit_kasih.png';
 
 export default function TravelCard({ title, image, altText, onClick }) {
-  const [loaded, setLoaded] = useState(false);
+  const [imgSrc, setImgSrc] = useState(() => resolveImageUrl(image));
+
+  useEffect(() => {
+    setImgSrc(resolveImageUrl(image));
+  }, [image]);
 
   return (
     <div 
       onClick={onClick}
-      className="group relative h-[400px] rounded-[24px] overflow-hidden cursor-pointer shadow-sm hover:shadow-[0_20px_40px_-10px_rgba(15,76,129,0.2)] hover:-translate-y-2 transition-all duration-500"
+      className="group relative h-[400px] rounded-[24px] overflow-hidden cursor-pointer shadow-sm hover:shadow-[0_20px_40px_-10px_rgba(15,76,129,0.2)] hover:-translate-y-2 transition-all duration-500 bg-slate-800"
     >
-      {/* Skeleton Pulse */}
-      {!loaded && (
-        <div 
-          className="absolute inset-0 bg-surface-variant animate-pulse" 
-          aria-label={altText}
-        />
-      )}
-      
       {/* Background Image */}
       <img 
-        alt={title} 
-        loading="lazy"
+        alt={altText || title} 
+        loading="eager"
         decoding="async"
-        className={`absolute inset-0 w-full h-full object-cover group-hover:scale-110 transition-transform duration-700 ${
-          loaded ? 'opacity-100' : 'opacity-0'
-        }`}
-        onLoad={() => setLoaded(true)}
-        src={image}
+        className="absolute inset-0 w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
+        src={imgSrc}
+        onError={() => setImgSrc(heroBg)}
       />
       
       {/* Overlay Gradients */}

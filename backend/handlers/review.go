@@ -86,3 +86,32 @@ func DeleteReview(c *gin.Context) {
 
 	c.JSON(http.StatusOK, gin.H{"message": "Review deleted successfully"})
 }
+
+// UpdateReviewStatus mengubah status moderasi ulasan (VISIBLE / HIDDEN) oleh Admin
+func UpdateReviewStatus(c *gin.Context) {
+	id := c.Param("id")
+
+	var input struct {
+		Status string `json:"status" binding:"required"`
+	}
+
+	if err := c.ShouldBindJSON(&input); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Format payload tidak valid. Field 'status' wajib diisi ('VISIBLE' atau 'HIDDEN')."})
+		return
+	}
+
+	review, err := services.UpdateReviewStatus(id, input.Status)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	adminEmail, _ := c.Get("userEmail")
+	services.LogAdminAction(fmt.Sprintf("%v", adminEmail), "MODERATE_REVIEW_STATUS", fmt.Sprintf("ReviewID: %s -> %s", id, review.Status), c.ClientIP())
+
+	c.JSON(http.StatusOK, gin.H{
+		"message": "Status ulasan berhasil diperbarui",
+		"review":  review,
+	})
+}
+

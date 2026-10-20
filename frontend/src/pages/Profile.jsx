@@ -6,6 +6,7 @@ import { useBookmark } from '../context/BookmarkContext';
 import Toast from '../components/Toast';
 import Modal from '../components/Modal';
 import { activityService } from '../services/api';
+import { resolveImageUrl } from '../utils/imageHelper';
 
 export default function Profile() {
   const { user } = useAuth();
@@ -132,7 +133,7 @@ export default function Profile() {
                   >
                     <div className="h-32 bg-slate-200 overflow-hidden relative">
                       <img 
-                        src={act.image} 
+                        src={resolveImageUrl(act.image)} 
                         alt={act.title} 
                         className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
                       />

@@ -1,7 +1,25 @@
 import { useFeedback } from '../../context/FeedbackContext';
 
 export default function ReviewModerationTab({ handleSendToTelegram, showToast }) {
-  const { reviews, deleteReview } = useFeedback();
+  const { reviews, updateReviewStatus, deleteReview } = useFeedback();
+
+  const handleToggleStatus = async (revId, currentStatus, author) => {
+    const isCurrentlyHidden = currentStatus === 'HIDDEN';
+    const newStatus = isCurrentlyHidden ? 'VISIBLE' : 'HIDDEN';
+    const actionText = isCurrentlyHidden ? 'menampilkan ke publik' : 'menyembunyikan dari publik';
+
+    if (window.confirm(`Apakah Anda yakin ingin ${actionText} ulasan dari "${author}"?`)) {
+      try {
+        await updateReviewStatus(revId, newStatus);
+        showToast(
+          `Ulasan dari "${author}" berhasil di-${isCurrentlyHidden ? 'tampilkan' : 'sembunyikan'}.`,
+          'success'
+        );
+      } catch (err) {
+        showToast('Gagal mengubah status moderasi ulasan.', 'error');
+      }
+    }
+  };
 
   const handleDeleteReview = (revId, author) => {
     if (window.confirm(`Apakah Anda yakin ingin menghapus ulasan dari "${author}"?`)) {
@@ -15,51 +33,89 @@ export default function ReviewModerationTab({ handleSendToTelegram, showToast })
       <h3 className="text-lg font-bold text-on-surface mb-6">Moderasi Ulasan Wisatawan</h3>
       <div className="space-y-4">
         {reviews.length > 0 ? (
-          reviews.map((rev) => (
-            <div
-              key={rev.id}
-              className="p-5 border border-outline-variant/20 rounded-2xl flex justify-between items-start gap-4 hover:bg-slate-50/50 dark:hover:bg-white/5 transition-colors"
-            >
-              <div className="space-y-1">
-                <div className="flex items-center gap-3">
-                  <span className="font-bold text-on-surface text-sm">{rev.author}</span>
-                  <span className="text-xs text-subtext">{rev.date}</span>
-                  <span className="flex text-accent-gold text-sm items-center font-bold">
-                    <span
-                      className="material-symbols-outlined text-[16px] mr-0.5"
-                      style={{ fontVariationSettings: "'FILL' 1" }}
-                    >
-                      star
+          reviews.map((rev) => {
+            const isHidden = rev.status === 'HIDDEN';
+
+            return (
+              <div
+                key={rev.id}
+                className={`p-5 border rounded-2xl flex justify-between items-start gap-4 transition-colors ${
+                  isHidden
+                    ? 'border-amber-500/30 bg-amber-500/5 dark:bg-amber-500/10'
+                    : 'border-outline-variant/20 hover:bg-slate-50/50 dark:hover:bg-white/5'
+                }`}
+              >
+                <div className="space-y-1">
+                  <div className="flex items-center gap-3 flex-wrap">
+                    <span className="font-bold text-on-surface text-sm">{rev.author}</span>
+                    <span className="text-xs text-subtext">{rev.date}</span>
+                    <span className="flex text-accent-gold text-sm items-center font-bold">
+                      <span
+                        className="material-symbols-outlined text-[16px] mr-0.5"
+                        style={{ fontVariationSettings: "'FILL' 1" }}
+                      >
+                        star
+                      </span>
+                      {rev.rating}
                     </span>
-                    {rev.rating}
-                  </span>
+                    {/* Badge Status Moderasi */}
+                    {isHidden ? (
+                      <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-amber-500/15 text-amber-600 dark:text-amber-400 border border-amber-500/30 flex items-center gap-1">
+                        <span className="material-symbols-outlined text-[12px]">visibility_off</span>
+                        Disembunyikan
+                      </span>
+                    ) : (
+                      <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30 flex items-center gap-1">
+                        <span className="material-symbols-outlined text-[12px]">check_circle</span>
+                        Tampil Publik
+                      </span>
+                    )}
+                  </div>
+                  <p className="text-on-surface-variant dark:text-slate-300 text-sm leading-relaxed text-left">
+                    "{rev.text}"
+                  </p>
                 </div>
-                <p className="text-on-surface-variant dark:text-slate-300 text-sm leading-relaxed text-left">
-                  "{rev.text}"
-                </p>
-              </div>
-              <div className="flex gap-2 shrink-0">
-                {rev.rating >= 4 && (
+                <div className="flex items-center gap-2 shrink-0">
+                  {/* Tombol Toggle Moderasi (Sembunyikan / Tampilkan) */}
                   <button
-                    onClick={() => handleSendToTelegram('review', rev.text, rev.author)}
-                    className="p-2 border border-[#229ED9]/20 text-[#229ED9] hover:bg-[#229ED9]/10 rounded-full flex items-center justify-center cursor-pointer transition-colors"
-                    title="Kirim Testimoni ke Telegram Hermes"
+                    onClick={() => handleToggleStatus(rev.id, rev.status, rev.author)}
+                    className={`p-2 border rounded-full flex items-center justify-center cursor-pointer transition-colors ${
+                      isHidden
+                        ? 'border-emerald-500/30 text-emerald-600 hover:bg-emerald-500/10 dark:text-emerald-400'
+                        : 'border-amber-500/30 text-amber-600 hover:bg-amber-500/10 dark:text-amber-400'
+                    }`}
+                    title={isHidden ? 'Tampilkan Ulasan ke Publik' : 'Sembunyikan Ulasan dari Publik'}
                   >
-                    <svg className="w-[18px] h-[18px] fill-current" viewBox="0 0 24 24">
-                      <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm4.64 6.8c-.15.82-.77 4.57-1.09 6.27-.14.72-.4 1.1-.66 1.13-.57.06-1 .36-1.55.72-.86.56-1.35.9-2.18 1.45-1 .63-.35.97.22 1.56 1.48 1.53 2.73 2.78 4.2 3.82.26.18.51.27.75.27.27 0 .42-.15.48-.44.13-.6 1.43-6.75 1.54-7.85.01-.1-.02-.2-.08-.28s-.17-.11-.27-.08c-.46.1-3.66 1.44-7.46 3.01l-4.7-1.46c-.95-.3-1.01-1.01.2-1.47 7.9-3.43 13.16-5.71 15.79-6.85.83-.34 1.4-.41 1.73-.2.33.2.39.67.26 1.34z" />
-                    </svg>
+                    <span className="material-symbols-outlined text-[18px]">
+                      {isHidden ? 'visibility' : 'visibility_off'}
+                    </span>
                   </button>
-                )}
-                <button
-                  onClick={() => handleDeleteReview(rev.id, rev.author)}
-                  className="p-2 border border-red-500/20 text-red-600 hover:bg-red-500/10 rounded-full flex items-center justify-center cursor-pointer transition-colors"
-                  title="Hapus Ulasan"
-                >
-                  <span className="material-symbols-outlined text-[18px]">delete</span>
-                </button>
+
+                  {/* Tombol Kirim ke Telegram Hermes */}
+                  {rev.rating >= 4 && !isHidden && (
+                    <button
+                      onClick={() => handleSendToTelegram('review', rev.text, rev.author)}
+                      className="p-2 border border-[#229ED9]/20 text-[#229ED9] hover:bg-[#229ED9]/10 rounded-full flex items-center justify-center cursor-pointer transition-colors"
+                      title="Kirim Testimoni ke Telegram Hermes"
+                    >
+                      <svg className="w-[18px] h-[18px] fill-current" viewBox="0 0 24 24">
+                        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm4.64 6.8c-.15.82-.77 4.57-1.09 6.27-.14.72-.4 1.1-.66 1.13-.57.06-1 .36-1.55.72-.86.56-1.35.9-2.18 1.45-1 .63-.35.97.22 1.56 1.48 1.53 2.73 2.78 4.2 3.82.26.18.51.27.75.27.27 0 .42-.15.48-.44.13-.6 1.43-6.75 1.54-7.85.01-.1-.02-.2-.08-.28s-.17-.11-.27-.08c-.46.1-3.66 1.44-7.46 3.01l-4.7-1.46c-.95-.3-1.01-1.01.2-1.47 7.9-3.43 13.16-5.71 15.79-6.85.83-.34 1.4-.41 1.73-.2.33.2.39.67.26 1.34z" />
+                      </svg>
+                    </button>
+                  )}
+
+                  {/* Tombol Hapus */}
+                  <button
+                    onClick={() => handleDeleteReview(rev.id, rev.author)}
+                    className="p-2 border border-red-500/20 text-red-600 hover:bg-red-500/10 rounded-full flex items-center justify-center cursor-pointer transition-colors"
+                    title="Hapus Ulasan Permanen"
+                  >
+                    <span className="material-symbols-outlined text-[18px]">delete</span>
+                  </button>
+                </div>
               </div>
-            </div>
-          ))
+            );
+          })
         ) : (
           <p className="text-subtext dark:text-slate-400 py-6 text-center">
             Tidak ada ulasan ditemukan untuk dimoderasi.

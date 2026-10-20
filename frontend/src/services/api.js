@@ -15,6 +15,7 @@ async function fetchWithAuth(endpoint, options = {}) {
   };
 
   const config = {
+    cache: 'no-store',
     credentials: 'include',
     ...options,
     headers,
@@ -93,6 +94,7 @@ export const bookmarkService = {
 export const reviewService = {
   getAll: () => fetchWithAuth('/reviews'),
   create: (data) => fetchWithAuth('/reviews', { method: 'POST', body: JSON.stringify(data) }),
+  updateStatus: (id, status) => fetchWithAuth(`/reviews/${id}/status`, { method: 'PATCH', body: JSON.stringify({ status }) }),
   delete: (id) => fetchWithAuth(`/reviews/${id}`, { method: 'DELETE' }),
 };
 

@@ -24,8 +24,14 @@ backend/tests/logs/
 backend/scratch_*.db
 backend/*.db
 
+# Uploads
+backend/uploads/*
+!backend/uploads/.gitkeep
+
 # Local Reports & Audit Documents (not pushed to remote)
 LAPORAN_PERBAIKAN.md
 docs/
 PERENCANAAN.MD
-TECHNICAL_DEBT.md
+# Deploy artifacts
+backend/bukit-kasih-server
+*.tar.gz

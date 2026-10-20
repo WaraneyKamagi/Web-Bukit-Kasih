@@ -3,6 +3,7 @@ package tests
 import (
 	"bytes"
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -114,6 +115,7 @@ func setupTestEnvironment(t *testing.T) *gin.Engine {
 		api.GET("/reviews", handlers.GetAllReviews)
 		api.GET("/reviews/activity/:activityId", handlers.GetReviewsByActivity)
 		api.POST("/reviews", handlers.CreateReview)
+		api.PATCH("/reviews/:id/status", middleware.AuthMiddleware(), middleware.AdminOnly(), handlers.UpdateReviewStatus)
 		api.DELETE("/reviews/:id", middleware.AuthMiddleware(), middleware.AdminOnly(), handlers.DeleteReview)
 
 		// Inquiries
@@ -331,6 +333,109 @@ func TestReviewAndInquiryValidation(t *testing.T) {
 		t.Errorf("Expected 400 for invalid email, got %d", wInqInvalid.Code)
 	}
 }
+
+// 4b. UNIT & INTEGRATION: Review Moderation & Auto-Profanity Filter
+func TestReviewModerationAndProfanityFilter(t *testing.T) {
+	r := setupTestEnvironment(t)
+
+	// Login as Admin to get admin token
+	wLoginAdm := performRequest(r, "POST", "/api/auth/login", map[string]string{
+		"email":    "pengelola@bukitkasih.com",
+		"password": "admin",
+	}, "")
+	var respAdm map[string]interface{}
+	json.Unmarshal(wLoginAdm.Body.Bytes(), &respAdm)
+	tokenAdm := respAdm["token"].(string)
+
+	// Login as Wisatawan to get user token
+	wLoginWis := performRequest(r, "POST", "/api/auth/login", map[string]string{
+		"email":    "wisatawan@gmail.com",
+		"password": "password",
+	}, "")
+	var respWis map[string]interface{}
+	json.Unmarshal(wLoginWis.Body.Bytes(), &respWis)
+	tokenWis := respWis["token"].(string)
+
+	// Scenario 1: Post clean review -> status should be VISIBLE
+	cleanReview := map[string]interface{}{
+		"activityId": "act-test-mod",
+		"author":     "Budi Santoso",
+		"rating":     5,
+		"text":       "Tempatnya sangat asri dan sejuk, recommended!",
+	}
+	wClean := performRequest(r, "POST", "/api/reviews", cleanReview, tokenWis)
+	if wClean.Code != http.StatusCreated {
+		t.Fatalf("Expected 201 for clean review, got %d", wClean.Code)
+	}
+	var cleanResp map[string]interface{}
+	json.Unmarshal(wClean.Body.Bytes(), &cleanResp)
+	if cleanResp["status"] != "VISIBLE" {
+		t.Errorf("Expected status VISIBLE for clean review, got %v", cleanResp["status"])
+	}
+
+	// Scenario 2: Post review with profanity -> status should be AUTO-FLAGGED to HIDDEN
+	toxicReview := map[string]interface{}{
+		"activityId": "act-test-mod",
+		"author":     "Anonim",
+		"rating":     1,
+		"text":       "Pelayanan anjing sangat jelek sekali!",
+	}
+	wToxic := performRequest(r, "POST", "/api/reviews", toxicReview, tokenWis)
+	if wToxic.Code != http.StatusCreated {
+		t.Fatalf("Expected 201 for toxic review creation, got %d", wToxic.Code)
+	}
+	var toxicResp map[string]interface{}
+	json.Unmarshal(wToxic.Body.Bytes(), &toxicResp)
+	if toxicResp["status"] != "HIDDEN" {
+		t.Errorf("Expected status HIDDEN for toxic review, got %v", toxicResp["status"])
+	}
+	toxicID := fmt.Sprintf("%v", toxicResp["id"])
+
+	// Scenario 3: Public endpoint GetReviewsByActivity must ONLY return VISIBLE reviews (toxicReview should be hidden)
+	wPublic := performRequest(r, "GET", "/api/reviews/activity/act-test-mod", nil, "")
+	if wPublic.Code != http.StatusOK {
+		t.Fatalf("Expected 200 for public reviews query, got %d", wPublic.Code)
+	}
+	var publicReviews []map[string]interface{}
+	json.Unmarshal(wPublic.Body.Bytes(), &publicReviews)
+	for _, rev := range publicReviews {
+		if fmt.Sprintf("%v", rev["id"]) == toxicID {
+			t.Errorf("Hidden/profane review should NOT appear in public activity reviews")
+		}
+	}
+
+	// Scenario 4: Unauthorized or Non-Admin attempts PATCH status -> 401 / 403
+	wUnauth := performRequest(r, "PATCH", "/api/reviews/"+toxicID+"/status", map[string]string{"status": "VISIBLE"}, "")
+	if wUnauth.Code != http.StatusUnauthorized {
+		t.Errorf("Expected 401 when no token is provided to PATCH status, got %d", wUnauth.Code)
+	}
+	wWisPatch := performRequest(r, "PATCH", "/api/reviews/"+toxicID+"/status", map[string]string{"status": "VISIBLE"}, tokenWis)
+	if wWisPatch.Code != http.StatusForbidden {
+		t.Errorf("Expected 403 when non-admin calls PATCH status, got %d", wWisPatch.Code)
+	}
+
+	// Scenario 5: Admin unhides review -> status becomes VISIBLE -> 200 OK
+	wAdmPatch := performRequest(r, "PATCH", "/api/reviews/"+toxicID+"/status", map[string]string{"status": "VISIBLE"}, tokenAdm)
+	if wAdmPatch.Code != http.StatusOK {
+		t.Errorf("Expected 200 when admin calls PATCH status, got %d: %s", wAdmPatch.Code, wAdmPatch.Body.String())
+	}
+
+	// Verify that it now appears in public activity reviews
+	wPublicAfter := performRequest(r, "GET", "/api/reviews/activity/act-test-mod", nil, "")
+	var publicReviewsAfter []map[string]interface{}
+	json.Unmarshal(wPublicAfter.Body.Bytes(), &publicReviewsAfter)
+	found := false
+	for _, rev := range publicReviewsAfter {
+		if fmt.Sprintf("%v", rev["id"]) == toxicID {
+			found = true
+			break
+		}
+	}
+	if !found {
+		t.Errorf("Un-hidden review should now appear in public reviews")
+	}
+}
+
 
 // 5. NEGATIVE SCENARIO TEST: Rate Limiting Enforcement
 func TestRateLimiterEnforcement(t *testing.T) {
