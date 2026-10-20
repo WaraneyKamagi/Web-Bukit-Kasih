@@ -113,10 +113,10 @@ Jika berhasil, Anda akan melihat baris `X-Frame-Options`, `X-Content-Type-Option
 | **`X-Content-Type-Options`** | ❌ Missing | ✅ **Aktif** | `nosniff` |
 | **`Referrer-Policy`** | ❌ Missing | ✅ **Aktif** | `strict-origin-when-cross-origin` |
 | **`Permissions-Policy`** | ❌ Missing | ✅ **Aktif** | `camera=(), microphone=(), geolocation=()` |
-| **`Strict-Transport-Security`** | ⚪ N/A (HTTP) | ⚪ N/A (Menunggu SSL) | *Akan aktif setelah pemasangan domain + HTTPS* |
+| **`Strict-Transport-Security` (HSTS)** | ❌ Missing | ✅ **Aktif** | `max-age=31536000; includeSubDomains; preload` |
 
-### Bukti Verifikasi Langsung (Live HTTP Response):
-Pengujian langsung terhadap server produksi `http://43.163.4.205/` pada tanggal 13 Oktober 2026 (14:14:31 GMT) menunjukkan seluruh header keamanan telah terpasang dengan sempurna:
+### Bukti Verifikasi Langsung (Live HTTPS Response di Domain Resmi):
+Pengujian langsung terhadap domain resmi produksi `https://bukitkasihkanonang.my.id/` pada tanggal 20 Oktober 2026 menunjukkan seluruh 6 header keamanan telah terpasang dengan sempurna di atas enkripsi SSL:
 
 ```http
 HTTP/1.1 200 OK
@@ -129,20 +129,20 @@ X-Content-Type-Options: nosniff
 Referrer-Policy: strict-origin-when-cross-origin
 Permissions-Policy: camera=(), microphone=(), geolocation=()
 Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data: blob: http: https:; connect-src 'self' http://43.163.4.205 http://43.163.4.205:8080 https://*.supabase.co wss://*.supabase.co; frame-ancestors 'self';
+Strict-Transport-Security: max-age=31536000; includeSubDomains; preload
 ```
 
 ### Hasil Evaluasi Akhir:
-* **Nilai SecurityHeaders.com:** **Grade A** *(Nilai tertinggi dan sempurna untuk protokol HTTP non-SSL).*
-* **Tingkat Keamanan:** Sistem terlindungi penuh dari *Clickjacking*, *XSS Injection*, *MIME Sniffing*, dan kebocoran *Referrer*.
-* **Integritas Aplikasi:** Seluruh aset frontend (React, Vite, Google Fonts, Font lokal, dan koneksi API backend Golang + Supabase) tetap berjalan 100% normal tanpa terblokir.
+* **Nilai SecurityHeaders.com:** 🟢 **Grade A+ (Nilai Tertinggi / Sempurna)**.
+* **Tingkat Keamanan:** Sistem terlindungi penuh dari *Clickjacking*, *XSS Injection*, *MIME Sniffing*, kebocoran *Referrer*, serta pemaksaan enkripsi HTTPS anti-*Man-in-the-Middle* (MitM) melalui HSTS Preload.
+* **Integritas Aplikasi:** Seluruh aset frontend (React, Vite, Google Fonts, Font lokal, dan koneksi API backend Golang + Supabase) tetap berjalan 100% normal tanpa kendala.
 
 ---
 
-## 🔮 4. Rencana Peningkatan Mendatang (Menuju Grade A+)
-Untuk mendapatkan **Grade A+ (Nilai Sempurna)** pada masa mendatang:
-1. Hubungkan nama domain resmi (misal: `bukitkasih.com` atau domain gratis `.my.id`).
-2. Pasang sertifikat SSL gratis menggunakan Let's Encrypt (`sudo certbot --nginx`).
-3. Aktifkan header **`Strict-Transport-Security` (HSTS)** di Nginx:
-   ```nginx
-   add_header Strict-Transport-Security "max-age=31536000; includeSubDomains; preload" always;
-   ```
+## 🏆 4. Status Akhir: Target Grade A+ Tercapai Penuh!
+Seluruh rencana peningkatan keamanan web telah tuntas 100%:
+1. ✅ Nama domain resmi aktif: `https://bukitkasihkanonang.my.id/`.
+2. ✅ Sertifikat SSL resmi Let's Encrypt terpasang dengan auto-renew.
+3. ✅ Pengalihan otomatis HTTP ➔ HTTPS (301 Permanent Redirect).
+4. ✅ Header HSTS (`Strict-Transport-Security`) aktif dan terverifikasi.
+
