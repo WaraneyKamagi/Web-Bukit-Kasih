@@ -66,6 +66,20 @@ export function AuthProvider({ children }) {
     }
   }, []);
 
+  const googleLogin = useCallback(async (idToken) => {
+    try {
+      const data = await authService.googleLogin(idToken);
+      localStorage.setItem('bukit_kasih_token', data.token);
+      localStorage.setItem('bukit_kasih_user', JSON.stringify(data.user));
+      setToken(data.token);
+      setUser(data.user);
+      return { success: true };
+    } catch (err) {
+      console.error('Google login error:', err);
+      return { success: false, error: err.message || 'Login dengan Google gagal' };
+    }
+  }, []);
+
   const register = useCallback(async (name, email, password) => {
     try {
       const data = await authService.register({ name, email, password });
@@ -77,8 +91,8 @@ export function AuthProvider({ children }) {
   }, []);
 
   const value = useMemo(() => ({
-    user, token, login, logout, register
-  }), [user, token, login, logout, register]);
+    user, token, login, googleLogin, logout, register
+  }), [user, token, login, googleLogin, logout, register]);
 
   return (
     <AuthContext.Provider value={value}>

@@ -80,6 +80,7 @@ export const activityService = {
 
 export const authService = {
   login: (credentials) => fetchWithAuth('/auth/login', { method: 'POST', body: JSON.stringify(credentials) }),
+  googleLogin: (idToken) => fetchWithAuth('/auth/google', { method: 'POST', body: JSON.stringify({ idToken }) }),
   register: (data) => fetchWithAuth('/auth/register', { method: 'POST', body: JSON.stringify(data) }),
   getProfile: () => fetchWithAuth('/auth/profile'),
   logout: () => fetchWithAuth('/auth/logout', { method: 'POST' }),

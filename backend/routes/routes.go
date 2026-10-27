@@ -53,6 +53,7 @@ func SetupRouter() *gin.Engine {
 		authLimiter := middleware.RateLimiter(10, 1*time.Minute)
 		api.POST("/auth/login", authLimiter, handlers.Login)
 		api.POST("/auth/register", authLimiter, handlers.Register)
+		api.POST("/auth/google", authLimiter, handlers.GoogleLogin)
 		api.POST("/auth/logout", handlers.Logout)
 		api.GET("/auth/profile", middleware.AuthMiddleware(), handlers.GetProfile)
 

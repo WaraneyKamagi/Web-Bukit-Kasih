@@ -538,3 +538,22 @@ func TestRAGSemanticRetrievalAndChatbot(t *testing.T) {
 		t.Errorf("Expected 403 when Tourist attempts to delete knowledge document, got %d", wDelWis.Code)
 	}
 }
+
+func TestGoogleAuthValidation(t *testing.T) {
+	r := setupTestEnvironment(t)
+	r.POST("/api/v1/auth/google", handlers.GoogleLogin)
+
+	// 1. Missing idToken should return 400 Bad Request
+	wEmpty := performRequest(r, "POST", "/api/v1/auth/google", map[string]string{}, "")
+	if wEmpty.Code != http.StatusBadRequest {
+		t.Errorf("Expected 400 on missing Google ID token, got %d", wEmpty.Code)
+	}
+
+	// 2. Invalid fake idToken should fail verification with 401 Unauthorized
+	wInvalid := performRequest(r, "POST", "/api/v1/auth/google", map[string]string{
+		"idToken": "fake-invalid-google-token-12345",
+	}, "")
+	if wInvalid.Code != http.StatusUnauthorized {
+		t.Errorf("Expected 401 on invalid Google token, got %d", wInvalid.Code)
+	}
+}

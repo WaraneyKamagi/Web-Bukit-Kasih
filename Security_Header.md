@@ -61,15 +61,16 @@ Cari blok `server { ... }` yang mendengarkan port 80 (`listen 80;`), lalu letakk
     add_header Referrer-Policy "strict-origin-when-cross-origin" always;
     add_header Permissions-Policy "camera=(), microphone=(), geolocation=()" always;
 
-    # Content Security Policy (Disesuaikan untuk React + Supabase + Go API)
-    add_header Content-Security-Policy "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data: blob: http: https:; connect-src 'self' http://43.163.4.205 http://43.163.4.205:8080 https://*.supabase.co wss://*.supabase.co; frame-ancestors 'self';" always;
+    # Content Security Policy (Disesuaikan untuk React + Supabase + Go API + Google OAuth)
+    add_header Content-Security-Policy "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://accounts.google.com/gsi/client; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data: blob: http: https: https://*.googleusercontent.com; connect-src 'self' http://43.163.4.205 http://43.163.4.205:8080 https://*.supabase.co wss://*.supabase.co https://accounts.google.com; frame-src https://accounts.google.com; frame-ancestors 'self';" always;
 ```
 
 > **Catatan Penyesuaian CSP:**
 > Konfigurasi CSP di atas sudah dirancang agar **tidak merusak** fitur website:
 > - Tetap mengizinkan font Google & font lokal.
 > - Mengizinkan pemanggilan API ke backend (`http://43.163.4.205:8080`) dan Supabase.
-> - Mengizinkan pemuatan gambar dari storage lokal maupun eksternal.
+> - Mengizinkan pemuatan gambar dari storage lokal maupun eksternal (termasuk foto profil akun Google).
+> - Mengizinkan script dan iframe Google Identity Services (`https://accounts.google.com`) untuk fitur Login dengan Google.
 
 Simpan file dengan menekan **`Ctrl + O`**, lalu tekan **`Enter`**, kemudian keluar dengan **`Ctrl + X`**.
 

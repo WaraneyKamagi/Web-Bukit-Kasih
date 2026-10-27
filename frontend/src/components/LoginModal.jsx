@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 
 export default function LoginModal({ isOpen, onClose }) {
-  const { login, register } = useAuth();
+  const { login, googleLogin, register } = useAuth();
   const [isRegistering, setIsRegistering] = useState(false);
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
@@ -20,6 +20,58 @@ export default function LoginModal({ isOpen, onClose }) {
       document.body.style.overflow = '';
     };
   }, [isOpen]);
+
+  // Inisialisasi Google Identity Services (Google Sign-In)
+  useEffect(() => {
+    if (!isOpen) return;
+
+    const clientId =
+      import.meta.env.VITE_GOOGLE_CLIENT_ID ||
+      '726409863841-su32unr1cp0ocnrmfmm3mna07so5se03.apps.googleusercontent.com';
+
+    const handleGoogleCallback = async (response) => {
+      if (!response?.credential) return;
+      setError('');
+      setSuccessMessage('');
+      const res = await googleLogin(response.credential);
+      if (res.success) {
+        handleClose();
+      } else {
+        setError(res.error || 'Gagal masuk dengan akun Google.');
+      }
+    };
+
+    const initGoogle = () => {
+      if (window.google?.accounts?.id) {
+        window.google.accounts.id.initialize({
+          client_id: clientId,
+          callback: handleGoogleCallback,
+          auto_select: false,
+        });
+
+        const btnContainer = document.getElementById('googleSignInContainer');
+        if (btnContainer) {
+          btnContainer.innerHTML = '';
+          window.google.accounts.id.renderButton(btnContainer, {
+            theme: 'outline',
+            size: 'large',
+            type: 'standard',
+            shape: 'pill',
+            text: isRegistering ? 'signup_with' : 'signin_with',
+            width: 320,
+            logo_alignment: 'left',
+          });
+        }
+      }
+    };
+
+    if (window.google?.accounts?.id) {
+      initGoogle();
+    } else {
+      const timer = setTimeout(initGoogle, 400);
+      return () => clearTimeout(timer);
+    }
+  }, [isOpen, isRegistering, googleLogin]);
 
   if (!isOpen) return null;
 
@@ -160,6 +212,22 @@ export default function LoginModal({ isOpen, onClose }) {
             {isRegistering ? 'Daftar Akun' : 'Masuk'}
           </button>
         </form>
+
+        {/* Divider & Google Login Button */}
+        <div className="relative my-5">
+          <div className="absolute inset-0 flex items-center">
+            <div className="w-full border-t border-outline-variant/30" />
+          </div>
+          <div className="relative flex justify-center text-xs">
+            <span className="bg-surface dark:bg-inverse-surface px-3 text-subtext dark:text-slate-400 font-medium">
+              atau {isRegistering ? 'daftar' : 'masuk'} dengan
+            </span>
+          </div>
+        </div>
+
+        <div className="flex justify-center w-full min-h-[44px]">
+          <div id="googleSignInContainer" className="flex justify-center w-full" />
+        </div>
 
         <div className="text-center mt-4">
           {isRegistering ? (

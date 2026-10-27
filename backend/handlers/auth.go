@@ -106,3 +106,37 @@ func Logout(c *gin.Context) {
 	c.SetCookie("token", "", -1, "/", "", false, true)
 	c.JSON(http.StatusOK, gin.H{"message": "Berhasil logout"})
 }
+
+// GoogleLogin handles authentication via Google OAuth ID token
+func GoogleLogin(c *gin.Context) {
+	var input struct {
+		IDToken string `json:"idToken" binding:"required"`
+	}
+
+	if err := c.ShouldBindJSON(&input); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "ID token Google diperlukan"})
+		return
+	}
+
+	tokenString, user, err := services.GoogleLogin(input.IDToken)
+	if err != nil {
+		services.LogAuthFailure("GoogleOAuth", c.ClientIP(), c.Request.UserAgent(), err.Error())
+		c.JSON(http.StatusUnauthorized, gin.H{"error": err.Error()})
+		return
+	}
+
+	services.LogAuthSuccess(user.Email, user.Role, c.ClientIP(), "Google OAuth Login")
+
+	isSecure := os.Getenv("GIN_MODE") == "release" || os.Getenv("ENV") == "production"
+	c.SetSameSite(http.SameSiteLaxMode)
+	c.SetCookie("token", tokenString, 86400, "/", "", isSecure, true)
+
+	c.JSON(http.StatusOK, gin.H{
+		"token": tokenString,
+		"user": gin.H{
+			"email": user.Email,
+			"name":  user.Name,
+			"role":  user.Role,
+		},
+	})
+}

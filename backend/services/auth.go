@@ -30,12 +30,21 @@ func Login(email, password string) (string, *models.User, error) {
 		return "", nil, errors.New("Email atau password salah!")
 	}
 
-	// Generate JWT Token (Expires in 24 hours)
+	tokenString, err := GenerateJWT(user.Email, user.Name, user.Role)
+	if err != nil {
+		return "", nil, err
+	}
+
+	return tokenString, &user, nil
+}
+
+// GenerateJWT creates a signed JWT token for the user session
+func GenerateJWT(email, name, role string) (string, error) {
 	expirationTime := time.Now().Add(24 * time.Hour)
 	claims := &Claims{
-		Email: user.Email,
-		Name:  user.Name,
-		Role:  user.Role,
+		Email: email,
+		Name:  name,
+		Role:  role,
 		RegisteredClaims: jwt.RegisteredClaims{
 			ExpiresAt: jwt.NewNumericDate(expirationTime),
 			IssuedAt:  jwt.NewNumericDate(time.Now()),
@@ -43,12 +52,7 @@ func Login(email, password string) (string, *models.User, error) {
 	}
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-	tokenString, err := token.SignedString(config.AppConfig.JWTSecret)
-	if err != nil {
-		return "", nil, err
-	}
-
-	return tokenString, &user, nil
+	return token.SignedString(config.AppConfig.JWTSecret)
 }
 
 func GetProfile(email string) (*models.User, error) {
