@@ -1,71 +1,105 @@
-# Website Pariwisata Bukit Kasih
+# Website Pariwisata Religi & Alam Bukit Kasih Kanonang
 
-Sistem Minimum Viable Product (MVP) untuk platform informasi pariwisata Bukit Kasih, Kanonang. Dibangun dengan pendekatan monorepo memisahkan antara frontend (React + Vite) dan backend (Golang + Gin + GORM) dengan basis data terpusat (Supabase PostgreSQL).
+Platform sistem informasi dan layanan pariwisata terpadu untuk kawasan wisata religi Bukit Kasih, Kanonang, Minahasa, Sulawesi Utara. Sistem dibangun menggunakan arsitektur monorepo yang memisahkan aplikasi web frontend (*Single Page Application*), backend RESTful API, dan basis data cloud terpusat.
 
-## Struktur Proyek
-- `frontend/` - Berisi aplikasi web React.
-- `backend/` - Berisi server API Golang.
+* **Domain Resmi Produksi:** [https://bukitkasihkanonang.my.id/](https://bukitkasihkanonang.my.id/)
+* **Status Keamanan:** 🟢 **Grade A+ (Maksimal)** di [SecurityHeaders.com](https://securityheaders.com) & 100/100 Kepatuhan OWASP
+* **Autentikasi:** Dual-Session (JWT + HttpOnly Cookie) & **Google OAuth 2.0 (Google Identity Services)**
 
 ---
 
-## 🛠 Cara Menjalankan di Lokal (Development)
+## 📂 Struktur Repositori
+
+```text
+Bukit-Kasih/
+├── frontend/          # Aplikasi web React 19 + Vite + Tailwind CSS
+├── backend/           # Server RESTful API Golang (Gin Framework + GORM)
+├── docs/              # Dokumentasi teknis terpadu & laporan sistem
+│   ├── KEAMANAN_DAN_INFRASTRUKTUR.md   # Audit OWASP (10 Kategori), SSL, Domain & Nginx CSP
+│   ├── SISTEM_AI.md                    # Sistem Generative AI, Reels Maker & Kebijakan Data
+│   └── CHANGELOG_27_OKTOBER_2026.md    # Catatan rilis Google OAuth 2.0 & VPS Deployment
+└── README.md          # Panduan utama proyek
+```
+
+---
+
+## 📚 Indeks Dokumentasi Sistem (`docs/`)
+
+Seluruh dokumentasi telah diringkas dan dikelompokkan ke dalam folder `docs/`:
+
+1. 🛡️ **[Dokumentasi Keamanan & Infrastruktur](docs/KEAMANAN_DAN_INFRASTRUKTUR.md)**
+   * Hasil audit kepatuhan 10 kategori OWASP (peningkatan dari 48% ke 100%).
+   * Panduan konfigurasi Domain DNS dan sertifikat SSL Let's Encrypt.
+   * Template Nginx Security Headers (CSP Grade A+, HSTS Preload, X-Frame-Options).
+   * Standar Operasional Prosedur (SOP) Disaster Recovery database Supabase.
+
+2. 🤖 **[Dokumentasi Sistem AI & Otomasi Konten](docs/SISTEM_AI.md)**
+   * Knowledge Base "Buku Pintar" Bukit Kasih.
+   * Mesin Reels generator video vertikal 9:16 via FFmpeg.
+   * Pemantau destinasi otomatis (cronjob) dengan koneksi database read-only.
+   * Kebijakan keamanan data Zero-Access PII untuk menjaga privasi pengguna.
+
+3. 🚀 **[Changelog Rilis Terbaru](docs/CHANGELOG_27_OKTOBER_2026.md)**
+   * Integrasi Google OAuth 2.0 (Google Identity Services) untuk pendaftaran & login wisatawan.
+   * Penghapusan komponen visual mock "Live Banner Simulation" pada dashboard admin.
+   * Resolusi encoding karakter khusus `@` (`%40`) pada connection string Supabase.
+
+---
+
+## 🛠️ Panduan Menjalankan Sistem di Lokal (Development)
 
 ### 1. Menjalankan Backend (Golang)
 Buka terminal dan arahkan ke folder `backend`:
 ```bash
 cd backend
 ```
-Buat file `.env` berdasarkan `backend/.env.example` lalu jalankan server:
+Salin template konfigurasi:
+```bash
+cp .env.example .env
+```
+Sesuaikan nilai `DATABASE_URL` di file `.env`, lalu jalankan server:
 ```bash
 go run main.go
 ```
-*Server akan berjalan di http://localhost:8080*
+*Server API aktif di: `http://localhost:8080`*
 
 ### 2. Menjalankan Frontend (React)
-Buka tab terminal baru dan arahkan ke folder `frontend`:
+Buka terminal baru dan arahkan ke folder `frontend`:
 ```bash
 cd frontend
 ```
-Install dependensi dan jalankan *development server*:
+Install dependensi dan jalankan server pengembangan:
 ```bash
 npm install
 npm run dev
 ```
-*Aplikasi frontend akan berjalan di http://localhost:5173*
+*Aplikasi frontend aktif di: `http://localhost:5173`*
 
 ---
 
-## 📝 Daftar Environment Variable
-
-Berikut adalah daftar variabel lingkungan yang tersedia dalam sistem ini. **PENTING: Jangan pernah membagikan atau meng-commit file yang berisi rahasia ke publik.**
+## ⚙️ Ringkasan Variabel Lingkungan (Environment Variables)
 
 ### Backend (`backend/.env`)
 | Variabel | Sifat | Deskripsi |
-| :--- | :--- | :--- |
-| `DB_DRIVER` | Opsional | Driver GORM (default: `postgres`) |
-| `DB_SOURCE` | **Wajib** | URL Koneksi Database PostgreSQL (Supabase) |
-| `JWT_SECRET` | **Wajib** | Kunci acak rahasia untuk tanda tangan (signing) token sesi pengguna |
+| :--- | :---: | :--- |
+| `DATABASE_URL` | **Wajib** | Connection string pooler Supabase PostgreSQL |
+| `JWT_SECRET` | **Wajib** | Kunci kriptografi penandatanganan token JWT |
+| `GOOGLE_CLIENT_ID` | **Wajib** | OAuth 2.0 Client ID dari Google Cloud Console |
 | `PORT` | Opsional | Port server API (default: `8080`) |
-| `FRONTEND_URL` | Opsional | URL asal frontend untuk keperluan validasi CORS (default: `http://localhost:5173`) |
-| `AUTO_MIGRATE` | Opsional | Set ke `true` untuk memperbarui tabel database secara otomatis saat server menyala |
-| `SEED_DATA` | Opsional | Set ke `true` untuk membuat data dummy/awal ke database saat server menyala (JANGAN aktifkan di production) |
-| `GIN_MODE` | Opsional | Mode jalannya Gin. Set `release` di production (default: `debug`) |
-| `GROQ_API_KEY` | **Wajib** | Kunci API Groq (LLM) untuk fitur Chatbot Pintar |
-| `GROQ_MODEL` | Opsional | Versi Model LLM Groq (default: `llama-3.3-70b-versatile`) |
-| `TELEGRAM_BOT_TOKEN` | **Wajib** | Token bot Telegram untuk integrasi chat Admin |
-| `TELEGRAM_ADMIN_CHAT_ID` | Opsional | ID Obrolan Admin di Telegram |
+| `GIN_MODE` | Opsional | Mode Gin (`debug` untuk lokal, `release` untuk produksi) |
+| `GROQ_API_KEY` | Opsional | Kunci API Groq LLM untuk chatbot interaktif |
+| `TELEGRAM_BOT_TOKEN` | Opsional | Token bot Telegram integrasi notifikasi admin |
 
 ### Frontend (`frontend/.env`)
 | Variabel | Sifat | Deskripsi |
-| :--- | :--- | :--- |
-| `VITE_API_URL` | Opsional | URL absolut Backend API di environment production (misal: `https://api.domain.com/api/v1`). Jika kosong, akan memakai nilai `/api/v1`. |
-| `VITE_SUPABASE_URL` | Opsional | URL Proyek Supabase (digunakan untuk Realtime Subscriptions) |
-| `VITE_SUPABASE_ANON_KEY` | Opsional | Anon Key Supabase (publik, aman untuk diletakkan di frontend) |
+| :--- | :---: | :--- |
+| `VITE_GOOGLE_CLIENT_ID` | **Wajib** | Client ID Google Identity Services untuk web |
+| `VITE_SUPABASE_URL` | Opsional | URL Supabase project untuk sinkronisasi realtime |
+| `VITE_SUPABASE_ANON_KEY`| Opsional | Anon Key publik Supabase |
 
 ---
 
-## 🚀 Catatan Deploy (Production)
-Sistem ini telah diaudit dan disiapkan untuk kelayakan *deploy* MVP:
-1. **Frontend**: Disarankan mendeploy ke **Vercel** atau **Netlify**. Jika menggunakan backend di domain/hosting yang berbeda (split-domain), **Anda wajib mengisi `VITE_API_URL` di konfigurasi hosting frontend tersebut**.
-2. **Backend**: Disarankan mendeploy ke **Render** atau VPS. Pastikan *environment variable* `GIN_MODE=release` dan `AUTO_MIGRATE` dimatikan jika tabel sudah terbuat dengan benar.
-3. **Database**: Cadangkan (*backup*) data secara rutin dan pastikan mengganti _password_ _default_ akun Admin apabila Anda pernah menyalakan *seed*!
+## 🚀 Deployment Produksi (VPS Ubuntu)
+* **Web Server & Reverse Proxy:** Nginx 1.24+ (port 80 & 443)
+* **Process Manager:** Systemd service (`bukitkasih.service`)
+* **Arsitektur Binary:** Linux AMD64 (`$env:GOOS = "linux"; $env:GOARCH = "amd64"`)

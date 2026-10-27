@@ -28,10 +28,6 @@ backend/*.db
 backend/uploads/*
 !backend/uploads/.gitkeep
 
-# Local Reports & Audit Documents (not pushed to remote)
-LAPORAN_PERBAIKAN.md
-docs/
-PERENCANAAN.MD
-# Deploy artifacts
+# Deploy & Temporary artifacts
 backend/bukit-kasih-server
 *.tar.gz
