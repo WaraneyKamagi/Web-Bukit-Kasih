@@ -43,6 +43,7 @@ Seluruh dokumentasi telah diringkas dan dikelompokkan ke dalam folder `docs/`:
    * Integrasi Google OAuth 2.0 (Google Identity Services) untuk pendaftaran & login wisatawan.
    * Penghapusan komponen visual mock "Live Banner Simulation" pada dashboard admin.
    * Resolusi encoding karakter khusus `@` (`%40`) pada connection string Supabase.
+   * Optimasi UI/UX, kontras aksesibilitas Light/Dark Mode, serta visibilitas kartu di perangkat mobile.
 
 ---
 

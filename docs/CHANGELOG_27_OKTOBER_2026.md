@@ -1,17 +1,18 @@
-# LAPORAN TEKNIS PERUBAHAN SISTEM (27 OKTOBER 2026)
+# LAPORAN TEKNIS PERUBAHAN SISTEM (OKTOBER 2026)
 **Proyek:** Sistem Informasi dan Layanan Wisata Religi Bukit Kasih Kanonang  
 **Dokumen ini ditujukan untuk:** AI Agent, Pengembang Sistem, dan Tim Penilai/Dosen Pembimbing  
 **Domain Produksi:** `https://bukitkasihkanonang.my.id/` | **VPS:** `43.163.4.205`  
-**Branch Git:** `development` | **Commit Terakhir:** `7a75c81`
+**Branch Git:** `development` | **Commit Terakhir:** `233505f`
 
 ---
 
 ## 📌 RINGKASAN EKSEKUTIF (TL;DR FOR AI AGENTS)
-Pada sesi pengembangan 27 Oktober 2026, telah diselesaikan dua tugas utama:
+Pada rangkaian sesi pengembangan akhir Oktober 2026 (27 – 31 Oktober 2026), telah diselesaikan lima agenda utama:
 1. **Pembersihan Antarmuka Mock:** Menghapus komponen *"Live Banner Simulation"* dari tab pengumuman admin (`AnnouncementTab.jsx`) agar dashboard admin hanya menampilkan data riil.
 2. **Implementasi Google OAuth 2.0 (Google Identity Services - GIS):** Menambahkan fitur masuk/daftar dengan akun Google untuk wisatawan di seluruh lapisan sistem (Frontend React 19 + Backend Golang Gin + Database Supabase PostgreSQL + Nginx CSP Headers).
 3. **Penyelesaian Kendala Database Password:** Mengatasi error otentikasi SASL Supabase akibat karakter `@` pada password yang memecah parser URI PostgreSQL dengan menerapkan URL Percent-Encoding (`%40`).
-4. **Build & Rilis Produksi ke VPS:** Mengompilasi binary Linux AMD64, men-deploy frontend ke `/var/www/bukit-kasih-frontend`, me-restart service systemd `bukitkasih`, dan memperbarui Content-Security-Policy (CSP) Nginx.
+4. **Optimasi UI/UX, Kontras Aksesibilitas & Responsivitas Mobile (31 Oktober 2026):** Memperbaiki sinkronisasi Light/Dark Mode pada Tailwind v4 (`@custom-variant dark`), meningkatkan kontras Hero Section di seluruh halaman (*Beranda, Aktivitas, Informasi, Sejarah*), serta menampilkan teks kartu secara permanen tanpa harus menunggu pointer hover agar ramah bagi pengguna perangkat mobile.
+5. **Build & Rilis Produksi ke VPS:** Mengompilasi binary Linux AMD64, men-deploy frontend terbaru ke `/var/www/bukit-kasih-frontend`, me-restart service systemd `bukitkasih`, dan memperbarui Content-Security-Policy (CSP) Nginx.
 
 ---
 
@@ -83,6 +84,24 @@ Pada sesi pengembangan 27 Oktober 2026, telah diselesaikan dua tugas utama:
   * `frame-src` -> `'self' https://accounts.google.com` (merender iframe tombol dan prompt Google).
   * `connect-src` -> `https://accounts.google.com` (mengirim telemetry dan verifikasi client Google).
   * `img-src` -> `https://*.googleusercontent.com` (menampilkan gambar profil Google milik wisatawan).
+
+---
+
+### E. Optimasi UI/UX, Kontras Aksesibilitas & Responsivitas Mobile (31 Oktober 2026)
+- **Konteks:** Ditemukan masalah rendahnya kontras teks terhadap latar foto pada beberapa Hero Section, ketidaksinkronan varian `dark:` Tailwind CSS v4 ketika pengguna memilih Light Mode pada OS bertema gelap, serta teks deskripsi kartu yang hanya muncul saat di-hover (`opacity-0 group-hover:opacity-100`) sehingga tidak terlihat di layar ponsel.
+- **Rincian Perbaikan (Murni Frontend UI tanpa mengubah arsitektur sistem):**
+  | Lokasi File | Deskripsi Perubahan UI |
+  |---|---|
+  | `frontend/src/index.css` | Menambahkan `@custom-variant dark (&:where(.dark, .dark *));` agar class `dark:` patuh 100% pada toggle tema website. Menggelapkan variabel warna Light Mode (`--color-subtext: #475569`, `--color-on-surface-variant: #334155`) untuk kontras tinggi. |
+  | `frontend/src/components/HeroSection.jsx` | Menambahkan *dark gradient* & *radial overlay* di atas foto latar, mengubah judul menjadi putih tegas (`text-white font-extrabold`), dan membuat tombol navigasi landmark bawah menggunakan latar solid (`bg-slate-900/90`). |
+  | `frontend/src/pages/Experiences.jsx` | Menambahkan *dark gradient* & *radial overlay* merata pada Hero, memperjelas bar filter kategori (*Ziarah, Rekreasi, Budaya, Kuliner*) dengan tombol aktif putih kontras, serta menampilkan deskripsi kartu aktivitas secara langsung tanpa menunggu hover. |
+  | `frontend/src/pages/Informasi.jsx` | Menambahkan *dark gradient* & *radial overlay* lembut di belakang judul *"Informasi Pengunjung"* agar tidak bertabrakan dengan pepohonan latar. |
+  | `frontend/src/pages/Sejarah.jsx` | Mengubah teks deskripsi Hero menjadi putih terang (`text-slate-100`), mempertegas tombol CTA utama dengan warna aksen emas (`bg-accent-gold text-slate-950 font-bold`), serta menghapus `opacity-0 group-hover:opacity-100` pada kartu *"Filosofi Kasih"* dan *"Legenda Minahasa"* agar langsung terbaca di perangkat mobile. |
+  | `frontend/src/components/Navigation.jsx` | Memperjelas kontras teks menu navigasi pada Light Mode (`text-slate-800`) dan Dark Mode (`dark:text-slate-200`). |
+  | `frontend/src/components/DestinationPanel.jsx` | Memperkuat kontras teks *"LANDMARK UTAMA"* (`text-primary font-bold`) dan paragraf deskripsi (`text-slate-700`) pada Light Mode. |
+  | `frontend/src/components/TrailMap.jsx` | Memperbaiki kontras kartu detail pos wisata interaktif agar teks deskripsi berwarna abu-abu gelap (`text-slate-700`) di atas kartu putih pada Light Mode. |
+  | `frontend/src/components/TravelCard.jsx` | Menampilkan tombol panah kartu secara langsung di layar mobile tanpa harus menunggu hover pointer. |
+- **Commit Git:** `233505f` (*style(ui): improve hero overlays, text contrast, light/dark mode sync, and mobile card visibility*).
 
 ---
 
