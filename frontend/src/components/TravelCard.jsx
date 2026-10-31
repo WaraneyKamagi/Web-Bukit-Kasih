@@ -29,10 +29,10 @@ export default function TravelCard({ title, image, altText, onClick }) {
       
       {/* Content */}
       <div className="absolute bottom-0 left-0 p-6 w-full flex justify-between items-end z-10">
-        <h3 className="font-headline-md text-headline-md text-white transform group-hover:-translate-y-2 transition-transform duration-500">
+        <h3 className="font-headline-md text-lg md:text-xl font-bold text-white transform md:group-hover:-translate-y-1 transition-transform duration-500 drop-shadow-md">
           {title}
         </h3>
-        <button className="w-10 h-10 rounded-full bg-white/20 backdrop-blur-md flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all translate-x-4 group-hover:translate-x-0 duration-500 hover:bg-white hover:text-primary">
+        <button className="w-10 h-10 rounded-full bg-white/25 backdrop-blur-md flex items-center justify-center opacity-100 md:opacity-80 md:group-hover:opacity-100 transition-all duration-500 hover:bg-white hover:text-primary shrink-0">
           <span className="material-symbols-outlined text-white hover:text-primary transition-colors">arrow_forward</span>
         </button>
       </div>

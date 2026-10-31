@@ -28,22 +28,26 @@ export default function Informasi() {
   return (
     <main>
       {/* Hero Section */}
-      <section className="relative h-[600px] w-full flex flex-col items-center justify-center mt-20">
+      <section className="relative h-[600px] w-full flex flex-col items-center justify-center mt-20 overflow-hidden">
         <div className="absolute inset-0 w-full h-full z-0">
           <img 
             alt="Bukit Belerang di Bukit Kasih" 
             className="w-full h-full object-cover" 
             src={heroBg}
           />
-          <div className="absolute inset-0 bg-primary/20"></div>
+          <div className="absolute inset-0 bg-gradient-to-b from-black/75 via-black/60 to-background"></div>
+          <div className="absolute inset-0 bg-radial from-black/55 via-black/25 to-transparent"></div>
         </div>
-        <div className="relative z-10 text-center px-4">
-          <span className="font-label-caps text-label-caps text-white bg-primary/30 px-4 py-1.5 rounded-full mb-4 border border-white/20 backdrop-blur-sm tracking-wider uppercase inline-block">
+        <div className="relative z-10 text-center px-4 max-w-4xl mx-auto -mt-8">
+          <span className="font-label-caps text-xs md:text-sm font-bold text-white bg-slate-900/80 px-5 py-2 rounded-full mb-5 border border-white/30 backdrop-blur-md tracking-widest uppercase inline-block shadow-lg">
             Panduan & Fasilitas Wisata
           </span>
-          <h1 className="font-display-xl text-display-xl text-white mb-4 drop-shadow-lg hidden md:block">Informasi Pengunjung</h1>
-          <h1 className="font-display-xl-mobile text-display-xl-mobile text-white mb-2 drop-shadow-lg md:hidden">Informasi Pengunjung</h1>
-          <p className="font-body-lg text-body-lg text-white/90 max-w-2xl mx-auto drop-shadow-md">Segala hal yang perlu Anda ketahui sebelum berkunjung ke Bukit Kasih Kanonang.</p>
+          <h1 className="text-3xl sm:text-5xl md:text-6xl font-extrabold text-white tracking-tight mb-5 drop-shadow-[0_4px_24px_rgba(0,0,0,0.9)] leading-tight">
+            Informasi Pengunjung
+          </h1>
+          <p className="font-body-lg text-base sm:text-lg md:text-xl font-medium text-white/95 max-w-2xl mx-auto drop-shadow-[0_2px_16px_rgba(0,0,0,0.95)] leading-relaxed">
+            Segala hal yang perlu Anda ketahui sebelum berkunjung ke Bukit Kasih Kanonang.
+          </p>
         </div>
       </section>
 

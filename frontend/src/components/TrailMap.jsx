@@ -13,13 +13,13 @@ export default function TrailMap() {
         
         {/* Section Header */}
         <div className="text-center mb-16">
-          <span className="font-label-caps text-label-caps text-primary dark:text-secondary-container tracking-widest uppercase mb-4 block">
+          <span className="font-label-caps text-xs md:text-sm font-bold text-primary dark:text-secondary-container tracking-widest uppercase mb-3 block">
             Petualangan 2.400 Tangga
           </span>
-          <h2 className="font-headline-lg text-headline-lg text-on-surface mb-4">
+          <h2 className="font-headline-lg text-2xl sm:text-3xl md:text-4xl font-extrabold text-slate-900 dark:text-white tracking-tight mb-4">
             Panduan Rute & Jalur Interaktif
           </h2>
-          <p className="font-body-lg text-body-lg text-subtext max-w-2xl mx-auto">
+          <p className="font-body-lg text-base md:text-lg font-medium text-slate-700 dark:text-slate-300 max-w-2xl mx-auto leading-relaxed">
             Jelajahi setiap pos penting dari rute melingkar Bukit Kasih Kanonang sebelum Anda memulai pendakian langsung.
           </p>
         </div>
@@ -29,7 +29,7 @@ export default function TrailMap() {
           
           {/* Left Side: Stepper Indicator */}
           <div className="lg:col-span-5 flex flex-col gap-4">
-            <div className="relative pl-6 md:pl-8 border-l border-outline-variant/50 space-y-6 text-left">
+            <div className="relative pl-6 md:pl-8 border-l-2 border-slate-300 dark:border-outline-variant/50 space-y-6 text-left">
               {trailCheckpoints.map((cp, idx) => {
                 const isActive = activeStep === idx;
                 return (
@@ -42,7 +42,7 @@ export default function TrailMap() {
                     <div className={`absolute -left-[39px] md:-left-[47px] top-1 w-7 h-7 md:w-9 md:h-9 rounded-full flex items-center justify-center border transition-all duration-300 ${
                       isActive 
                         ? 'bg-primary border-primary text-white scale-110 shadow-md shadow-primary/20 dark:bg-secondary dark:border-secondary dark:text-on-secondary' 
-                        : 'bg-white border-outline-variant/60 text-outline group-hover:border-primary/50 group-hover:text-primary dark:bg-inverse-surface'
+                        : 'bg-white border-slate-300 text-slate-700 group-hover:border-primary group-hover:text-primary dark:bg-inverse-surface dark:border-outline-variant/60 dark:text-slate-300'
                     }`}>
                       <span className="material-symbols-outlined text-[16px] md:text-[18px]">
                         {cp.icon}
@@ -51,17 +51,17 @@ export default function TrailMap() {
 
                     {/* Step Content summary */}
                     <div className="pl-4">
-                      <span className={`font-label-caps text-label-caps tracking-wider block text-xs mb-1 ${
-                        isActive ? 'text-primary dark:text-secondary-container font-semibold' : 'text-subtext'
+                      <span className={`font-label-caps tracking-wider block text-xs mb-1 ${
+                        isActive ? 'text-primary dark:text-secondary-container font-bold' : 'text-slate-600 dark:text-slate-400 font-semibold'
                       }`}>
                         POS 0{idx + 1}
                       </span>
-                      <h3 className={`font-headline-md text-headline-md leading-tight transition-colors ${
-                        isActive ? 'text-on-surface font-semibold' : 'text-on-surface-variant group-hover:text-primary dark:group-hover:text-secondary-fixed'
+                      <h3 className={`font-headline-md text-base md:text-lg leading-tight transition-colors ${
+                        isActive ? 'text-slate-900 dark:text-white font-extrabold' : 'text-slate-800 dark:text-slate-300 font-semibold group-hover:text-primary dark:group-hover:text-secondary-fixed'
                       }`}>
                         {cp.title}
                       </h3>
-                      <p className="font-body-md text-body-md text-subtext text-sm mt-1 line-clamp-1">
+                      <p className="font-body-md text-slate-600 dark:text-slate-400 font-medium text-sm mt-1 line-clamp-1">
                         {cp.subtitle}
                       </p>
                     </div>
@@ -73,7 +73,7 @@ export default function TrailMap() {
 
           {/* Right Side: Active Detail Panel */}
           <div className="lg:col-span-7">
-            <div className="glass-panel-light dark:glass-panel bg-white/70 dark:bg-black/20 rounded-[32px] p-6 md:p-8 shadow-xl border border-white/50 dark:border-white/10 overflow-hidden flex flex-col md:flex-row gap-8 min-h-[420px] transition-all duration-500 scale-100">
+            <div className="bg-white dark:bg-slate-900/90 rounded-[32px] p-6 md:p-8 shadow-xl border border-slate-200/90 dark:border-white/10 overflow-hidden flex flex-col md:flex-row gap-8 min-h-[420px] transition-all duration-500 scale-100">
               
               {/* Checkpoint Image */}
               <div className="w-full md:w-1/2 h-64 md:h-auto rounded-[20px] overflow-hidden relative shadow-inner shrink-0 bg-surface-variant">
@@ -85,35 +85,35 @@ export default function TrailMap() {
                 <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent"></div>
                 
                 {/* Float Badge */}
-                <div className="absolute bottom-4 left-4 bg-primary/80 dark:bg-secondary/80 backdrop-blur-md px-3.5 py-1.5 rounded-full text-white font-label-caps text-[10px] tracking-wider uppercase">
+                <div className="absolute bottom-4 left-4 bg-primary/90 dark:bg-secondary/90 backdrop-blur-md px-3.5 py-1.5 rounded-full text-white font-label-caps font-bold text-[10px] tracking-wider uppercase shadow-md">
                   {trailCheckpoints[activeStep].duration}
                 </div>
               </div>
 
               {/* Checkpoint Text Details */}
               <div className="flex-1 flex flex-col text-left">
-                <span className="font-label-caps text-label-caps text-primary dark:text-secondary-container tracking-wider text-xs uppercase mb-1">
+                <span className="font-label-caps font-bold text-primary dark:text-secondary-container tracking-wider text-xs uppercase mb-1.5">
                   Detail Pos Wisata
                 </span>
-                <h4 className="font-headline-lg text-headline-lg text-on-surface leading-tight font-semibold mb-3">
+                <h4 className="font-headline-lg text-xl md:text-2xl text-slate-900 dark:text-white leading-tight font-extrabold mb-3">
                   {trailCheckpoints[activeStep].title}
                 </h4>
-                <p className="font-body-md text-body-md text-on-surface-variant dark:text-white/80 leading-relaxed mb-6 flex-1 text-sm">
+                <p className="font-body-md text-slate-700 dark:text-slate-200 leading-relaxed mb-6 flex-1 text-sm md:text-base font-normal">
                   {trailCheckpoints[activeStep].description}
                 </p>
 
                 {/* Additional Metadata Card */}
-                <div className="grid grid-cols-2 gap-4 pt-4 border-t border-outline-variant/20">
+                <div className="grid grid-cols-2 gap-4 pt-4 border-t border-slate-200 dark:border-outline-variant/20">
                   <div>
-                    <span className="block text-xs font-label-caps text-subtext uppercase tracking-wider mb-1">Tingkat Kesulitan</span>
+                    <span className="block text-xs font-label-caps font-bold text-slate-600 dark:text-slate-400 uppercase tracking-wider mb-1">Tingkat Kesulitan</span>
                     <div className="flex items-center gap-1.5">
-                      <span className="material-symbols-outlined text-[16px] text-primary dark:text-secondary-fixed">fitness_center</span>
-                      <span className="font-body-md text-body-md text-on-surface text-sm font-semibold">{trailCheckpoints[activeStep].difficulty}</span>
+                      <span className="material-symbols-outlined text-[18px] text-primary dark:text-secondary-fixed">fitness_center</span>
+                      <span className="font-body-md text-slate-900 dark:text-white text-sm font-bold">{trailCheckpoints[activeStep].difficulty}</span>
                     </div>
                   </div>
                   <div>
-                    <span className="block text-xs font-label-caps text-subtext uppercase tracking-wider mb-1">Tips Praktis</span>
-                    <p className="font-body-md text-body-md text-on-surface text-xs leading-snug">{trailCheckpoints[activeStep].tips}</p>
+                    <span className="block text-xs font-label-caps font-bold text-slate-600 dark:text-slate-400 uppercase tracking-wider mb-1">Tips Praktis</span>
+                    <p className="font-body-md text-slate-700 dark:text-slate-300 font-medium text-xs leading-snug">{trailCheckpoints[activeStep].tips}</p>
                   </div>
                 </div>
 

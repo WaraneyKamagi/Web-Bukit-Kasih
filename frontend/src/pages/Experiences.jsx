@@ -173,32 +173,32 @@ export default function Experiences() {
             className="w-full h-full object-cover object-center scale-105" 
             src={ibadahImg}
           />
-          <div className="absolute inset-0 bg-primary/25 mix-blend-multiply"></div>
-          <div className="absolute bottom-0 w-full h-1/3 bg-gradient-to-t from-background to-transparent"></div>
+          <div className="absolute inset-0 bg-gradient-to-b from-black/75 via-black/60 to-background"></div>
+          <div className="absolute inset-0 bg-radial from-black/50 via-black/25 to-transparent"></div>
         </div>
         
-        <div className="relative z-10 text-center px-4 max-w-4xl mx-auto mt-20">
-          <span className="font-label-caps text-label-caps text-white tracking-[0.2em] uppercase mb-4 block drop-shadow-md">
+        <div className="relative z-10 text-center px-4 max-w-4xl mx-auto mt-16">
+          <span className="inline-block font-label-caps text-xs md:text-sm font-bold text-white bg-slate-900/80 border border-white/30 backdrop-blur-md px-5 py-2 rounded-full tracking-[0.2em] uppercase mb-5 shadow-lg">
             Pengalaman Spiritual & Alam
           </span>
-          <h1 className="font-display-xl-mobile md:font-display-xl text-display-xl-mobile md:text-display-xl text-white mb-6 drop-shadow-lg leading-tight">
+          <h1 className="text-3xl sm:text-5xl md:text-6xl font-extrabold text-white tracking-tight mb-5 drop-shadow-[0_4px_24px_rgba(0,0,0,0.9)] leading-tight">
             Aktivitas & Pengalaman Ziarah
           </h1>
-          <p className="font-body-lg text-body-lg text-white/90 max-w-2xl mx-auto mb-10 drop-shadow">
+          <p className="font-body-lg text-base sm:text-lg md:text-xl font-medium text-white max-w-2xl mx-auto mb-10 drop-shadow-[0_2px_16px_rgba(0,0,0,0.95)] leading-relaxed">
             Rasakan kebersamaan dalam toleransi dan keindahan spiritual di tengah alam Minahasa yang sejuk dan berkabut.
           </p>
           
           {/* Floating Filter Bar */}
-          <div className="glass-panel rounded-24 p-2 inline-flex items-center mx-auto shadow-lg max-w-full overflow-x-auto hide-scrollbar">
-            <div className="flex items-center gap-2 px-2">
+          <div className="bg-slate-900/85 backdrop-blur-xl border border-white/35 rounded-full p-2 inline-flex items-center mx-auto shadow-[0_8px_32px_rgba(0,0,0,0.65)] max-w-full overflow-x-auto hide-scrollbar">
+            <div className="flex items-center gap-2 px-1">
               {filters.map((filter) => (
                 <button 
                   key={filter}
                   onClick={() => setActiveFilter(filter)}
-                  className={`px-6 py-2.5 font-body-md text-body-md rounded-xl transition-all duration-300 whitespace-nowrap cursor-pointer ${
+                  className={`px-6 py-2.5 font-body-md text-sm md:text-base rounded-full transition-all duration-300 whitespace-nowrap cursor-pointer ${
                     activeFilter === filter 
-                      ? 'text-primary dark:text-white font-semibold bg-white/30 dark:bg-white/10 shadow-sm' 
-                      : 'text-white/80 hover:text-white hover:bg-white/10'
+                      ? 'bg-white text-slate-950 font-bold shadow-md scale-[1.02]' 
+                      : 'text-white/90 font-semibold hover:text-white hover:bg-white/15'
                   }`}
                 >
                   {filter}
@@ -273,15 +273,15 @@ export default function Experiences() {
                       </button>
                     </div>
                     
-                    <div className="translate-y-4 group-hover:translate-y-0 transition-transform duration-500">
-                      <div className="flex items-center gap-2 mb-2 text-white/80 font-body-md text-sm">
+                    <div className="transition-transform duration-500">
+                      <div className="flex items-center gap-2 mb-2 text-white/90 font-body-md text-sm">
                         <span className="material-symbols-outlined text-[18px] text-accent-gold">location_on</span>
                         <span>{act.location}</span>
                       </div>
-                      <h3 className="text-xl md:text-2xl font-bold mb-2 leading-tight">
+                      <h3 className="text-xl md:text-2xl font-bold mb-2 leading-tight text-white">
                         {act.title}
                       </h3>
-                      <p className="font-body-md text-body-md text-white/80 line-clamp-2 max-w-xl mb-4 opacity-0 group-hover:opacity-100 transition-opacity duration-500 delay-100 text-xs md:text-sm">
+                      <p className="font-body-md text-white/90 line-clamp-2 max-w-xl mb-4 text-xs md:text-sm leading-relaxed">
                         {act.description}
                       </p>
                       <div className="flex items-center justify-between pt-2 border-t border-white/10">

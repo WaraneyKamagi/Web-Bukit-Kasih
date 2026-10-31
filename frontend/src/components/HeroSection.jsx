@@ -43,36 +43,37 @@ export default function HeroSection() {
 
   return (
     <section className="relative min-h-[85vh] md:min-h-[90vh] flex flex-col justify-center overflow-hidden pt-20">
-      {/* Background Image with Overlay */}
+      {/* Background Image with Dark Gradient Overlay */}
       <div className="absolute inset-0 z-0">
         <img
           alt="Pemandangan indah Bukit Kasih Kanonang"
           className="w-full h-full object-cover"
           src={heroBg}
         />
-        <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-primary-container/10 to-background"></div>
+        <div className="absolute inset-0 bg-gradient-to-b from-black/75 via-black/60 to-background"></div>
+        <div className="absolute inset-0 bg-radial from-black/40 via-transparent to-transparent"></div>
       </div>
 
       <div className="relative z-10 w-full max-w-container-max mx-auto px-margin-mobile md:px-margin-desktop flex flex-col items-center justify-center text-center mt-12 md:mt-20">
-        <span className="font-label-caps text-label-caps text-on-primary bg-primary/30 px-4 py-1.5 rounded-full mb-6 border border-white/20 backdrop-blur-sm tracking-wider uppercase animate-fade-up delay-100">
+        <span className="font-label-caps text-xs md:text-sm font-bold text-white bg-slate-900/80 px-5 py-2 rounded-full mb-6 border border-white/30 backdrop-blur-md tracking-widest uppercase shadow-lg animate-fade-up delay-100">
           Wisata Religi & Alam
         </span>
 
-        <h1 className="font-display-xl-mobile md:font-display-xl text-display-xl-mobile md:text-display-xl text-on-primary mb-6 max-w-4xl drop-shadow-lg leading-tight animate-fade-up delay-200">
+        <h1 className="text-4xl sm:text-5xl md:text-6xl font-extrabold text-white tracking-tight mb-6 max-w-4xl drop-shadow-[0_4px_24px_rgba(0,0,0,0.85)] leading-tight animate-fade-up delay-200">
           Menemukan Kedamaian di Bukit Kasih
         </h1>
 
-        <p className="font-body-lg text-body-lg text-white/90 max-w-2xl mb-12 drop-shadow animate-fade-up delay-250">
+        <p className="font-body-lg text-base sm:text-lg md:text-xl font-medium text-white/95 max-w-2xl mb-12 drop-shadow-[0_2px_12px_rgba(0,0,0,0.85)] leading-relaxed animate-fade-up delay-250">
           Destinasi harmoni kerukunan beragama dan pesona alam vulkanik legendaris di tanah Minahasa, Sulawesi Utara.
         </p>
 
         {/* Destination Tags */}
-        <div className="flex flex-wrap justify-center gap-3 mt-4 text-white/90 font-body-md text-body-md animate-fade-up delay-300">
+        <div className="flex flex-wrap justify-center gap-3.5 mt-4 text-white font-body-md text-sm md:text-base font-semibold animate-fade-up delay-300">
           {tags.map((tag) => (
             <span
               key={tag}
               onClick={() => handleTagClick(tag)}
-              className="px-4 py-2 rounded-full border border-white/20 glass-panel hover:bg-white/30 hover:-translate-y-1 hover:shadow-lg cursor-pointer transition-all duration-300"
+              className="px-5 py-2.5 rounded-full bg-slate-900/90 hover:bg-[#0F4C81] text-white border border-white/30 shadow-lg hover:-translate-y-1 hover:shadow-xl cursor-pointer transition-all duration-300"
             >
               {tag}
             </span>

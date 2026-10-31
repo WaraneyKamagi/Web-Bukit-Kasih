@@ -32,22 +32,22 @@ export default function Navigation() {
   ];
 
   const getLinkClass = (isActive) => {
-    const base = "font-body-md text-body-md transition-all duration-300 px-4 py-2 rounded-DEFAULT";
+    const base = "font-body-md text-sm md:text-base transition-all duration-300 px-4 py-2 rounded-DEFAULT";
     if (isActive) {
-      return `${base} text-primary border-b-2 border-primary pb-1 bg-white/20 dark:bg-white/5`;
+      return `${base} text-primary dark:text-secondary-fixed font-bold border-b-2 border-primary dark:border-secondary-fixed pb-1 bg-primary/10 dark:bg-white/10`;
     }
-    return `${base} text-on-surface-variant hover:text-primary dark:hover:text-secondary-fixed hover:bg-white/40 dark:hover:bg-white/5 hover:backdrop-blur-2xl`;
+    return `${base} text-slate-800 dark:text-slate-200 font-medium hover:text-primary dark:hover:text-secondary-fixed hover:bg-slate-200/60 dark:hover:bg-white/10 hover:backdrop-blur-2xl`;
   };
 
   return (
     <>
-      <nav className={`fixed top-0 w-full z-50 backdrop-blur-xl transition-all duration-500 ease-in-out ${
+      <nav className={`fixed top-0 w-full z-50 backdrop-blur-xl transition-all duration-500 ease-in-out border-b border-slate-200/60 dark:border-white/10 ${
         scrolled 
-          ? 'bg-white/90 dark:bg-black/80 shadow-[0_40px_40px_-10px_rgba(15,76,129,0.08)]' 
-          : 'bg-surface-glass dark:bg-black/30 shadow-[0_40px_40px_-10px_rgba(15,76,129,0.08)]'
+          ? 'bg-white/95 dark:bg-slate-900/90 shadow-[0_10px_30px_-10px_rgba(15,76,129,0.12)]' 
+          : 'bg-white/85 dark:bg-slate-900/75 shadow-[0_10px_30px_-10px_rgba(15,76,129,0.08)]'
       }`}>
         <div className="flex justify-between items-center h-20 px-margin-mobile md:px-margin-desktop max-w-container-max mx-auto">
-          <NavLink to="/" className="font-headline-md text-headline-md font-semibold tracking-tight text-primary dark:text-secondary-fixed-dim">
+          <NavLink to="/" className="font-headline-md text-lg md:text-xl font-extrabold tracking-tight text-primary dark:text-secondary-fixed">
             BUKIT KASIH
           </NavLink>
 

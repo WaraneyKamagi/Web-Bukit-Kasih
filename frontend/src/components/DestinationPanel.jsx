@@ -66,13 +66,17 @@ export default function DestinationPanel() {
         isActive ? 'active' : ''
       }`}
     >
-      <div className="flex flex-col md:flex-row justify-between items-end mb-16 gap-8">
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-16 gap-8">
         <div className="max-w-xl text-left">
-          <span className="font-label-caps text-label-caps text-primary dark:text-secondary-fixed tracking-widest uppercase mb-4 block">Landmark Utama</span>
-          <h2 className="font-headline-lg text-headline-lg text-on-surface">Jelajahi Setiap Sudut Keindahan</h2>
+          <span className="font-label-caps text-xs md:text-sm font-bold text-primary dark:text-secondary-fixed tracking-widest uppercase mb-3 block">
+            Landmark Utama
+          </span>
+          <h2 className="font-headline-lg text-2xl sm:text-3xl md:text-4xl font-extrabold text-slate-900 dark:text-white tracking-tight leading-tight">
+            Jelajahi Setiap Sudut Keindahan
+          </h2>
         </div>
         <div className="max-w-md text-left">
-          <p className="font-body-md text-body-md text-subtext dark:text-slate-400">
+          <p className="font-body-md text-sm md:text-base font-medium text-slate-700 dark:text-slate-300 leading-relaxed">
             Bukit Kasih menyimpan keindahan alam vulkanik yang dipadukan dengan nilai-nilai kerohanian dan budaya leluhur Minahasa yang tak lekang oleh waktu.
           </p>
         </div>
