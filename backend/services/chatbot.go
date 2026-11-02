@@ -44,7 +44,7 @@ type DocumentCitation struct {
 const BaseSystemPrompt = `Anda adalah "Kawan Kasih", asisten pemandu wisata digital resmi untuk portal pariwisata religi dan alam Bukit Kasih Kanonang di Minahasa, Sulawesi Utara.
 
 TUGAS UTAMA:
-Membantu wisatawan menjawab pertanyaan seputar objek wisata Bukit Kasih Kanonang secara ramah, ringkas, jelas, dan akurat berdasarkan DOKUMEN PENGETAHUAN RESMI yang disediakan oleh sistem pencarian semantik (RAG) di bawah ini.
+Membantu wisatawan menjawab pertanyaan seputar objek wisata Bukit Kasih Kanonang secara ramah, ringkas, jelas, dan akurat berdasarkan DOKUMEN PENGETAHUAN RESMI yang disediakan melalui mekanisme Context Injection di bawah ini.
 
 PANDUAN PERCAKAPAN & GAYA BAHASA (SANGAT PENTING):
 1. SAPAAN & PERKENALAN:
@@ -55,7 +55,7 @@ PANDUAN PERCAKAPAN & GAYA BAHASA (SANGAT PENTING):
    - Hindari jawaban yang terlalu panjang atau bertele-tele jika pertanyaan pengguna sederhana.
 3. KELUASAN & BAHASA:
    - Gunakan Bahasa Indonesia yang baik, sopan, dan bersahabat.
-   - JANGAN PERNAH menyebutkan istilah teknis internal seperti "berdasarkan database RAG", "data sistem", atau "sesuai instruksi". Bicaralah secara alami layaknya staf pemandu wisata sungguhan.
+   - JANGAN PERNAH menyebutkan istilah teknis internal seperti "berdasarkan database Context Injection", "data sistem", atau "sesuai instruksi". Bicaralah secara alami layaknya staf pemandu wisata sungguhan.
 4. REGULASI BATASAN (GUARDRAILS):
    - Anda HANYA melayani informasi seputar Bukit Kasih Kanonang.
    - Jika pengguna menanyakan hal yang sama sekali di luar topik Bukit Kasih (seperti politik, coding/pemrograman, resep masakan daerah lain, tempat wisata di kota lain, rumus matematika, dll), tolaklah dengan sangat sopan dan arahkan kembali:
@@ -63,7 +63,7 @@ PANDUAN PERCAKAPAN & GAYA BAHASA (SANGAT PENTING):
 
 
 func ProcessChat(userMsg string) (string, string, []DocumentCitation, error) {
-	// 1. Dynamic RAG Context Retrieval from Database
+	// 1. Dynamic Context Injection Retrieval from Database
 	retrievedDocs, contextStr := RetrieveRelevantContext(userMsg, 3)
 
 	var citations []DocumentCitation
@@ -77,7 +77,7 @@ func ProcessChat(userMsg string) (string, string, []DocumentCitation, error) {
 
 	dynamicSystemPrompt := BaseSystemPrompt
 	if contextStr != "" {
-		dynamicSystemPrompt += "\n\n=== DOKUMEN PENGETAHUAN TERKAIT (RAG DYNAMIC CONTEXT) ===\n" + contextStr + "\n==================================================="
+		dynamicSystemPrompt += "\n\n=== DOKUMEN PENGETAHUAN TERKAIT (DYNAMIC CONTEXT INJECTION) ===\n" + contextStr + "\n==================================================="
 	}
 
 	apiKey := config.AppConfig.GroqAPIKey
@@ -86,10 +86,10 @@ func ProcessChat(userMsg string) (string, string, []DocumentCitation, error) {
 		model = "llama-3.3-70b-versatile"
 	}
 
-	// If API Key is empty or placeholder, fallback to the simulator with RAG context
+	// If API Key is empty or placeholder, fallback to the simulator with Context Injection
 	if apiKey == "" || strings.Contains(apiKey, "YOUR_") || apiKey == "gsk_placeholder" {
 		responseMsg := runChatbotSimulator(userMsg, retrievedDocs)
-		return responseMsg, "simulated_rag", citations, nil
+		return responseMsg, "simulated_context_injection", citations, nil
 	}
 
 	// Prepare payload for Groq (OpenAI-compatible)
@@ -164,7 +164,7 @@ func ProcessChat(userMsg string) (string, string, []DocumentCitation, error) {
 }
 
 
-// runChatbotSimulator is a keyword & RAG matching fallback router that strictly follows our knowledge base constraints
+// runChatbotSimulator is a keyword & Context Injection matching fallback router that strictly follows our knowledge base constraints
 func runChatbotSimulator(message string, retrievedDocs []models.KnowledgeDocument) string {
 	msgLower := strings.TrimSpace(strings.ToLower(message))
 
@@ -185,7 +185,7 @@ func runChatbotSimulator(message string, retrievedDocs []models.KnowledgeDocumen
 		return "Halo! Saya Kawan Kasih. Ada yang bisa saya bantu terkait informasi wisata, rute pendakian 2.400 anak tangga, fasilitas, atau sejarah Bukit Kasih Kanonang?"
 	}
 
-	// If RAG documents are available, use the most relevant document's concise summary
+	// If Context Injection documents are available, use the most relevant document's concise summary
 	if len(retrievedDocs) > 0 {
 		topDoc := retrievedDocs[0]
 		// If query has strong relevance to top doc
@@ -205,8 +205,9 @@ func runChatbotSimulator(message string, retrievedDocs []models.KnowledgeDocumen
 	// 3. Tiket & Biaya Masuk
 	if strings.Contains(msgLower, "tiket") || strings.Contains(msgLower, "harga") ||
 		strings.Contains(msgLower, "biaya") || strings.Contains(msgLower, "tarif") ||
-		strings.Contains(msgLower, "bayar") || strings.Contains(msgLower, "karcis") {
-		return "Harga tiket masuk simulasi kawasan wisata religi Bukit Kasih Kanonang adalah Rp 10.000 per orang. Pembelian tiket dilakukan di pintu masuk Gerbang Utama."
+		strings.Contains(msgLower, "bayar") || strings.Contains(msgLower, "karcis") ||
+		strings.Contains(msgLower, "parkir") {
+		return "Harga tiket masuk kawasan wisata religi Bukit Kasih Kanonang adalah Rp 5.000 per orang (belum termasuk biaya parkir motor Rp 3.000 dan mobil Rp 5.000). Pembelian tiket dilakukan di loket pintu masuk Gerbang Utama."
 	}
 
 	// 4. Terapi Air Panas & Belerang
@@ -279,7 +280,7 @@ func runChatbotSimulator(message string, retrievedDocs []models.KnowledgeDocumen
 	if strings.Contains(msgLower, "jam") || strings.Contains(msgLower, "buka") ||
 		strings.Contains(msgLower, "operasional") || strings.Contains(msgLower, "tutup") ||
 		strings.Contains(msgLower, "waktu terbaik") || strings.Contains(msgLower, "kapan baiknya") {
-		return "Kawasan Bukit Kasih buka setiap hari 24 jam. Waktu berkunjung terbaik disarankan pada pagi hari (06:00 - 09:00) atau sore hari (15:00 - 17:30) agar cuaca sejuk dan tidak terlalu terik saat menaiki anak tangga."
+		return "Jam operasional resmi kawasan Bukit Kasih buka setiap hari pukul 08:00 - 18:00 WITA. Waktu berkunjung terbaik disarankan pada pagi hari (08:00 - 10:00 WITA) atau sore hari (15:00 - 17:30 WITA) agar cuaca sejuk dan tidak terlalu terik saat menaiki anak tangga."
 	}
 
 	// Default Constraint Response (Out of Context)

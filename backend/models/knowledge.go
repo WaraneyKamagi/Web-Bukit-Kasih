@@ -6,7 +6,7 @@ import (
 	"gorm.io/gorm"
 )
 
-// KnowledgeDocument represents a chunk or article in the RAG knowledge base
+// KnowledgeDocument represents a document or article in the Context Injection knowledge base
 type KnowledgeDocument struct {
 	ID        uint           `gorm:"primarykey" json:"id"`
 	CreatedAt time.Time      `json:"createdAt"`

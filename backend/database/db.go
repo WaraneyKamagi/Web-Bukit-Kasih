@@ -189,8 +189,8 @@ func seedKnowledgeDocuments() {
 			{
 				Title:    "Informasi Lokasi, Tiket Masuk, dan Jam Operasional Bukit Kasih",
 				Category: "destinasi",
-				Content:  "Bukit Kasih terletak di Desa Kanonang, Kecamatan Kawangkoan, Kabupaten Minahasa, Provinsi Sulawesi Utara (sekitar 55 km ke arah selatan dari Kota Manado atau 15 menit dari pusat Kota Kawangkoan). Tiket masuk adalah Rp 10.000 per orang yang dapat dibeli di loket pintu gerbang utama. Objek wisata ini buka setiap hari selama 24 jam penuh. Waktu kunjungan terbaik adalah pagi hari pukul 06:00 - 09:00 atau sore hari pukul 15:00 - 17:30 agar cuaca sejuk dan pemandangan kawah belerang serta pegunungan terlihat jelas.",
-				Keywords: "lokasi tiket harga masuk karcis jam buka operasional alamat desa kanonang kawangkoan minahasa manado rute jam berapa",
+				Content:  "Bukit Kasih terletak di Desa Kanonang, Kecamatan Kawangkoan, Kabupaten Minahasa, Provinsi Sulawesi Utara (sekitar 55 km ke arah selatan dari Kota Manado atau 15 menit dari pusat Kota Kawangkoan). Tiket masuk adalah Rp 5.000 per orang (belum termasuk biaya parkir motor Rp 3.000 dan mobil Rp 5.000) yang dapat dibeli di loket pintu gerbang utama. Jam operasional resmi objek wisata ini buka setiap hari pukul 08:00 - 18:00 WITA. Waktu kunjungan terbaik adalah pagi hari pukul 08:00 - 10:00 WITA atau sore hari pukul 15:00 - 17:30 WITA agar cuaca sejuk dan pemandangan kawah belerang serta pegunungan terlihat jelas.",
+				Keywords: "lokasi tiket harga masuk karcis parkir jam buka operasional alamat desa kanonang kawangkoan minahasa manado rute jam berapa",
 			},
 			{
 				Title:    "Panduan Jalur Pendakian 2.400 Anak Tangga (Tangga Seribu)",
@@ -251,6 +251,18 @@ func seedKnowledgeDocuments() {
 		for _, doc := range docs {
 			DB.Create(&doc)
 		}
-		log.Println("Seeded initial RAG knowledge documents (10 articles) successfully.")
+		log.Println("Seeded initial Context Injection knowledge documents (10 articles) successfully.")
+	} else {
+		// Ensure existing database rows are synchronized with official ticket price (Rp 5.000) and operating hours (08:00 - 18:00 WITA)
+		updatedContent := "Bukit Kasih terletak di Desa Kanonang, Kecamatan Kawangkoan, Kabupaten Minahasa, Provinsi Sulawesi Utara (sekitar 55 km ke arah selatan dari Kota Manado atau 15 menit dari pusat Kota Kawangkoan). Tiket masuk adalah Rp 5.000 per orang (belum termasuk biaya parkir motor Rp 3.000 dan mobil Rp 5.000) yang dapat dibeli di loket pintu gerbang utama. Jam operasional resmi objek wisata ini buka setiap hari pukul 08:00 - 18:00 WITA. Waktu kunjungan terbaik adalah pagi hari pukul 08:00 - 10:00 WITA atau sore hari pukul 15:00 - 17:30 WITA agar cuaca sejuk dan pemandangan kawah belerang serta pegunungan terlihat jelas."
+		res := DB.Model(&models.KnowledgeDocument{}).
+			Where("title = ? AND content LIKE ?", "Informasi Lokasi, Tiket Masuk, dan Jam Operasional Bukit Kasih", "%Rp 10.000%").
+			Updates(map[string]interface{}{
+				"content":   updatedContent,
+				"embedding": "",
+			})
+		if res.RowsAffected > 0 {
+			log.Println("Synchronized ticket price (Rp 5.000) & operating hours (08:00 - 18:00 WITA) in existing knowledge_documents.")
+		}
 	}
 }

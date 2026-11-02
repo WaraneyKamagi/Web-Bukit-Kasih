@@ -49,13 +49,10 @@ export default function ReviewModerationTab({ handleSendToTelegram, showToast })
                   <div className="flex items-center gap-3 flex-wrap">
                     <span className="font-bold text-on-surface text-sm">{rev.author}</span>
                     <span className="text-xs text-subtext">{rev.date}</span>
-                    <span className="flex text-accent-gold text-sm items-center font-bold">
-                      <span
-                        className="material-symbols-outlined text-[16px] mr-0.5"
-                        style={{ fontVariationSettings: "'FILL' 1" }}
-                      >
-                        star
-                      </span>
+                    <span className="flex text-[#FEBB02] text-sm items-center font-bold gap-0.5">
+                      <svg className="w-4 h-4 fill-[#FEBB02] text-[#FEBB02]" viewBox="0 0 24 24">
+                        <path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" />
+                      </svg>
                       {rev.rating}
                     </span>
                     {/* Badge Status Moderasi */}

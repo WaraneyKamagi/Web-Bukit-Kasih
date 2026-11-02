@@ -237,7 +237,7 @@ export default function Experiences() {
             </div>
           ) : filteredActivities.length > 0 ? (
             filteredActivities.map((act) => {
-              const isBookmarked = bookmarkedIds.includes(act.id);
+              const isBookmarked = bookmarkedIds.some((bId) => String(bId) === String(act.id));
               // Handle layout span based on item index or custom settings
               const spanClass = act.gridSpan || (filteredActivities.length === 1 ? 'md:col-span-12' : 'md:col-span-6');
               
@@ -261,15 +261,25 @@ export default function Experiences() {
                         {act.meta}
                       </span>
                       <button 
+                        type="button"
                         onClick={(e) => handleToggleBookmark(act.id, act.title, e)}
-                        className="w-10 h-10 rounded-full glass-panel flex items-center justify-center hover:bg-white/90 dark:hover:bg-white/20 transition-all cursor-pointer group/btn active:scale-95 shadow-sm"
+                        className={`w-10 h-10 rounded-full flex items-center justify-center transition-all cursor-pointer group/btn active:scale-95 shadow-md ${
+                          isBookmarked
+                            ? 'bg-slate-900/85 border border-[#FEBB02]/70 text-[#FEBB02]'
+                            : 'glass-panel text-white hover:bg-white/90 dark:hover:bg-white/20 hover:text-[#FEBB02]'
+                        }`}
                         aria-label="Bookmark"
+                        title={isBookmarked ? 'Tersimpan di Rencana Perjalanan' : 'Simpan ke Rencana Perjalanan'}
                       >
-                        <span className={`material-symbols-outlined text-white transition-colors ${
-                          isBookmarked ? 'text-accent-gold fill-1' : 'group-hover/btn:text-accent-gold'
-                        }`} style={{ fontVariationSettings: isBookmarked ? "'FILL' 1" : "'FILL' 0" }}>
-                          {isBookmarked ? 'bookmark' : 'bookmark_border'}
-                        </span>
+                        {isBookmarked ? (
+                          <svg className="w-5 h-5 fill-[#FEBB02] text-[#FEBB02] drop-shadow-[0_0_6px_rgba(254,187,2,0.5)] transition-transform duration-200 scale-110" viewBox="0 0 24 24">
+                            <path d="M17 3H7c-1.1 0-1.99.9-1.99 2L5 21l7-3 7 3V5c0-1.1-.9-2-2-2z" />
+                          </svg>
+                        ) : (
+                          <svg className="w-5 h-5 fill-current transition-colors duration-200 group-hover/btn:text-[#FEBB02]" viewBox="0 0 24 24">
+                            <path d="M17 3H7c-1.1 0-1.99.9-1.99 2L5 21l7-3 7 3V5c0-1.1-.9-2-2-2zm0 15l-5-2.18L7 18V5h10v13z" />
+                          </svg>
+                        )}
                       </button>
                     </div>
                     
@@ -455,9 +465,23 @@ export default function Experiences() {
                           <span className="font-bold text-on-surface">{rev.author}</span>
                           <span className="text-subtext text-[10px]">{rev.date}</span>
                         </div>
-                        <div className="flex text-accent-gold text-[12px] gap-0.5">
+                        <div className="flex items-center gap-0.5">
                           {Array.from({ length: 5 }).map((_, i) => (
-                            <span key={i} className="material-symbols-outlined text-[14px]" style={{ fontVariationSettings: i < rev.rating ? "'FILL' 1" : "'FILL' 0" }}>star</span>
+                            <svg
+                              key={i}
+                              className={`w-3.5 h-3.5 ${
+                                i < rev.rating
+                                  ? 'fill-[#FEBB02] text-[#FEBB02]'
+                                  : 'fill-current text-slate-300 dark:text-slate-600'
+                              }`}
+                              viewBox="0 0 24 24"
+                            >
+                              {i < rev.rating ? (
+                                <path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" />
+                              ) : (
+                                <path d="M22 9.24l-7.19-.62L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21 12 17.27 18.18 21l-1.63-7.03L22 9.24zM12 15.4l-3.76 2.27 1-4.28-3.32-2.88 4.38-.38L12 6.1l1.71 4.04 4.38.38-3.32 2.88 1 4.28L12 15.4z" />
+                              )}
+                            </svg>
                           ))}
                         </div>
                         <p className="text-on-surface-variant dark:text-slate-350 text-xs leading-relaxed">
@@ -477,17 +501,37 @@ export default function Experiences() {
                       <h5 className="text-xs font-bold text-on-surface">Tulis Ulasan Anda:</h5>
                       <div className="flex items-center gap-2">
                         <span className="text-xs text-subtext">Rating:</span>
-                        <div className="flex text-accent-gold cursor-pointer select-none">
-                          {[1, 2, 3, 4, 5].map((star) => (
-                            <span 
-                              key={star} 
-                              onClick={() => setRatingInput(star)}
-                              className="material-symbols-outlined text-[18px] hover:scale-110 transition-transform"
-                              style={{ fontVariationSettings: star <= ratingInput ? "'FILL' 1" : "'FILL' 0" }}
-                            >
-                              star
-                            </span>
-                          ))}
+                        <div className="flex items-center gap-1 select-none">
+                          {[1, 2, 3, 4, 5].map((star) => {
+                            const isSelected = star <= ratingInput;
+                            return (
+                              <button
+                                key={star}
+                                type="button"
+                                onClick={() => setRatingInput(star)}
+                                className="p-0.5 cursor-pointer hover:scale-125 active:scale-95 transition-transform focus:outline-none"
+                                aria-label={`Beri rating ${star} bintang`}
+                              >
+                                <svg
+                                  className={`w-5 h-5 transition-colors duration-150 ${
+                                    isSelected
+                                      ? 'fill-[#FEBB02] text-[#FEBB02] drop-shadow-[0_0_4px_rgba(254,187,2,0.45)]'
+                                      : 'fill-current text-slate-300 dark:text-slate-600 hover:text-[#FEBB02]/70'
+                                  }`}
+                                  viewBox="0 0 24 24"
+                                >
+                                  {isSelected ? (
+                                    <path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" />
+                                  ) : (
+                                    <path d="M22 9.24l-7.19-.62L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21 12 17.27 18.18 21l-1.63-7.03L22 9.24zM12 15.4l-3.76 2.27 1-4.28-3.32-2.88 4.38-.38L12 6.1l1.71 4.04 4.38.38-3.32 2.88 1 4.28L12 15.4z" />
+                                  )}
+                                </svg>
+                              </button>
+                            );
+                          })}
+                          <span className="ml-1 text-xs font-bold text-[#d99b00] dark:text-[#FEBB02]">
+                            ({ratingInput}/5)
+                          </span>
                         </div>
                       </div>
                       <div className="flex gap-2">

@@ -35,7 +35,7 @@ func GetKnowledgeDocumentByID(c *gin.Context) {
 	c.JSON(http.StatusOK, doc)
 }
 
-// CreateKnowledgeDocument allows Admin to add new articles to the RAG knowledge base
+// CreateKnowledgeDocument allows Admin to add new articles to the Context Injection knowledge base
 func CreateKnowledgeDocument(c *gin.Context) {
 	var input struct {
 		Title    string `json:"title" binding:"required"`
@@ -61,7 +61,7 @@ func CreateKnowledgeDocument(c *gin.Context) {
 	c.JSON(http.StatusCreated, doc)
 }
 
-// UpdateKnowledgeDocument allows Admin to update an existing article in the RAG knowledge base
+// UpdateKnowledgeDocument allows Admin to update an existing article in the Context Injection knowledge base
 func UpdateKnowledgeDocument(c *gin.Context) {
 	id := c.Param("id")
 
@@ -90,7 +90,7 @@ func UpdateKnowledgeDocument(c *gin.Context) {
 	c.JSON(http.StatusOK, doc)
 }
 
-// DeleteKnowledgeDocument allows Admin to delete an article from the RAG knowledge base
+// DeleteKnowledgeDocument allows Admin to delete an article from the Context Injection knowledge base
 func DeleteKnowledgeDocument(c *gin.Context) {
 	id := c.Param("id")
 

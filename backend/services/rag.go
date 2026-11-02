@@ -42,7 +42,7 @@ func TokenizeQuery(query string) []string {
 	return tokens
 }
 
-// RetrieveRelevantContext performs RAG semantic retrieval from database documents
+// RetrieveRelevantContext performs dynamic Context Injection retrieval from database documents
 func RetrieveRelevantContext(query string, topK int) ([]models.KnowledgeDocument, string) {
 	if topK <= 0 {
 		topK = 3

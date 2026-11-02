@@ -14,7 +14,7 @@ type ChatRequest struct {
 	Message string `json:"message" binding:"required"`
 }
 
-// Chatbot handles requests from logged-in tourists for information about Bukit Kasih using RAG
+// Chatbot handles requests from logged-in tourists for information about Bukit Kasih using Context Injection
 func Chatbot(c *gin.Context) {
 	// Verify user role
 	role, exists := c.Get("userRole")

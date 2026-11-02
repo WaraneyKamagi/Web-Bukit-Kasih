@@ -82,8 +82,8 @@ export default function KnowledgeBaseTab({ showToast }) {
     <div className="glass-panel-light dark:glass-panel rounded-24 p-6 border border-outline-variant/20">
       <div className="flex justify-between items-center mb-6">
         <div>
-          <h3 className="text-lg font-bold text-on-surface mb-1">Kelola Basis Pengetahuan (RAG)</h3>
-          <p className="text-xs text-subtext">Sumber Pengetahuan untuk Chatbot.</p>
+          <h3 className="text-lg font-bold text-on-surface mb-1">Kelola Basis Pengetahuan (Context Injection)</h3>
+          <p className="text-xs text-subtext">Sumber Pengetahuan Kontekstual untuk Chatbot Kawan Kasih.</p>
         </div>
         {!showKnowledgeForm && (
           <button

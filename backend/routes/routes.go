@@ -76,11 +76,11 @@ func SetupRouter() *gin.Engine {
 		api.POST("/inquiries", inquiryLimiter, handlers.CreateInquiry)
 		api.PUT("/inquiries/:id/reply", middleware.AuthMiddleware(), middleware.AdminOnly(), handlers.ReplyInquiry)
 
-		// Chatbot route (RAG-enhanced with rate limiter to protect Groq AI quota: 20 req/min)
+		// Chatbot route (Context Injection enhanced with rate limiter to protect Groq AI quota: 20 req/min)
 		chatLimiter := middleware.RateLimiter(20, 1*time.Minute)
 		api.POST("/chat", chatLimiter, middleware.AuthMiddleware(), handlers.Chatbot)
 
-		// RAG Knowledge Base routes
+		// Context Injection Knowledge Base routes
 		api.GET("/knowledge", handlers.GetAllKnowledgeDocuments)
 		api.GET("/knowledge/:id", handlers.GetKnowledgeDocumentByID)
 		api.POST("/knowledge", middleware.AuthMiddleware(), middleware.AdminOnly(), handlers.CreateKnowledgeDocument)

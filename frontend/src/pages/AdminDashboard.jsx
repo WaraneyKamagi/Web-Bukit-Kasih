@@ -273,7 +273,7 @@ export default function AdminDashboard() {
             <AnnouncementTab handleSendToTelegram={handleSendToTelegram} showToast={showToast} />
           )}
 
-          {/* TAB 3.5: KNOWLEDGE BASE (RAG) */}
+          {/* TAB 3.5: KNOWLEDGE BASE (CONTEXT INJECTION) */}
           {activeTab === 'knowledge' && <KnowledgeBaseTab showToast={showToast} />}
 
           {/* TAB 4: MODERATE REVIEWS */}
