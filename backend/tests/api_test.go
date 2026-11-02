@@ -75,8 +75,8 @@ func setupTestEnvironment(t *testing.T) *gin.Engine {
 	db.Create(&models.KnowledgeDocument{
 		Title:    "Informasi Tiket dan Jam Masuk Bukit Kasih",
 		Category: "destinasi",
-		Content:  "Harga tiket masuk Rp 10.000 per orang di gerbang utama, buka 24 jam setiap hari.",
-		Keywords: "tiket harga biaya masuk jam buka",
+		Content:  "Harga tiket masuk Rp 5.000 per orang di gerbang utama (parkir motor Rp 3.000, mobil Rp 5.000), buka setiap hari pukul 08:00 - 18:00 WITA.",
+		Keywords: "tiket harga biaya masuk parkir jam buka operasional",
 	})
 	db.Create(&models.KnowledgeDocument{
 		Title:    "Jalur Pendakian 2.400 Anak Tangga",

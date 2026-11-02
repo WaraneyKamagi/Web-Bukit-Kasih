@@ -128,9 +128,9 @@ func seedDestinations() {
 			{
 				Title:             "Salib Kasih",
 				ImageURL:          "/src/assets/salib.png",
-				AltText:           "Monumen Salib putih setinggi 22 meter di puncak bukit",
+				AltText:           "Monumen Salib putih setinggi 53 meter di puncak bukit",
 				DetailsTitle:      "Monumen Salib Kasih Raksasa",
-				DetailsText:       "Sebuah monumen salib putih megah setinggi 22 meter yang berdiri kokoh menghadap langsung ke arah lembah Minahasa. Monumen ini melambangkan cinta kasih universal dan perdamaian abadi. Dari ketinggian ini, pengunjung dapat menikmati panorama alam pegunungan Minahasa yang sejuk dan berselimut kabut.",
+				DetailsText:       "Sebuah monumen salib putih megah setinggi 53 meter yang berdiri kokoh menghadap langsung ke arah lembah Minahasa. Monumen ini melambangkan cinta kasih universal dan perdamaian abadi. Dari ketinggian ini, pengunjung dapat menikmati panorama alam pegunungan Minahasa yang sejuk dan berselimut kabut.",
 				DetailsTips:       "Tempat yang sangat indah untuk menikmati pemandangan matahari terbenam. Siapkan kamera Anda untuk sudut foto lanskap yang dramatis.",
 				DetailsHours:      "Buka Setiap Hari (08:00 - 18:00 WITA)",
 				DetailsDifficulty: "Sedang-Tinggi (~1.200 anak tangga)",
@@ -160,5 +160,16 @@ func seedDestinations() {
 			DB.Create(&d)
 		}
 		log.Println("Seeded initial destinations successfully.")
+	} else {
+		// Synchronize Salib Kasih height (53 meter) in existing database rows if still set to 22 meter
+		res := DB.Model(&models.Destination{}).
+			Where("title = ? AND details_text LIKE ?", "Salib Kasih", "%22 meter%").
+			Updates(map[string]interface{}{
+				"alt_text":     "Monumen Salib putih setinggi 53 meter di puncak bukit",
+				"details_text": "Sebuah monumen salib putih megah setinggi 53 meter yang berdiri kokoh menghadap langsung ke arah lembah Minahasa. Monumen ini melambangkan cinta kasih universal dan perdamaian abadi. Dari ketinggian ini, pengunjung dapat menikmati panorama alam pegunungan Minahasa yang sejuk dan berselimut kabut.",
+			})
+		if res.RowsAffected > 0 {
+			log.Println("Synchronized Salib Kasih height (53 meter) in existing destinations table.")
+		}
 	}
 }

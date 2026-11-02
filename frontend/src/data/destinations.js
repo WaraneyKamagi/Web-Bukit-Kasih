@@ -19,10 +19,10 @@ export const destinations = [
   {
     title: 'Salib Kasih',
     image: salibImg,
-    altText: 'Monumen Salib putih setinggi 22 meter di puncak bukit',
+    altText: 'Monumen Salib putih setinggi 53 meter di puncak bukit',
     details: {
       title: 'Monumen Salib Kasih Raksasa',
-      text: 'Sebuah monumen salib putih megah setinggi 22 meter yang berdiri kokoh menghadap langsung ke arah lembah Minahasa. Monumen ini melambangkan cinta kasih universal dan perdamaian abadi. Dari ketinggian ini, pengunjung dapat menikmati panorama alam pegunungan Minahasa yang sejuk dan berselimut kabut.',
+      text: 'Sebuah monumen salib putih megah setinggi 53 meter yang berdiri kokoh menghadap langsung ke arah lembah Minahasa. Monumen ini melambangkan cinta kasih universal dan perdamaian abadi. Dari ketinggian ini, pengunjung dapat menikmati panorama alam pegunungan Minahasa yang sejuk dan berselimut kabut.',
       tips: 'Tempat yang sangat indah untuk menikmati pemandangan matahari terbenam. Siapkan kamera Anda untuk sudut foto lanskap yang dramatis.',
       hours: 'Buka Setiap Hari (08:00 - 18:00 WITA)',
       difficulty: 'Sedang-Tinggi (~1.200 anak tangga)'

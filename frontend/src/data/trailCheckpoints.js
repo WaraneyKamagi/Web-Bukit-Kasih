@@ -38,7 +38,7 @@ export const trailCheckpoints = [
   {
     title: 'Monumen Salib Kasih',
     subtitle: 'Puncak Bukit Pertama',
-    description: 'Sebuah monumen salib putih megah setinggi 22 meter yang berdiri kokoh di puncak bukit pertama. Lokasi ini menawarkan pemandangan panorama lembah Kanonang dan pegunungan Minahasa yang spektakuler.',
+    description: 'Sebuah monumen salib putih megah setinggi 53 meter yang berdiri kokoh di puncak bukit pertama. Lokasi ini menawarkan pemandangan panorama lembah Kanonang dan pegunungan Minahasa yang spektakuler.',
     image: salibImg,
     duration: '45 Menit (Anak Tangga Ke-1.200)',
     difficulty: 'Cukup Berat',
